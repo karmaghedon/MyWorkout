@@ -1,0 +1,33 @@
+# Xcode
+.DS_Store
+DerivedData/
+build/
+*.xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# User-specific
+*.mode1v3
+*.mode2v3
+*.pbxuser
+*.perspectivev3
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Secrets
+*.env
