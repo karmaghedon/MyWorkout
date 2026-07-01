@@ -11,75 +11,119 @@ struct TemplateEditorView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            TextField("Template name", text: $editableTemplate.name)
-                .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
+        Form {
+            Section {
+                TextField("Template name", text: $editableTemplate.name)
+                    .font(AppTheme.Typography.label)
+            }
 
-            List {
+            Section {
                 ForEach(Array(editableTemplate.exercises.enumerated()), id: \.element.id) { index, exercise in
                     HStack {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(exercise.name)
                                 .font(.headline)
 
                             Text("\(exercise.muscleGroup) • \(exercise.equipment)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
 
+                        #if os(macOS)
                         Spacer()
 
-                        Button("↑") {
-                            moveUp(index)
-                        }
-                        .disabled(index == 0)
+                        VStack(spacing: 4) {
+                            Button {
+                                moveExercise(at: index, offset: -1)
+                            } label: {
+                                Image(systemName: "chevron.up")
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(index == 0)
 
-                        Button("↓") {
-                            moveDown(index)
+                            Button {
+                                moveExercise(at: index, offset: 1)
+                            } label: {
+                                Image(systemName: "chevron.down")
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(index == editableTemplate.exercises.count - 1)
                         }
-                        .disabled(index == editableTemplate.exercises.count - 1)
 
-                        Button("Delete") {
-                            deleteExercise(index)
+                        Button(role: .destructive) {
+                            deleteExercise(at: index)
+                        } label: {
+                            Image(systemName: "trash")
                         }
+                        .buttonStyle(.borderless)
+                        #endif
                     }
                 }
+                #if os(iOS)
+                .onMove(perform: moveExercises)
+                .onDelete(perform: deleteExercises)
+                #endif
+            } header: {
+                Text("Exercises")
+            } footer: {
+                #if os(iOS)
+                Text("Tap Edit to reorder or remove exercises.")
+                #else
+                Text("Use the arrows to reorder, or the trash icon to remove an exercise.")
+                #endif
             }
 
-            HStack {
-                Button("Save Changes") {
-                    templateStore.update(editableTemplate)
-                    dismiss()
-                }
-
-                Button("Duplicate") {
+            Section {
+                Button {
                     templateStore.duplicate(editableTemplate)
                     dismiss()
+                } label: {
+                    Label("Duplicate Template", systemImage: "doc.on.doc")
                 }
-
-                Spacer()
-
+            }
+        }
+        .navigationTitle("Edit Template")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {
                     dismiss()
                 }
             }
-            .padding()
+
+            ToolbarItem(placement: .primaryAction) {
+                Button("Save") {
+                    templateStore.update(editableTemplate)
+                    dismiss()
+                }
+                .fontWeight(.semibold)
+                .disabled(editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+
+            #if os(iOS)
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+            }
+            #endif
         }
-        .navigationTitle("Edit Template")
     }
 
-    private func moveUp(_ index: Int) {
-        guard index > 0 else { return }
-        editableTemplate.exercises.swapAt(index, index - 1)
+    private func moveExercises(from source: IndexSet, to destination: Int) {
+        editableTemplate.exercises.move(fromOffsets: source, toOffset: destination)
     }
 
-    private func moveDown(_ index: Int) {
-        guard index < editableTemplate.exercises.count - 1 else { return }
-        editableTemplate.exercises.swapAt(index, index + 1)
+    private func deleteExercises(at offsets: IndexSet) {
+        editableTemplate.exercises.remove(atOffsets: offsets)
     }
 
-    private func deleteExercise(_ index: Int) {
+    #if os(macOS)
+    private func moveExercise(at index: Int, offset: Int) {
+        let destination = index + offset
+        guard editableTemplate.exercises.indices.contains(destination) else { return }
+        editableTemplate.exercises.swapAt(index, destination)
+    }
+
+    private func deleteExercise(at index: Int) {
         editableTemplate.exercises.remove(at: index)
     }
+    #endif
 }

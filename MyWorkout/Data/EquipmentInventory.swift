@@ -30,13 +30,13 @@ struct EquipmentInventory: Codable {
     )
 }
 
-struct PlateInventory: Identifiable, Codable {
+struct PlateInventory: Identifiable, Codable, Equatable {
     var id = UUID()
     var weight: Double
     var quantity: Int
 }
 
-struct DumbbellInventory: Identifiable, Codable {
+struct DumbbellInventory: Identifiable, Codable, Equatable {
     var id = UUID()
     var weight: Double
     var quantity: Int

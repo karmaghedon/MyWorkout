@@ -9,124 +9,195 @@ struct EquipmentInventoryView: View {
     @State private var newDumbbellQuantity = ""
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                barbellSection
-                platesSection
-                dumbbellsSection
+        Form {
+            Section {
+                barbellRow
+            } header: {
+                Text("Barbell")
             }
-            .padding()
+
+            Section {
+                ForEach(equipmentStore.inventory.plates) { plate in
+                    weightRow(
+                        weight: bindingForPlateWeight(id: plate.id),
+                        quantity: bindingForPlateQuantity(id: plate.id)
+                    )
+                }
+                .onDelete(perform: deletePlates)
+
+                addRow(
+                    weightText: $newPlateWeight,
+                    quantityText: $newPlateQuantity,
+                    placeholder: "New plate weight",
+                    accessibilityLabel: "Add plate",
+                    action: addPlate
+                )
+            } header: {
+                Text("Plates (per plate, not per pair)")
+            }
+
+            Section {
+                ForEach(equipmentStore.inventory.dumbbells) { dumbbell in
+                    weightRow(
+                        weight: bindingForDumbbellWeight(id: dumbbell.id),
+                        quantity: bindingForDumbbellQuantity(id: dumbbell.id)
+                    )
+                }
+                .onDelete(perform: deleteDumbbells)
+
+                addRow(
+                    weightText: $newDumbbellWeight,
+                    quantityText: $newDumbbellQuantity,
+                    placeholder: "New dumbbell weight",
+                    accessibilityLabel: "Add dumbbell",
+                    action: addDumbbell
+                )
+            } header: {
+                Text("Dumbbells")
+            }
         }
         .navigationTitle("Equipment Inventory")
+        // NOTE: Using the single-parameter onChange (macOS 11+/iOS 14+) instead of
+        // the newer two-parameter { old, new in ... } form, which requires macOS 14+.
+        // None of these handlers need the old/new values — they just trigger a save.
+        .onChange(of: equipmentStore.inventory.barbellWeight) { _ in
+            equipmentStore.save()
+        }
+        .onChange(of: equipmentStore.inventory.plates) { _ in
+            equipmentStore.save()
+        }
+        .onChange(of: equipmentStore.inventory.dumbbells) { _ in
+            equipmentStore.save()
+        }
     }
 
-    private var barbellSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Barbell")
-                .font(.title3)
-                .bold()
+    // MARK: - Rows
 
-            HStack {
-                Text("Barbell weight")
-                    .frame(width: 140, alignment: .leading)
+    private var barbellRow: some View {
+        HStack {
+            Text("Barbell weight")
 
-                TextField("45", value: $equipmentStore.inventory.barbellWeight, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 100)
+            Spacer()
 
-                Text("lb")
+            TextField("45", value: $equipmentStore.inventory.barbellWeight, format: .number)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+                .multilineTextAlignment(.trailing)
+                .frame(width: 60)
 
-                Button("Save") {
-                    equipmentStore.save()
-                }
+            Text("lb")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    /// A single existing plate/dumbbell entry. Changes save automatically
+    /// via onChange on the parent — no per-row Save button needed.
+    private func weightRow(weight: Binding<Double>, quantity: Binding<Int>) -> some View {
+        HStack {
+            TextField("Weight", value: weight, format: .number)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+                .frame(minWidth: 44, maxWidth: 70)
+
+            Text("lb")
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(.secondary)
+
+            Spacer(minLength: AppTheme.Spacing.sm)
+
+            Stepper(value: quantity, in: 0...20) {
+                Text("Qty: \(quantity.wrappedValue)")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }
 
-    private var platesSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Plates")
-                .font(.title3)
-                .bold()
+    private func addRow(
+        weightText: Binding<String>,
+        quantityText: Binding<String>,
+        placeholder: String,
+        accessibilityLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack {
+            TextField(placeholder, text: weightText)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
 
-            ForEach($equipmentStore.inventory.plates) { $plate in
-                HStack {
-                    TextField("Weight", value: $plate.weight, format: .number)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 90)
+            TextField("Qty", text: quantityText)
+                #if os(iOS)
+                .keyboardType(.numberPad)
+                #endif
+                .frame(width: 50)
 
-                    Text("lb")
-
-                    Stepper("Qty: \(plate.quantity)", value: $plate.quantity, in: 0...20)
-                        .frame(width: 140)
-
-                    Button("Save") {
-                        equipmentStore.save()
-                    }
-
-                    Button("Delete") {
-                        deletePlate(id: plate.id)
-                    }
-                }
+            Button(action: action) {
+                Image(systemName: "plus.circle.fill")
+                    .foregroundStyle(AppTheme.accent)
             }
-
-            HStack {
-                TextField("New plate weight", text: $newPlateWeight)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 150)
-
-                TextField("Qty", text: $newPlateQuantity)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 70)
-
-                Button("Add Plate") {
-                    addPlate()
-                }
-            }
+            .buttonStyle(.plain)
+            .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
+            .accessibilityLabel(accessibilityLabel)
         }
     }
 
-    private var dumbbellsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Dumbbells")
-                .font(.title3)
-                .bold()
+    // MARK: - Bindings
+    //
+    // Building fresh Bindings by ID (instead of $equipmentStore.inventory.plates[index])
+    // keeps rows stable across inserts/deletes without index math scattered in the view.
 
-            ForEach($equipmentStore.inventory.dumbbells) { $dumbbell in
-                HStack {
-                    TextField("Weight", value: $dumbbell.weight, format: .number)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 90)
-
-                    Text("lb")
-
-                    Stepper("Qty: \(dumbbell.quantity)", value: $dumbbell.quantity, in: 0...20)
-                        .frame(width: 140)
-
-                    Button("Save") {
-                        equipmentStore.save()
-                    }
-
-                    Button("Delete") {
-                        deleteDumbbell(id: dumbbell.id)
-                    }
+    private func bindingForPlateWeight(id: UUID) -> Binding<Double> {
+        Binding(
+            get: { equipmentStore.inventory.plates.first { $0.id == id }?.weight ?? 0 },
+            set: { newValue in
+                if let index = equipmentStore.inventory.plates.firstIndex(where: { $0.id == id }) {
+                    equipmentStore.inventory.plates[index].weight = newValue
                 }
             }
+        )
+    }
 
-            HStack {
-                TextField("New dumbbell weight", text: $newDumbbellWeight)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 170)
-
-                TextField("Qty", text: $newDumbbellQuantity)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 70)
-
-                Button("Add Dumbbell") {
-                    addDumbbell()
+    private func bindingForPlateQuantity(id: UUID) -> Binding<Int> {
+        Binding(
+            get: { equipmentStore.inventory.plates.first { $0.id == id }?.quantity ?? 0 },
+            set: { newValue in
+                if let index = equipmentStore.inventory.plates.firstIndex(where: { $0.id == id }) {
+                    equipmentStore.inventory.plates[index].quantity = newValue
                 }
             }
-        }
+        )
+    }
+
+    private func bindingForDumbbellWeight(id: UUID) -> Binding<Double> {
+        Binding(
+            get: { equipmentStore.inventory.dumbbells.first { $0.id == id }?.weight ?? 0 },
+            set: { newValue in
+                if let index = equipmentStore.inventory.dumbbells.firstIndex(where: { $0.id == id }) {
+                    equipmentStore.inventory.dumbbells[index].weight = newValue
+                }
+            }
+        )
+    }
+
+    private func bindingForDumbbellQuantity(id: UUID) -> Binding<Int> {
+        Binding(
+            get: { equipmentStore.inventory.dumbbells.first { $0.id == id }?.quantity ?? 0 },
+            set: { newValue in
+                if let index = equipmentStore.inventory.dumbbells.firstIndex(where: { $0.id == id }) {
+                    equipmentStore.inventory.dumbbells[index].quantity = newValue
+                }
+            }
+        )
+    }
+
+    // MARK: - Actions
+
+    private func canAdd(weightText: String, quantityText: String) -> Bool {
+        guard let quantity = Int(quantityText), quantity > 0 else { return false }
+        return Double(weightText) != nil
     }
 
     private func addPlate() {
@@ -149,13 +220,11 @@ struct EquipmentInventoryView: View {
         newDumbbellQuantity = ""
     }
 
-    private func deletePlate(id: UUID) {
-        equipmentStore.inventory.plates.removeAll { $0.id == id }
-        equipmentStore.save()
+    private func deletePlates(at offsets: IndexSet) {
+        equipmentStore.deletePlates(at: offsets)
     }
 
-    private func deleteDumbbell(id: UUID) {
-        equipmentStore.inventory.dumbbells.removeAll { $0.id == id }
-        equipmentStore.save()
+    private func deleteDumbbells(at offsets: IndexSet) {
+        equipmentStore.deleteDumbbells(at: offsets)
     }
 }

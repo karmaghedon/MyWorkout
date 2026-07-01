@@ -18,147 +18,60 @@ struct WorkoutSessionView: View {
     @State private var exerciseStates: [UUID: ExerciseSessionState] = [:]
     @State private var activeRestExerciseID: UUID?
     @State private var restSecondsRemaining = 0
+    @State private var restTotalSeconds = 0
     @State private var restTimer: Timer?
     @State private var showFinishSummary = false
 
     var body: some View {
-        VStack {
-            List {
-                ForEach(workout.exercises) { exercise in
-                    Section(exercise.name) {
-                        let state = exerciseStates[exercise.id] ?? ExerciseSessionState()
-
-                        if let suggestion = state.suggestionMessage {
-                            Text(suggestion)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-
-                        let warmups = WarmupEngine.generateWarmups(
-                            for: state.weight,
-                            exerciseType: exercise.exerciseType
+        VStack(spacing: 0) {
+            ScrollView {
+                LazyVStack(spacing: AppTheme.Spacing.lg) {
+                    ForEach(workout.exercises) { exercise in
+                        ExerciseSessionCardView(
+                            exercise: exercise,
+                            state: binding(for: exercise.id),
+                            weightStep: exercise.usesBarbell
+                                ? equipmentStore.smallestPlateIncrement()
+                                : 5,
+                            equipmentInventory: equipmentStore.inventory,
+                            isResting: activeRestExerciseID == exercise.id && restSecondsRemaining > 0,
+                            restSecondsRemaining: restSecondsRemaining,
+                            restTotalSeconds: restTotalSeconds,
+                            onLogSet: {
+                                logSet(for: exercise.id)
+                                startRestTimer(for: exercise)
+                            },
+                            onStopRest: stopRestTimer,
+                            onDeleteSet: { setID in
+                                deleteSet(setID: setID, for: exercise.id)
+                            }
                         )
-
-                        if !warmups.isEmpty {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Warm-up")
-                                    .font(.caption)
-                                    .bold()
-
-                                ForEach(warmups) { warmup in
-                                    if exercise.usesBarbell {
-                                        let loading = PlateCalculator.loading(
-                                            for: warmup.weight,
-                                            inventory: equipmentStore.inventory
-                                        )
-
-                                        Text("\(warmup.weight) lb × \(warmup.reps) — \(loading.displayText) / side")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    } else {
-                                        Text("\(warmup.weight) lb × \(warmup.reps)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                            }
-                        }
-
-                        HStack(spacing: 12) {
-                            Text("Reps")
-                                .frame(width: 70, alignment: .leading)
-
-                            Stepper("", value: binding(for: exercise.id).reps, in: 1...50)
-                                .labelsHidden()
-
-                            TextField("Reps", value: binding(for: exercise.id).reps, format: .number)
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 70)
-                        }
-
-                        let weightStep = exercise.usesBarbell
-                            ? equipmentStore.smallestPlateIncrement()
-                            : 5
-
-                        HStack(spacing: 12) {
-                            Text("Weight")
-                                .frame(width: 70, alignment: .leading)
-
-                            Stepper(
-                                "",
-                                value: binding(for: exercise.id).weight,
-                                in: 0...500,
-                                step: weightStep
-                            )
-                            .labelsHidden()
-
-                            TextField("Weight", value: binding(for: exercise.id).weight, format: .number)
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 80)
-
-                            Text("lb")
-                        }
-
-                        if exercise.usesBarbell {
-                            let workingLoading = PlateCalculator.loading(
-                                for: state.weight,
-                                inventory: equipmentStore.inventory
-                            )
-
-                            Text("Working load: \(workingLoading.displayText) / side")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-
-                        Button("Log Set") {
-                            logSet(for: exercise.id)
-                            startRestTimer(for: exercise)
-                        }
-
-                        if activeRestExerciseID == exercise.id && restSecondsRemaining > 0 {
-                            Text("Rest: \(formatTime(restSecondsRemaining))")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-
-                            Button("Stop Rest Timer") {
-                                stopRestTimer()
-                            }
-                        }
-
-                        ForEach(state.loggedSets) { set in
-                            HStack {
-                                Text("Set \(set.setNumber): \(set.weight) lb × \(set.reps)")
-                                    .font(.caption)
-
-                                Spacer()
-
-                                Button("Delete") {
-                                    deleteSet(setID: set.id, for: exercise.id)
-                                }
-                                .font(.caption)
-                            }
-                        }
-
-                        Text("Notes")
-                            .font(.caption)
-                            .bold()
-
-                        TextEditor(text: binding(for: exercise.id).notes)
-                            .frame(minHeight: 80)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.gray.opacity(0.4))
-                            )
                     }
                 }
+                .padding(AppTheme.Spacing.lg)
+                .animation(.default, value: activeRestExerciseID)
             }
+            .background(AppTheme.groupedBackground)
 
-            Button("Finish Workout") {
+            Divider()
+
+            Button {
                 showFinishSummary = true
+            } label: {
+                Text("Finish Workout")
+                    .font(AppTheme.Typography.label)
+                    .frame(maxWidth: .infinity)
             }
-            .padding()
+            .buttonStyle(.borderedProminent)
+            .tint(AppTheme.accent)
+            .controlSize(.large)
+            .padding(AppTheme.Spacing.lg)
+            .background(.bar)
         }
         .navigationTitle(workout.name)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .onAppear {
             initializeStates()
         }
@@ -267,7 +180,8 @@ struct WorkoutSessionView: View {
         stopRestTimer()
 
         activeRestExerciseID = exercise.id
-        restSecondsRemaining = RestTimerRule.seconds(for: exercise.exerciseType)
+        restTotalSeconds = RestTimerRule.seconds(for: exercise.exerciseType)
+        restSecondsRemaining = restTotalSeconds
 
         restTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
             if restSecondsRemaining > 0 {
@@ -285,12 +199,6 @@ struct WorkoutSessionView: View {
         restTimer = nil
         activeRestExerciseID = nil
         restSecondsRemaining = 0
-    }
-
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%d:%02d", minutes, remainingSeconds)
     }
 
     private func workoutSummaryText() -> String {

@@ -42,6 +42,9 @@
 		F54004FF2FF4780C0079CC05 /* TemplateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004FE2FF4780C0079CC05 /* TemplateListView.swift */; };
 		F54005012FF4783D0079CC05 /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005002FF4783D0079CC05 /* TemplateEditorView.swift */; };
 		F54005032FF47B0C0079CC05 /* DashboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005022FF47B0C0079CC05 /* DashboardCard.swift */; };
+		F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005052FF568570079CC05 /* RestTimerBadge.swift */; };
+		F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */; };
+		F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005092FF58D660079CC05 /* AppTheme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +85,9 @@
 		F54004FE2FF4780C0079CC05 /* TemplateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateListView.swift; sourceTree = "<group>"; };
 		F54005002FF4783D0079CC05 /* TemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEditorView.swift; sourceTree = "<group>"; };
 		F54005022FF47B0C0079CC05 /* DashboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCard.swift; sourceTree = "<group>"; };
+		F54005052FF568570079CC05 /* RestTimerBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerBadge.swift; sourceTree = "<group>"; };
+		F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSessionCardView.swift; sourceTree = "<group>"; };
+		F54005092FF58D660079CC05 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +127,7 @@
 				F54004DA2FF162CC0079CC05 /* Stores */,
 				F54004C22FF0C8150079CC05 /* Data */,
 				F54004E12FF169210079CC05 /* Helper */,
+				F54005042FF562580079CC05 /* Theme */,
 				F54004B62FF0C7030079CC05 /* Assets.xcassets */,
 				F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */,
 				F54004B82FF0C7030079CC05 /* Preview Content */,
@@ -177,6 +184,8 @@
 				F54004FC2FF476F10079CC05 /* WorkoutCalendarView.swift */,
 				F54004FE2FF4780C0079CC05 /* TemplateListView.swift */,
 				F54005002FF4783D0079CC05 /* TemplateEditorView.swift */,
+				F54005052FF568570079CC05 /* RestTimerBadge.swift */,
+				F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -200,6 +209,14 @@
 				F54004F62FF439FB0079CC05 /* RestTimerRule.swift */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		F54005042FF562580079CC05 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				F54005092FF58D660079CC05 /* AppTheme.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -287,11 +304,13 @@
 				F54004CF2FF0C87E0079CC05 /* ExerciseLibraryView.swift in Sources */,
 				F54004D12FF0C88A0079CC05 /* StartWorkoutView.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
+				F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */,
 				F54004C52FF0C83E0079CC05 /* Exercise.swift in Sources */,
 				F54004CB2FF0C8640079CC05 /* SeedData.swift in Sources */,
 				F54004E72FF338CE0079CC05 /* ExerciseType.swift in Sources */,
 				F54005012FF4783D0079CC05 /* TemplateEditorView.swift in Sources */,
 				F54004E52FF16A750079CC05 /* ProgressionEngine.swift in Sources */,
+				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
@@ -305,6 +324,7 @@
 				F54004F92FF472700079CC05 /* AnalyticsView.swift in Sources */,
 				F54004DE2FF163F10079CC05 /* WorkoutTemplateStore.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
+				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
