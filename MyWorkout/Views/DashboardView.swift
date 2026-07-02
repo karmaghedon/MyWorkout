@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @EnvironmentObject var logStore: WorkoutLogStore
+
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -15,105 +17,83 @@ struct DashboardView: View {
                         .bold()
                         .padding(.horizontal)
 
-                    LazyVGrid(columns: columns, spacing: 20) {
+                    if let error = logStore.lastSaveError {
+                        Text(error)
+                            .foregroundStyle(.red)
+                            .padding()
+                            .background(.red.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal)
+                    }
 
+                    LazyVGrid(columns: columns, spacing: 20) {
                         NavigationLink {
                             StartWorkoutView()
                         } label: {
-                            DashboardCard(
-                                title: "Start Workout",
-                                subtitle: "Begin training session"
-                            )
+                            DashboardCard(title: "Start Workout", subtitle: "Begin training session")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             HistoryView()
                         } label: {
-                            DashboardCard(
-                                title: "History",
-                                subtitle: "View previous workouts"
-                            )
+                            DashboardCard(title: "History", subtitle: "View previous workouts")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             AnalyticsView()
                         } label: {
-                            DashboardCard(
-                                title: "Analytics",
-                                subtitle: "PRs, volume, trends"
-                            )
+                            DashboardCard(title: "Analytics", subtitle: "PRs, volume, trends")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             WorkoutCalendarView()
                         } label: {
-                            DashboardCard(
-                                title: "Calendar",
-                                subtitle: "Training schedule"
-                            )
+                            DashboardCard(title: "Calendar", subtitle: "Training schedule")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             CreateWorkoutTemplateView()
                         } label: {
-                            DashboardCard(
-                                title: "Templates",
-                                subtitle: "Create workout plans"
-                            )
+                            DashboardCard(title: "Templates", subtitle: "Create workout plans")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             TemplateListView()
                         } label: {
-                            DashboardCard(
-                                title: "Edit Templates",
-                                subtitle: "Modify workouts"
-                            )
+                            DashboardCard(title: "Edit Templates", subtitle: "Modify workouts")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             EquipmentInventoryView()
                         } label: {
-                            DashboardCard(
-                                title: "Equipment",
-                                subtitle: "Inventory & plates"
-                            )
+                            DashboardCard(title: "Equipment", subtitle: "Inventory & plates")
                         }
                         .buttonStyle(.plain)
 
                         NavigationLink {
                             StrengthTrendView()
                         } label: {
-                            DashboardCard(
-                                title: "Strength",
-                                subtitle: "1RM progression"
-                            )
+                            DashboardCard(title: "Strength", subtitle: "1RM progression")
                         }
                         .buttonStyle(.plain)
-                        
+
                         NavigationLink {
                             SettingsView()
                         } label: {
-                            DashboardCard(
-                                title: "Settings",
-                                subtitle: "Units, timers, formulas"
-                            )
+                            DashboardCard(title: "Settings", subtitle: "Units, timers, formulas")
                         }
                         .buttonStyle(.plain)
-                        
+
                         NavigationLink {
                             ExportView()
                         } label: {
-                            DashboardCard(
-                                title: "Export",
-                                subtitle: "CSV backup & reports"
-                            )
+                            DashboardCard(title: "Export", subtitle: "CSV backup & reports")
                         }
                         .buttonStyle(.plain)
                     }
