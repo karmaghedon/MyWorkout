@@ -53,6 +53,19 @@ struct ExportView: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(AppTheme.accent)
+            .fileExporter(
+                isPresented: $showCSVExporter,
+                document: csvDocument,
+                contentType: .commaSeparatedText,
+                defaultFilename: filename()
+            ) { result in
+                switch result {
+                case .success(let url):
+                    print("CSV exported to: \(url)")
+                case .failure(let error):
+                    print("Failed to export CSV: \(error)")
+                }
+            }
             
             Button("Export Full Backup JSON") {
                 backupDocument = BackupDocument(
@@ -68,42 +81,42 @@ struct ExportView: View {
                 showJSONExporter = true
             }
             .buttonStyle(.bordered)
+            .fileExporter(
+                isPresented: $showJSONExporter,
+                document: backupDocument,
+                contentType: .json,
+                defaultFilename: jsonFilename()
+            ) { result in
+                switch result {
+                case .success(let url):
+                    print("JSON backup exported to: \(url)")
+                case .failure(let error):
+                    print("Failed to export JSON backup: \(error)")
+                }
+            }
 
             Button("Import Full Backup JSON") {
                 showJSONImporter = true
             }
             .buttonStyle(.bordered)
+            .fileImporter(
+                isPresented: $showJSONImporter,
+                allowedContentTypes: [.json],
+                allowsMultipleSelection: false
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    guard let url = urls.first else { return }
+                    importBackup(from: url)
+                case .failure(let error):
+                    print("Failed to import JSON backup: \(error)")
+                }
+            }
 
             Spacer()
         }
         .padding(AppTheme.Spacing.lg)
         .navigationTitle("Backup & Export")
-        .fileExporter(
-            isPresented: $showJSONExporter,
-            document: backupDocument,
-            contentType: .json,
-            defaultFilename: jsonFilename()
-        ) { result in
-            switch result {
-            case .success(let url):
-                print("JSON backup exported to: \(url)")
-            case .failure(let error):
-                print("Failed to export JSON backup: \(error)")
-            }
-        }
-        .fileImporter(
-            isPresented: $showJSONImporter,
-            allowedContentTypes: [.json],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                guard let url = urls.first else { return }
-                importBackup(from: url)
-            case .failure(let error):
-                print("Failed to import JSON backup: \(error)")
-            }
-        }
     }
 
     private func csvText() -> String {
