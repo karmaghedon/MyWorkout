@@ -9,6 +9,7 @@ struct StrengthPoint: Identifiable {
 
 struct StrengthTrendView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
+    @EnvironmentObject var settingsStore: UserSettingsStore
 
     @State private var selectedExerciseName: String = ""
 
@@ -52,12 +53,12 @@ struct StrengthTrendView: View {
                 Chart(trendData) { point in
                     LineMark(
                         x: .value("Date", point.date),
-                        y: .value("Estimated 1RM", point.estimatedOneRepMax)
+                        y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
                     )
 
                     PointMark(
                         x: .value("Date", point.date),
-                        y: .value("Estimated 1RM", point.estimatedOneRepMax)
+                        y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
                     )
                 }
                 .frame(height: 300)
@@ -66,7 +67,7 @@ struct StrengthTrendView: View {
                     HStack {
                         Text(point.date.formatted(date: .abbreviated, time: .omitted))
                         Spacer()
-                        Text("\(Int(point.estimatedOneRepMax.rounded())) lb")
+                        Text("\(settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded()))) \(settingsStore.settings.weightUnitLabel)")
                             .bold()
                     }
                 }
@@ -82,6 +83,16 @@ struct StrengthTrendView: View {
     }
 
     private func estimatedOneRepMax(weight: Int, reps: Int) -> Double {
-        Double(weight) * (1.0 + Double(reps) / 30.0)
+        let weight = Double(weight)
+        let reps = Double(reps)
+
+        switch settingsStore.settings.oneRepMaxFormula {
+        case .epley:
+            return weight * (1.0 + reps / 30.0)
+
+        case .brzycki:
+            guard reps < 37 else { return weight }
+            return weight * (36.0 / (37.0 - reps))
+        }
     }
 }

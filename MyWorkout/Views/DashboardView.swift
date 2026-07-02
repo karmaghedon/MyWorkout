@@ -96,6 +96,26 @@ struct DashboardView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        
+                        NavigationLink {
+                            SettingsView()
+                        } label: {
+                            DashboardCard(
+                                title: "Settings",
+                                subtitle: "Units, timers, formulas"
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        NavigationLink {
+                            ExportView()
+                        } label: {
+                            DashboardCard(
+                                title: "Export",
+                                subtitle: "CSV backup & reports"
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
                     .padding()
                 }

@@ -1,11 +1,13 @@
 import Foundation
 
 struct EquipmentInventory: Codable {
+    var unitSystem: UnitSystem
     var barbellWeight: Double
     var plates: [PlateInventory]
     var dumbbells: [DumbbellInventory]
 
     static let defaultInventory = EquipmentInventory(
+        unitSystem: .pounds,
         barbellWeight: 45,
         plates: [
             PlateInventory(weight: 45, quantity: 2),
@@ -15,29 +17,32 @@ struct EquipmentInventory: Codable {
             PlateInventory(weight: 5, quantity: 4),
             PlateInventory(weight: 2.5, quantity: 2)
         ],
-        dumbbells: [
-            DumbbellInventory(weight: 5, quantity: 2),
-            DumbbellInventory(weight: 10, quantity: 2),
-            DumbbellInventory(weight: 15, quantity: 2),
-            DumbbellInventory(weight: 20, quantity: 2),
-            DumbbellInventory(weight: 25, quantity: 2),
-            DumbbellInventory(weight: 30, quantity: 2),
-            DumbbellInventory(weight: 35, quantity: 2),
-            DumbbellInventory(weight: 40, quantity: 2),
-            DumbbellInventory(weight: 45, quantity: 2),
-            DumbbellInventory(weight: 50, quantity: 2)
-        ]
+        dumbbells: []
     )
 }
 
 struct PlateInventory: Identifiable, Codable, Equatable {
-    var id = UUID()
+    var id: UUID
     var weight: Double
     var quantity: Int
+
+    init(id: UUID = UUID(), weight: Double, quantity: Int) {
+        self.id = id
+        self.weight = weight
+        self.quantity = quantity
+    }
 }
 
 struct DumbbellInventory: Identifiable, Codable, Equatable {
-    var id = UUID()
+    var id: UUID
     var weight: Double
     var quantity: Int
+
+    init(id: UUID = UUID(), weight: Double, quantity: Int) {
+        self.id = id
+        self.weight = weight
+        self.quantity = quantity
+    }
 }
+
+

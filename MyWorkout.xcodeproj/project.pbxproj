@@ -45,6 +45,14 @@
 		F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005052FF568570079CC05 /* RestTimerBadge.swift */; };
 		F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */; };
 		F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005092FF58D660079CC05 /* AppTheme.swift */; };
+		F540050C2FF597CB0079CC05 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540050B2FF597CB0079CC05 /* UserSettings.swift */; };
+		F540050E2FF598060079CC05 /* UserSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540050D2FF598060079CC05 /* UserSettingsStore.swift */; };
+		F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540050F2FF5984C0079CC05 /* SettingsView.swift */; };
+		F54005122FF5C0990079CC05 /* WeightConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005112FF5C0990079CC05 /* WeightConversion.swift */; };
+		F54005162FF5CF8D0079CC05 /* WorkoutCSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005152FF5CF8D0079CC05 /* WorkoutCSVExporter.swift */; };
+		F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005172FF5CFA50079CC05 /* ExportView.swift */; };
+		F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005192FF69CC60079CC05 /* AppBackup.swift */; };
+		F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051B2FF69DD30079CC05 /* BackupDocument.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +96,14 @@
 		F54005052FF568570079CC05 /* RestTimerBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerBadge.swift; sourceTree = "<group>"; };
 		F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSessionCardView.swift; sourceTree = "<group>"; };
 		F54005092FF58D660079CC05 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		F540050B2FF597CB0079CC05 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		F540050D2FF598060079CC05 /* UserSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsStore.swift; sourceTree = "<group>"; };
+		F540050F2FF5984C0079CC05 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F54005112FF5C0990079CC05 /* WeightConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightConversion.swift; sourceTree = "<group>"; };
+		F54005152FF5CF8D0079CC05 /* WorkoutCSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutCSVExporter.swift; sourceTree = "<group>"; };
+		F54005172FF5CFA50079CC05 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		F54005192FF69CC60079CC05 /* AppBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBackup.swift; sourceTree = "<group>"; };
+		F540051B2FF69DD30079CC05 /* BackupDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +171,10 @@
 				F54004E22FF169390079CC05 /* ProgressionRule.swift */,
 				F54004EC2FF41A8C0079CC05 /* PlateLoading.swift */,
 				F54005022FF47B0C0079CC05 /* DashboardCard.swift */,
+				F540050B2FF597CB0079CC05 /* UserSettings.swift */,
+				F54005152FF5CF8D0079CC05 /* WorkoutCSVExporter.swift */,
+				F54005192FF69CC60079CC05 /* AppBackup.swift */,
+				F540051B2FF69DD30079CC05 /* BackupDocument.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -186,6 +206,8 @@
 				F54005002FF4783D0079CC05 /* TemplateEditorView.swift */,
 				F54005052FF568570079CC05 /* RestTimerBadge.swift */,
 				F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */,
+				F540050F2FF5984C0079CC05 /* SettingsView.swift */,
+				F54005172FF5CFA50079CC05 /* ExportView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -196,6 +218,7 @@
 				F54004DD2FF163F10079CC05 /* WorkoutTemplateStore.swift */,
 				F54004D42FF0CF5C0079CC05 /* WorkoutLogStore.swift */,
 				F54004F22FF41DC50079CC05 /* EquipmentInventoryStore.swift */,
+				F540050D2FF598060079CC05 /* UserSettingsStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -207,6 +230,7 @@
 				F54004EA2FF413EA0079CC05 /* WarmupEngine.swift */,
 				F54004EE2FF41AD90079CC05 /* PlateCalculator.swift */,
 				F54004F62FF439FB0079CC05 /* RestTimerRule.swift */,
+				F54005112FF5C0990079CC05 /* WeightConversion.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -294,16 +318,24 @@
 				F54004F32FF41DC50079CC05 /* EquipmentInventoryStore.swift in Sources */,
 				F54004EB2FF413EA0079CC05 /* WarmupEngine.swift in Sources */,
 				F54004B32FF0C6FE0079CC05 /* ContentView.swift in Sources */,
+				F540050C2FF597CB0079CC05 /* UserSettings.swift in Sources */,
 				F54004F72FF439FB0079CC05 /* RestTimerRule.swift in Sources */,
+				F54005122FF5C0990079CC05 /* WeightConversion.swift in Sources */,
+				F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */,
+				F54005162FF5CF8D0079CC05 /* WorkoutCSVExporter.swift in Sources */,
 				F54004E92FF413830079CC05 /* WarmupSet.swift in Sources */,
 				F54004D72FF0CFBA0079CC05 /* HistoryView.swift in Sources */,
 				F54004FD2FF476F10079CC05 /* WorkoutCalendarView.swift in Sources */,
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
+				F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */,
+				F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */,
 				F54005032FF47B0C0079CC05 /* DashboardCard.swift in Sources */,
 				F54004CF2FF0C87E0079CC05 /* ExerciseLibraryView.swift in Sources */,
 				F54004D12FF0C88A0079CC05 /* StartWorkoutView.swift in Sources */,
+				F540050E2FF598060079CC05 /* UserSettingsStore.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
+				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
 				F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */,
 				F54004C52FF0C83E0079CC05 /* Exercise.swift in Sources */,
 				F54004CB2FF0C8640079CC05 /* SeedData.swift in Sources */,

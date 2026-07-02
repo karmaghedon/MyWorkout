@@ -23,6 +23,11 @@ final class WorkoutTemplateStore: ObservableObject {
         templates.remove(atOffsets: offsets)
         save()
     }
+    
+    func replaceAll(with newTemplates: [WorkoutTemplate]) {
+        templates = newTemplates
+        save()
+    }
 
     private func save() {
         do {

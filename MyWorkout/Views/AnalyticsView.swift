@@ -3,7 +3,8 @@ import Charts
 
 struct AnalyticsView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
-
+    @EnvironmentObject var settingsStore: UserSettingsStore
+    
     var totalWorkouts: Int {
         logStore.logs.count
     }
@@ -95,8 +96,7 @@ struct AnalyticsView: View {
 
                             Spacer()
 
-                            Text("\(pr.weight) lb × \(pr.reps)")
-                                .font(AppTheme.Typography.numeric(15, weight: .semibold))
+                            Text("\(settingsStore.settings.displayWeight(pr.weight)) \(settingsStore.settings.weightUnitLabel) × \(pr.reps)")
                         }
                     }
                 }

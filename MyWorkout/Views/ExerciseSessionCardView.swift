@@ -1,11 +1,5 @@
 import SwiftUI
 
-/// One exercise's full logging surface during a session: warm-up guidance,
-/// rep/weight controls, the log action, completed sets, and notes.
-///
-/// Pulled out of WorkoutSessionView so that view stays a thin coordinator
-/// and all the visual styling for "what one exercise looks like mid-workout"
-/// lives in a single, focused place.
 struct ExerciseSessionCardView: View {
     let exercise: Exercise
     @Binding var state: ExerciseSessionState
@@ -19,6 +13,12 @@ struct ExerciseSessionCardView: View {
     let onLogSet: () -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID) -> Void
+
+    @EnvironmentObject var settingsStore: UserSettingsStore
+
+    private var weightUnit: String {
+        settingsStore.settings.weightUnitLabel
+    }
 
     private var warmups: [WarmupSet] {
         WarmupEngine.generateWarmups(for: state.weight, exerciseType: exercise.exerciseType)
@@ -74,8 +74,6 @@ struct ExerciseSessionCardView: View {
         )
     }
 
-    // MARK: - Sections
-
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(exercise.name)
@@ -100,12 +98,18 @@ struct ExerciseSessionCardView: View {
 
             ForEach(warmups) { warmup in
                 HStack {
-                    Text("\(warmup.weight) lb × \(warmup.reps)")
+                    Text("\(settingsStore.settings.displayWeight(warmup.weight)) \(weightUnit) × \(warmup.reps)")
                         .font(AppTheme.Typography.caption)
 
                     if exercise.usesBarbell {
                         Spacer()
-                        Text("\(PlateCalculator.loading(for: warmup.weight, inventory: equipmentInventory).displayText) / side")
+//                        Text("\(PlateCalculator.loading(for: warmup.weight, inventory: equipmentInventory).displayText(settings: settingsStore.settings)) / side")
+                        let loading = PlateCalculator.loading(
+                            for: warmup.weight,
+                            inventory: equipmentInventory
+                        )
+
+                        Text("\(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side")
                             .font(AppTheme.Typography.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -121,16 +125,30 @@ struct ExerciseSessionCardView: View {
 
     private var controlsSection: some View {
         HStack(spacing: AppTheme.Spacing.md) {
-            StepperField(label: "Reps", value: $state.reps, range: 1...50, step: 1, suffix: nil)
-            StepperField(label: "Weight", value: $state.weight, range: 0...500, step: weightStep, suffix: "lb")
+            StepperField(
+                label: "Reps",
+                value: $state.reps,
+                range: 1...50,
+                step: 1,
+                suffix: nil
+            )
+
+            StepperField(
+                label: "Weight",
+                value: weightDisplayBinding,
+                range: 0...500,
+                step: displayWeightStep,
+                suffix: weightUnit
+            )
         }
     }
 
     private var workingLoadRow: some View {
         let loading = PlateCalculator.loading(for: state.weight, inventory: equipmentInventory)
-        return Text("Working load: \(loading.displayText) / side")
-            .font(AppTheme.Typography.caption)
-            .foregroundStyle(.secondary)
+//        return Text("Working load: \(loading.displayText(settings: settingsStore.settings)) / side")
+        return Text("Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side")
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(.secondary)
     }
 
     private var loggedSetsSection: some View {
@@ -147,7 +165,7 @@ struct ExerciseSessionCardView: View {
                         .frame(width: 22, height: 22)
                         .background(Circle().fill(AppTheme.accentMuted))
 
-                    Text("\(set.weight) lb × \(set.reps)")
+                    Text("\(set.weight) \(weightUnit) × \(set.reps)")
                         .font(AppTheme.Typography.caption)
 
                     Spacer()
@@ -194,13 +212,28 @@ struct ExerciseSessionCardView: View {
             )
         }
     }
+    
+    private var weightDisplayBinding: Binding<Int> {
+        Binding(
+            get: {
+                settingsStore.settings.displayWeight(state.weight)
+            },
+            set: { newDisplayValue in
+                state.weight = settingsStore.settings.storageWeight(fromDisplayed: newDisplayValue)
+            }
+        )
+    }
+
+    private var displayWeightStep: Int {
+        switch settingsStore.settings.unitSystem {
+        case .pounds:
+            return weightStep
+        case .kilograms:
+            return max(1, Int((Double(weightStep) * 0.453592).rounded()))
+        }
+    }
 }
 
-/// A labeled stepper + direct-entry field, used for reps and weight.
-/// Pairs the tap-to-nudge stepper with a text field so people can either
-/// bump by one increment or type an exact number — both are common
-/// mid-workout depending on whether you're making a small jump or
-/// loading a specific plate combo.
 private struct StepperField: View {
     let label: String
     @Binding var value: Int

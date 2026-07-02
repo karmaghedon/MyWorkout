@@ -85,4 +85,9 @@ final class WorkoutLogStore: ObservableObject {
             reps: latestSet.reps
         )
     }
+    
+    func replaceAll(with newLogs: [WorkoutLog]) {
+        logs = newLogs
+        save()
+    }
 }

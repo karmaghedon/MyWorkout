@@ -14,6 +14,7 @@ struct WorkoutSessionView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var settingsStore: UserSettingsStore
 
     @State private var exerciseStates: [UUID: ExerciseSessionState] = [:]
     @State private var activeRestExerciseID: UUID?
@@ -180,7 +181,10 @@ struct WorkoutSessionView: View {
         stopRestTimer()
 
         activeRestExerciseID = exercise.id
-        restTotalSeconds = RestTimerRule.seconds(for: exercise.exerciseType)
+        restSecondsRemaining = RestTimerRule.seconds(
+            for: exercise.exerciseType,
+            settings: settingsStore.settings
+        )
         restSecondsRemaining = restTotalSeconds
 
         restTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in

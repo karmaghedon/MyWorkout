@@ -3,12 +3,14 @@ import SwiftUI
 struct WorkoutLogDetailView: View {
     let log: WorkoutLog
 
+    @EnvironmentObject var settingsStore: UserSettingsStore
+    
     var body: some View {
         List {
             ForEach(log.completedExercises) { exercise in
                 Section(exercise.exerciseName) {
                     ForEach(exercise.sets) { set in
-                        Text("Set \(set.setNumber): \(set.weight) lb × \(set.reps)")
+                        Text("Set \(set.setNumber): \(settingsStore.settings.displayWeight(set.weight)) \(settingsStore.settings.weightUnitLabel) × \(set.reps)")
                     }
 
                     if !exercise.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

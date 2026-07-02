@@ -1,14 +1,14 @@
 import Foundation
 
 struct RestTimerRule {
-    static func seconds(for exerciseType: ExerciseType) -> Int {
+    static func seconds(for exerciseType: ExerciseType, settings: UserSettings) -> Int {
         switch exerciseType {
         case .compound:
-            return 180
+            return settings.compoundRestSeconds
         case .isolation:
-            return 90
+            return settings.isolationRestSeconds
         case .bodyweight:
-            return 120
+            return settings.bodyweightRestSeconds
         }
     }
 }
