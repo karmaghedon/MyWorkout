@@ -97,11 +97,11 @@ struct WorkoutSessionView: View {
     private func initializeStates() {
         for exercise in workout.exercises {
             if exerciseStates[exercise.id] == nil {
-                if let latestExercise = logStore.lastPerformances(for: exercise.name, limit: 1).first,
+                if let latestExercise = logStore.lastPerformances(for: exercise, limit: 1).first,
                    let latestSet = latestExercise.sets.last {
 
                     let previous = logStore.lastPerformances(
-                        for: exercise.name,
+                        for: exercise,
                         limit: exercise.progressionRule.stallLimit
                     )
 
@@ -148,6 +148,7 @@ struct WorkoutSessionView: View {
             }
 
             return CompletedExercise(
+                exerciseID: exercise.id,
                 exerciseName: exercise.name,
                 sets: state.loggedSets,
                 notes: state.notes

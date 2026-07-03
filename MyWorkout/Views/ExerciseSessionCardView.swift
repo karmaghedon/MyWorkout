@@ -76,17 +76,18 @@ struct ExerciseSessionCardView: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(exercise.name)
-                .font(AppTheme.Typography.sectionTitle)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(exercise.exerciseType.rawValue.capitalized)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, AppTheme.Spacing.sm)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(AppTheme.subtleFill))
 
-            Spacer()
-
-            Text(exercise.exerciseType.rawValue.capitalized)
-                .font(AppTheme.Typography.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, AppTheme.Spacing.sm)
-                .padding(.vertical, 4)
-                .background(Capsule().fill(AppTheme.subtleFill))
+                Text(exercise.progressionStrategy.displayName)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.accent)
+            }
         }
     }
 

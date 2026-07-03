@@ -1,10 +1,9 @@
 import SwiftUI
-import Charts
 
 struct AnalyticsView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var settingsStore: UserSettingsStore
-    
+
     var totalWorkouts: Int {
         logStore.logs.count
     }
@@ -18,7 +17,15 @@ struct AnalyticsView: View {
     }
 
     var mostRecentWorkoutName: String {
-        logStore.logs.first?.workoutName ?? "—"
+        logStore.logs.first?.workoutName ?? "No workouts yet"
+    }
+
+    var recoveryWarnings: [RecoveryWarning] {
+        RecoveryAnalyzer.warnings(logs: logStore.logs)
+    }
+
+    var performanceWarnings: [ExercisePerformanceWarning] {
+        ExercisePerformanceAnalyzer.warnings(logs: logStore.logs)
     }
 
     var volumeByMuscleGroup: [(muscle: String, sets: Int)] {
@@ -27,7 +34,11 @@ struct AnalyticsView: View {
         for log in logStore.logs {
             for completedExercise in log.completedExercises {
                 guard let exercise = SeedData.exercises.first(where: {
-                    $0.name == completedExercise.exerciseName
+                    if let completedID = completedExercise.exerciseID {
+                        return $0.id == completedID
+                    }
+
+                    return $0.name == completedExercise.exerciseName
                 }) else {
                     continue
                 }
@@ -42,31 +53,110 @@ struct AnalyticsView: View {
     }
 
     var personalRecords: [(exercise: String, weight: Int, reps: Int)] {
-        var bestByExercise: [String: LoggedSet] = [:]
+        var bestByExercise: [String: (name: String, set: LoggedSet)] = [:]
 
         for log in logStore.logs {
             for completedExercise in log.completedExercises {
+                let key = completedExercise.exerciseID?.uuidString ?? completedExercise.exerciseName
+
                 for set in completedExercise.sets {
-                    let currentBest = bestByExercise[completedExercise.exerciseName]
+                    let currentBest = bestByExercise[key]?.set
 
                     if currentBest == nil || isBetter(set, than: currentBest!) {
-                        bestByExercise[completedExercise.exerciseName] = set
+                        bestByExercise[key] = (
+                            name: completedExercise.exerciseName,
+                            set: set
+                        )
                     }
                 }
             }
         }
 
         return bestByExercise
-            .map { (exercise: $0.key, weight: $0.value.weight, reps: $0.value.reps) }
+            .map {
+                (
+                    exercise: $0.value.name,
+                    weight: $0.value.set.weight,
+                    reps: $0.value.set.reps
+                )
+            }
             .sorted { $0.exercise < $1.exercise }
     }
 
     var body: some View {
         List {
-            Section {
-                overviewTiles
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
+            Section("Overview") {
+                HStack {
+                    Text("Total Workouts")
+                    Spacer()
+                    Text("\(totalWorkouts)")
+                        .bold()
+                }
+
+                HStack {
+                    Text("Total Sets")
+                    Spacer()
+                    Text("\(totalSets)")
+                        .bold()
+                }
+
+                HStack {
+                    Text("Latest Workout")
+                    Spacer()
+                    Text(mostRecentWorkoutName)
+                        .bold()
+                }
+            }
+
+            Section("Recovery / Fatigue") {
+                if recoveryWarnings.isEmpty {
+                    Text("No recovery warnings")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(recoveryWarnings) { warning in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(warning.title)
+                                    .font(.headline)
+
+                                Spacer()
+
+                                Text(warning.severity.rawValue)
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(.orange.opacity(0.2))
+                                    .clipShape(Capsule())
+                            }
+
+                            Text(warning.message)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text("Suggested action: \(warning.recommendation)")
+                                .font(.caption)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
+            Section("Performance Warnings") {
+                if performanceWarnings.isEmpty {
+                    Text("No performance warnings")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(performanceWarnings) { warning in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(warning.exerciseName)
+                                .font(.headline)
+
+                            Text(warning.message)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
             }
 
             Section("Volume by Muscle Group") {
@@ -74,9 +164,14 @@ struct AnalyticsView: View {
                     Text("No volume data yet")
                         .foregroundStyle(.secondary)
                 } else {
-                    volumeChart
-                        .frame(height: CGFloat(volumeByMuscleGroup.count) * 34 + 20)
-                        .padding(.vertical, AppTheme.Spacing.xs)
+                    ForEach(volumeByMuscleGroup, id: \.muscle) { item in
+                        HStack {
+                            Text(item.muscle)
+                            Spacer()
+                            Text("\(item.sets) sets")
+                                .bold()
+                        }
+                    }
                 }
             }
 
@@ -86,17 +181,11 @@ struct AnalyticsView: View {
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(personalRecords, id: \.exercise) { pr in
-                        HStack(spacing: AppTheme.Spacing.sm) {
-                            Image(systemName: "trophy.fill")
-                                .font(.caption)
-                                .foregroundStyle(AppTheme.accent)
-                                .frame(width: 20)
-
+                        HStack {
                             Text(pr.exercise)
-
                             Spacer()
-
                             Text("\(settingsStore.settings.displayWeight(pr.weight)) \(settingsStore.settings.weightUnitLabel) × \(pr.reps)")
+                                .bold()
                         }
                     }
                 }
@@ -107,7 +196,7 @@ struct AnalyticsView: View {
                     NavigationLink {
                         WorkoutLogDetailView(log: log)
                     } label: {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading) {
                             Text(log.workoutName)
                                 .font(.headline)
 
@@ -117,67 +206,13 @@ struct AnalyticsView: View {
 
                             Text("\(setCount(for: log)) sets")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
                         }
-                        .padding(.vertical, 2)
                     }
                 }
             }
         }
         .navigationTitle("Analytics")
     }
-
-    // MARK: - Overview
-
-    private var overviewTiles: some View {
-        HStack(spacing: AppTheme.Spacing.sm) {
-            statTile(value: "\(totalWorkouts)", label: "Workouts")
-            statTile(value: "\(totalSets)", label: "Total Sets")
-            statTile(value: mostRecentWorkoutName, label: "Latest", isTextValue: true)
-        }
-        .padding(.horizontal, AppTheme.Spacing.lg)
-        .padding(.vertical, AppTheme.Spacing.sm)
-    }
-
-    private func statTile(value: String, label: String, isTextValue: Bool = false) -> some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(isTextValue ? AppTheme.Typography.label : AppTheme.Typography.numeric(24))
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .foregroundStyle(isTextValue ? .primary : AppTheme.accent)
-
-            Text(label.uppercased())
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
-                .fill(AppTheme.subtleFill)
-        )
-    }
-
-    // MARK: - Volume chart
-
-    private var volumeChart: some View {
-        Chart(volumeByMuscleGroup, id: \.muscle) { item in
-            BarMark(
-                x: .value("Sets", item.sets),
-                y: .value("Muscle Group", item.muscle)
-            )
-            .foregroundStyle(AppTheme.accent.gradient)
-            .cornerRadius(4)
-            .annotation(position: .trailing) {
-                Text("\(item.sets)")
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    // MARK: - Helpers
 
     private func setCount(for log: WorkoutLog) -> Int {
         log.completedExercises.reduce(0) { total, exercise in

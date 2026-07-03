@@ -2,15 +2,24 @@ import Foundation
 
 final class EquipmentInventoryStore: ObservableObject {
     @Published var inventory: EquipmentInventory
+    @Published private(set) var lastSaveError: String?
+    @Published private(set) var lastLoadError: String?
 
     private let key = "equipment_inventory"
 
     init() {
-        if let data = UserDefaults.standard.data(forKey: key),
-           let decoded = try? JSONDecoder().decode(EquipmentInventory.self, from: data) {
-            inventory = decoded
+        if let data = UserDefaults.standard.data(forKey: key) {
+            do {
+                inventory = try JSONDecoder().decode(EquipmentInventory.self, from: data)
+                lastLoadError = nil
+            } catch {
+                print("Failed to load equipment inventory: \(error)")
+                UserDefaults.standard.removeObject(forKey: key)
+                inventory = EquipmentInventory.defaultInventory
+                lastLoadError = "Couldn't load equipment inventory. Defaults were restored."
+                save()
+            }
         } else {
-            UserDefaults.standard.removeObject(forKey: key)
             inventory = EquipmentInventory.defaultInventory
             save()
         }
@@ -20,15 +29,16 @@ final class EquipmentInventoryStore: ObservableObject {
         do {
             let data = try JSONEncoder().encode(inventory)
             UserDefaults.standard.set(data, forKey: key)
+            lastSaveError = nil
         } catch {
             print("Failed to save equipment inventory: \(error)")
+            lastSaveError = "Couldn't save equipment inventory."
         }
     }
 
     func resetToDefault(unit: UnitSystem) {
         inventory = EquipmentInventory.defaultInventory
         convertInventory(to: unit, from: .pounds)
-        save()
     }
 
     func addPlate(weight: Double, quantity: Int) {
@@ -52,15 +62,11 @@ final class EquipmentInventoryStore: ObservableObject {
         inventory.dumbbells.remove(atOffsets: offsets)
         save()
     }
-    
+
     func replace(with newInventory: EquipmentInventory) {
         inventory = newInventory
+        sort()
         save()
-    }
-
-    private func sort() {
-        inventory.plates.sort { $0.weight > $1.weight }
-        inventory.dumbbells.sort { $0.weight < $1.weight }
     }
 
     func smallestPlateIncrement() -> Int {
@@ -112,6 +118,11 @@ final class EquipmentInventoryStore: ObservableObject {
         inventory.unitSystem = newUnit
         sort()
         save()
+    }
+
+    private func sort() {
+        inventory.plates.sort { $0.weight > $1.weight }
+        inventory.dumbbells.sort { $0.weight < $1.weight }
     }
 
     private func roundToHalf(_ value: Double) -> Double {

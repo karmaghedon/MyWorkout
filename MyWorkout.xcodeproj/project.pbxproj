@@ -53,6 +53,10 @@
 		F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005172FF5CFA50079CC05 /* ExportView.swift */; };
 		F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005192FF69CC60079CC05 /* AppBackup.swift */; };
 		F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051B2FF69DD30079CC05 /* BackupDocument.swift */; };
+		F540051E2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051D2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift */; };
+		F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */; };
+		F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005212FF6F7560079CC05 /* DashboardStatsView.swift */; };
+		F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,6 +108,10 @@
 		F54005172FF5CFA50079CC05 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		F54005192FF69CC60079CC05 /* AppBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBackup.swift; sourceTree = "<group>"; };
 		F540051B2FF69DD30079CC05 /* BackupDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDocument.swift; sourceTree = "<group>"; };
+		F540051D2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePerformanceAnalyzer.swift; sourceTree = "<group>"; };
+		F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAnalyzer.swift; sourceTree = "<group>"; };
+		F54005212FF6F7560079CC05 /* DashboardStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsView.swift; sourceTree = "<group>"; };
+		F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionStrategy.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +216,7 @@
 				F54005072FF5686C0079CC05 /* ExerciseSessionCardView.swift */,
 				F540050F2FF5984C0079CC05 /* SettingsView.swift */,
 				F54005172FF5CFA50079CC05 /* ExportView.swift */,
+				F54005212FF6F7560079CC05 /* DashboardStatsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -231,6 +240,9 @@
 				F54004EE2FF41AD90079CC05 /* PlateCalculator.swift */,
 				F54004F62FF439FB0079CC05 /* RestTimerRule.swift */,
 				F54005112FF5C0990079CC05 /* WeightConversion.swift */,
+				F540051D2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift */,
+				F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */,
+				F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -342,10 +354,12 @@
 				F54004E72FF338CE0079CC05 /* ExerciseType.swift in Sources */,
 				F54005012FF4783D0079CC05 /* TemplateEditorView.swift in Sources */,
 				F54004E52FF16A750079CC05 /* ProgressionEngine.swift in Sources */,
+				F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */,
 				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
+				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
 				F54004EF2FF41AD90079CC05 /* PlateCalculator.swift in Sources */,
 				F54004F52FF41DEA0079CC05 /* EquipmentInventoryView.swift in Sources */,
@@ -354,8 +368,10 @@
 				F54004FF2FF4780C0079CC05 /* TemplateListView.swift in Sources */,
 				F54004E32FF169390079CC05 /* ProgressionRule.swift in Sources */,
 				F54004F92FF472700079CC05 /* AnalyticsView.swift in Sources */,
+				F540051E2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift in Sources */,
 				F54004DE2FF163F10079CC05 /* WorkoutTemplateStore.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
+				F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */,
 				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,8 +518,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.MyWorkout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -528,8 +547,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.MyWorkout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

@@ -8,6 +8,7 @@ struct Exercise: Identifiable, Codable {
     let instructions: String
     let progressionRule: ProgressionRule
     let exerciseType: ExerciseType
+    let progressionStrategy: ProgressionStrategy
 
     var usesBarbell: Bool {
         equipment.lowercased().contains("barbell")
@@ -20,7 +21,8 @@ struct Exercise: Identifiable, Codable {
         equipment: String,
         instructions: String,
         progressionRule: ProgressionRule,
-        exerciseType: ExerciseType
+        exerciseType: ExerciseType,
+        progressionStrategy: ProgressionStrategy
     ) {
         self.id = id
         self.name = name
@@ -29,5 +31,6 @@ struct Exercise: Identifiable, Codable {
         self.instructions = instructions
         self.progressionRule = progressionRule
         self.exerciseType = exerciseType
+        self.progressionStrategy = progressionStrategy
     }
 }

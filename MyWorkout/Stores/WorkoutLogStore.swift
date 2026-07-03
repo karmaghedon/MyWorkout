@@ -3,13 +3,8 @@ import Foundation
 final class WorkoutLogStore: ObservableObject {
     @Published var logs: [WorkoutLog] = []
 
-    /// Set whenever a save or load fails, so views can surface it to the
-    /// user instead of silently losing data. Cleared automatically on the
-    /// next successful save.
     @Published private(set) var lastSaveError: String?
 
-    /// Legacy UserDefaults key, kept only to migrate existing installs onto
-    /// file-based storage on first launch after the upgrade.
     private let legacyDefaultsKey = "workout_logs"
 
     private let fileURL: URL
@@ -23,6 +18,76 @@ final class WorkoutLogStore: ObservableObject {
     func add(_ log: WorkoutLog) {
         logs.insert(log, at: 0)
         save()
+    }
+
+    func replaceAll(with newLogs: [WorkoutLog]) {
+        logs = newLogs
+        save()
+    }
+
+    func lastPerformance(for exercise: Exercise) -> LoggedSet? {
+        for log in logs {
+            for completedExercise in log.completedExercises {
+                if matches(completedExercise, exercise: exercise) {
+                    return completedExercise.sets.last
+                }
+            }
+        }
+
+        return nil
+    }
+
+    func lastPerformances(for exercise: Exercise, limit: Int) -> [CompletedExercise] {
+        var results: [CompletedExercise] = []
+
+        for log in logs {
+            for completedExercise in log.completedExercises {
+                if matches(completedExercise, exercise: exercise) {
+                    results.append(completedExercise)
+                }
+
+                if results.count == limit {
+                    return results
+                }
+            }
+        }
+
+        return results
+    }
+
+    func suggestedStartingSet(for exercise: Exercise) -> LoggedSet? {
+        guard let latestExercise = lastPerformances(for: exercise, limit: 1).first,
+              let latestSet = latestExercise.sets.last else {
+            return nil
+        }
+
+        let previous = lastPerformances(
+            for: exercise,
+            limit: exercise.progressionRule.stallLimit
+        )
+
+        guard let suggestion = ProgressionEngine.suggestion(
+            exercise: exercise,
+            currentSets: latestExercise.sets,
+            previousPerformances: Array(previous.dropFirst())
+        ) else {
+            return latestSet
+        }
+
+        return LoggedSet(
+            setNumber: 1,
+            weight: suggestion.suggestedWeight,
+            reps: latestSet.reps
+        )
+    }
+
+    private func matches(_ completedExercise: CompletedExercise, exercise: Exercise) -> Bool {
+        if let exerciseID = completedExercise.exerciseID {
+            return exerciseID == exercise.id
+        }
+
+        // Backward compatibility for old logs saved before exerciseID existed.
+        return completedExercise.exerciseName == exercise.name
     }
 
     // MARK: - Persistence
@@ -39,11 +104,6 @@ final class WorkoutLogStore: ObservableObject {
         return directory.appendingPathComponent("workout_logs.json")
     }
 
-    /// Writes happen on a background queue so encoding/disk I/O never blocks
-    /// the main thread (e.g. mid-workout when a set is logged). The array is
-    /// snapshotted synchronously first so we always persist exactly what was
-    /// on screen at the time of the call, even if `logs` changes again before
-    /// the write completes.
     private func save() {
         let logsToSave = logs
         let destination = fileURL
@@ -67,9 +127,6 @@ final class WorkoutLogStore: ObservableObject {
     }
 
     private func load() {
-        // One-time migration: if no file exists yet but there's data under
-        // the old UserDefaults key, adopt it, write it to the new file, and
-        // remove the old key so this only runs once.
         if !FileManager.default.fileExists(atPath: fileURL.path),
            let legacyData = UserDefaults.standard.data(forKey: legacyDefaultsKey) {
             if let decoded = try? JSONDecoder().decode([WorkoutLog].self, from: legacyData) {
@@ -89,63 +146,5 @@ final class WorkoutLogStore: ObservableObject {
             print("Failed to load workout logs: \(error)")
             lastSaveError = "Couldn't load your saved workouts. Recent data may be unavailable."
         }
-    }
-    
-    func lastPerformance(for exerciseName: String) -> LoggedSet? {
-        for log in logs {
-            for exercise in log.completedExercises {
-                if exercise.exerciseName == exerciseName {
-                    return exercise.sets.last
-                }
-            }
-        }
-
-        return nil
-    }
-    
-    func lastPerformances(for exerciseName: String, limit: Int) -> [CompletedExercise] {
-        var results: [CompletedExercise] = []
-
-        for log in logs {
-            for exercise in log.completedExercises {
-                if exercise.exerciseName == exerciseName {
-                    results.append(exercise)
-                }
-
-                if results.count == limit {
-                    return results
-                }
-            }
-        }
-
-        return results
-    }
-    
-    func suggestedStartingSet(for exercise: Exercise) -> LoggedSet? {
-        guard let latestExercise = lastPerformances(for: exercise.name, limit: 1).first,
-              let latestSet = latestExercise.sets.last else {
-            return nil
-        }
-
-        let previous = lastPerformances(for: exercise.name, limit: exercise.progressionRule.stallLimit)
-
-        guard let suggestion = ProgressionEngine.suggestion(
-            exercise: exercise,
-            currentSets: latestExercise.sets,
-            previousPerformances: Array(previous.dropFirst())
-        ) else {
-            return latestSet
-        }
-
-        return LoggedSet(
-            setNumber: 1,
-            weight: suggestion.suggestedWeight,
-            reps: latestSet.reps
-        )
-    }
-    
-    func replaceAll(with newLogs: [WorkoutLog]) {
-        logs = newLogs
-        save()
     }
 }
