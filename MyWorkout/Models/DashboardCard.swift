@@ -14,10 +14,10 @@ struct DashboardCard: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            Spacer()
+            Spacer(minLength: 0)
         }
         .padding()
-        .frame(width: 240, height: 120)
+        .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(.gray.opacity(0.12))

@@ -24,21 +24,46 @@ struct DashboardView: View {
                     
                     DashboardStatsView()
 
-                    LazyVGrid(columns: columns, spacing: 20) {
+                    dashboardSection(title: "Train") {
                         dashboardLink("Start Workout", "Begin training session", StartWorkoutView())
                         dashboardLink("History", "View previous workouts", HistoryView())
-                        dashboardLink("Analytics", "PRs, volume, trends", AnalyticsView())
                         dashboardLink("Calendar", "Training schedule", WorkoutCalendarView())
+                    }
+
+                    dashboardSection(title: "Progress") {
+                        dashboardLink("Analytics", "PRs, volume, trends", AnalyticsView())
+                        dashboardLink("Strength", "1RM progression", StrengthTrendView())
+                    }
+
+                    dashboardSection(title: "Manage") {
                         dashboardLink("Templates", "Create workout plans", CreateWorkoutTemplateView())
                         dashboardLink("Edit Templates", "Modify workouts", TemplateListView())
                         dashboardLink("Equipment", "Inventory & plates", EquipmentInventoryView())
-                        dashboardLink("Strength", "1RM progression", StrengthTrendView())
+                    }
+
+                    dashboardSection(title: "Settings") {
                         dashboardLink("Settings", "Units, timers, formulas", SettingsView())
                         dashboardLink("Export", "CSV backup & reports", ExportView())
                     }
-                    .padding()
                 }
+                .padding(.bottom)
             }
+        }
+    }
+
+    private func dashboardSection<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text(title)
+                .font(AppTheme.Typography.sectionTitle)
+                .padding(.horizontal)
+
+            LazyVGrid(columns: columns, spacing: 20) {
+                content()
+            }
+            .padding(.horizontal)
         }
     }
 

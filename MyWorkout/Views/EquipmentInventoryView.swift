@@ -50,22 +50,35 @@ struct EquipmentInventoryView: View {
 
     private var barbellSection: some View {
         sectionCard(title: "Barbell") {
-            HStack {
-                Text("Barbell weight")
-                    .frame(width: 160, alignment: .leading)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    Text("Barbell weight")
 
-                TextField("Weight", value: $equipmentStore.inventory.barbellWeight, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 100)
+                    weightField($equipmentStore.inventory.barbellWeight)
 
-                Text(unit)
-                    .foregroundStyle(.secondary)
+                    Text(unit)
+                        .foregroundStyle(.secondary)
 
-                Spacer()
+                    Spacer(minLength: 0)
+                }
+
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                    Text("Barbell weight")
+
+                    HStack(spacing: AppTheme.Spacing.md) {
+                        weightField($equipmentStore.inventory.barbellWeight)
+
+                        Text(unit)
+                            .foregroundStyle(.secondary)
+
+                        Spacer(minLength: 0)
+                    }
+                }
             }
             .onChange(of: equipmentStore.inventory.barbellWeight) { _ in
                 equipmentStore.save()
             }
+
             Button("Reset Inventory to Default") {
                 equipmentStore.resetToDefault(unit: settingsStore.settings.unitSystem)
             }
@@ -143,31 +156,56 @@ struct EquipmentInventoryView: View {
         quantity: Binding<Int>,
         deleteAction: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            Text("Weight")
-                .frame(width: 80, alignment: .leading)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: AppTheme.Spacing.md) {
+                weightField(weight)
 
-            TextField("Weight", value: weight, format: .number)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: 90)
+                Text(unit)
+                    .foregroundStyle(.secondary)
 
-            Text(unit)
-                .foregroundStyle(.secondary)
-                .frame(width: 30, alignment: .leading)
+                Stepper(value: quantity, in: 0...20) {
+                    Text("Qty: \(quantity.wrappedValue)")
+                }
+                .fixedSize()
 
-            Stepper(value: quantity, in: 0...20) {
-                Text("Qty: \(quantity.wrappedValue)")
-                    .frame(width: 80, alignment: .leading)
+                Spacer(minLength: 0)
+
+                deleteButton(action: deleteAction)
             }
-            .frame(width: 160)
 
-            Button("Delete") {
-                deleteAction()
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    weightField(weight)
+
+                    Text(unit)
+                        .foregroundStyle(.secondary)
+
+                    Spacer(minLength: 0)
+
+                    deleteButton(action: deleteAction)
+                }
+
+                Stepper(value: quantity, in: 0...20) {
+                    Text("Qty: \(quantity.wrappedValue)")
+                }
             }
-            .foregroundStyle(.red)
-
-            Spacer()
         }
+    }
+
+    private func weightField(_ weight: Binding<Double>) -> some View {
+        TextField("Weight", value: weight, format: .number)
+            .textFieldStyle(.roundedBorder)
+            #if os(iOS)
+            .keyboardType(.decimalPad)
+            #endif
+            .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
+    }
+
+    private func deleteButton(action: @escaping () -> Void) -> some View {
+        Button(role: .destructive, action: action) {
+            Image(systemName: "trash")
+        }
+        .accessibilityLabel("Delete")
     }
 
     private func addRow(
@@ -177,27 +215,49 @@ struct EquipmentInventoryView: View {
         placeholder: String,
         action: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            Text(title)
-                .frame(width: 100, alignment: .leading)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: AppTheme.Spacing.md) {
+                addRowFields(weightText: weightText, quantityText: quantityText, placeholder: placeholder)
 
+                Button("Add", action: action)
+                    .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
+                    .accessibilityLabel(title)
+
+                Spacer(minLength: 0)
+            }
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                addRowFields(weightText: weightText, quantityText: quantityText, placeholder: placeholder)
+
+                Button("Add", action: action)
+                    .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
+                    .accessibilityLabel(title)
+            }
+        }
+    }
+
+    private func addRowFields(
+        weightText: Binding<String>,
+        quantityText: Binding<String>,
+        placeholder: String
+    ) -> some View {
+        HStack(spacing: AppTheme.Spacing.md) {
             TextField(placeholder, text: weightText)
                 .textFieldStyle(.roundedBorder)
-                .frame(width: 120)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+                .frame(minWidth: 90, idealWidth: 120, maxWidth: 140)
 
             Text(unit)
                 .foregroundStyle(.secondary)
 
             TextField("Qty", text: quantityText)
                 .textFieldStyle(.roundedBorder)
-                .frame(width: 60)
-
-            Button("Add") {
-                action()
-            }
-            .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
-
-            Spacer()
+                #if os(iOS)
+                .keyboardType(.numberPad)
+                #endif
+                .frame(minWidth: 44, idealWidth: 60, maxWidth: 70)
         }
     }
 

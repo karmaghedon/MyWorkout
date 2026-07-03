@@ -119,6 +119,7 @@ struct TemplateEditorView: View {
 
                             Image(systemName: "plus.circle.fill")
                                 .foregroundStyle(AppTheme.accent)
+                                .accessibilityHidden(true)
                         }
                     }
                     .buttonStyle(.plain)
@@ -150,6 +151,7 @@ struct TemplateEditorView: View {
                 }
                 .buttonStyle(.borderless)
                 .disabled(index == 0)
+                .accessibilityLabel("Move \(exercise.name) up")
 
                 Button {
                     moveExercise(at: index, offset: 1)
@@ -158,6 +160,7 @@ struct TemplateEditorView: View {
                 }
                 .buttonStyle(.borderless)
                 .disabled(index == editableTemplate.exercises.count - 1)
+                .accessibilityLabel("Move \(exercise.name) down")
             }
 
             Button(role: .destructive) {
@@ -166,6 +169,7 @@ struct TemplateEditorView: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(.borderless)
+            .accessibilityLabel("Delete \(exercise.name)")
             #endif
         }
     }

@@ -36,6 +36,7 @@ struct RestTimerBadge: View {
                     .foregroundStyle(AppTheme.accent)
             }
             .frame(width: 32, height: 32)
+            .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("RESTING")
@@ -46,6 +47,8 @@ struct RestTimerBadge: View {
                     .font(AppTheme.Typography.numeric(22))
                     .monospacedDigit()
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Resting, \(timeText) remaining")
 
             Spacer()
 

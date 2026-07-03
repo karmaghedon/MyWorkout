@@ -138,6 +138,8 @@ struct WorkoutSessionView: View {
 
         state.loggedSets.append(newSet)
         exerciseStates[exerciseID] = state
+
+        Haptics.setLogged()
     }
 
     private func finishWorkout() {
@@ -182,7 +184,7 @@ struct WorkoutSessionView: View {
         stopRestTimer()
 
         activeRestExerciseID = exercise.id
-        restSecondsRemaining = RestTimerRule.seconds(
+        restTotalSeconds = RestTimerRule.seconds(
             for: exercise.exerciseType,
             settings: settingsStore.settings
         )
@@ -195,6 +197,7 @@ struct WorkoutSessionView: View {
                 timer.invalidate()
                 restTimer = nil
                 activeRestExerciseID = nil
+                Haptics.restComplete()
             }
         }
     }

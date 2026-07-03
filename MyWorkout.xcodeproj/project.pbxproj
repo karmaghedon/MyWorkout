@@ -57,6 +57,7 @@
 		F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */; };
 		F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005212FF6F7560079CC05 /* DashboardStatsView.swift */; };
 		F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */; };
+		F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B32FF83B9D00991F1D /* Haptics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -112,6 +113,7 @@
 		F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAnalyzer.swift; sourceTree = "<group>"; };
 		F54005212FF6F7560079CC05 /* DashboardStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsView.swift; sourceTree = "<group>"; };
 		F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionStrategy.swift; sourceTree = "<group>"; };
+		F59350B32FF83B9D00991F1D /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,8 +152,9 @@
 				F54004C32FF0C8290079CC05 /* Views */,
 				F54004DA2FF162CC0079CC05 /* Stores */,
 				F54004C22FF0C8150079CC05 /* Data */,
-				F54004E12FF169210079CC05 /* Helper */,
+				F54004E12FF169210079CC05 /* Logic */,
 				F54005042FF562580079CC05 /* Theme */,
+				F59350B22FF83B5D00991F1D /* Helper */,
 				F54004B62FF0C7030079CC05 /* Assets.xcassets */,
 				F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */,
 				F54004B82FF0C7030079CC05 /* Preview Content */,
@@ -232,7 +235,7 @@
 			path = Stores;
 			sourceTree = "<group>";
 		};
-		F54004E12FF169210079CC05 /* Helper */ = {
+		F54004E12FF169210079CC05 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
 				F54004E42FF16A750079CC05 /* ProgressionEngine.swift */,
@@ -244,7 +247,7 @@
 				F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */,
 				F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */,
 			);
-			path = Helper;
+			path = Logic;
 			sourceTree = "<group>";
 		};
 		F54005042FF562580079CC05 /* Theme */ = {
@@ -253,6 +256,14 @@
 				F54005092FF58D660079CC05 /* AppTheme.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		F59350B22FF83B5D00991F1D /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				F59350B32FF83B9D00991F1D /* Haptics.swift */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -360,6 +371,7 @@
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
+				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
 				F54004EF2FF41AD90079CC05 /* PlateCalculator.swift in Sources */,
 				F54004F52FF41DEA0079CC05 /* EquipmentInventoryView.swift in Sources */,

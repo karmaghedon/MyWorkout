@@ -35,6 +35,8 @@ struct CreateWorkoutTemplateView: View {
             .pickerStyle(.menu)
 
             List(filteredExercises) { exercise in
+                let isSelected = selectedExerciseIDs.contains(exercise.id)
+
                 Button {
                     toggle(exercise)
                 } label: {
@@ -50,13 +52,16 @@ struct CreateWorkoutTemplateView: View {
 
                         Spacer()
 
-                        if selectedExerciseIDs.contains(exercise.id) {
+                        if isSelected {
                             Image(systemName: "checkmark.circle.fill")
+                                .accessibilityHidden(true)
                         }
                     }
                     .padding(.vertical, 6)
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+                .accessibilityValue(isSelected ? "Selected" : "")
             }
 
             Button("Save Template") {
