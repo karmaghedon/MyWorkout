@@ -27,7 +27,6 @@ struct DashboardView: View {
                     dashboardSection(title: "Train") {
                         dashboardLink("Start Workout", "Begin training session", StartWorkoutView())
                         dashboardLink("History", "View previous workouts", HistoryView())
-                        dashboardLink("Calendar", "Training schedule", WorkoutCalendarView())
                     }
 
                     dashboardSection(title: "Progress") {
