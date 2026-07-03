@@ -35,8 +35,7 @@ struct DashboardView: View {
                     }
 
                     dashboardSection(title: "Manage") {
-                        dashboardLink("Templates", "Create workout plans", CreateWorkoutTemplateView())
-                        dashboardLink("Edit Templates", "Modify workouts", TemplateListView())
+                        dashboardLink("Templates", "Create & edit workout plans", TemplatesView())
                         dashboardLink("Equipment", "Inventory & plates", EquipmentInventoryView())
                     }
 
