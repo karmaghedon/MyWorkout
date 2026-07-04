@@ -57,6 +57,7 @@ struct WorkoutSessionView: View {
             }
         }
         .onAppear {
+            activeWorkoutStore.resumeTimer()
             initializeStates()
         }
         .onDisappear {
@@ -112,6 +113,8 @@ struct WorkoutSessionView: View {
     private func workoutContent(_ workout: Workout) -> some View {
         ScrollView {
             LazyVStack(spacing: AppTheme.Spacing.lg) {
+                workoutTimerCard
+
                 ForEach(workout.exercises) { exercise in
                     ExerciseSessionCardView(
                         exercise: exercise,
@@ -161,6 +164,31 @@ struct WorkoutSessionView: View {
             .padding(AppTheme.Spacing.lg)
             .animation(.default, value: activeRestExerciseID)
         }
+    }
+
+    private var workoutTimerCard: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("WORKOUT TIME")
+                    .font(AppTheme.Typography.eyebrow)
+                    .foregroundStyle(.secondary)
+
+                Text(activeWorkoutStore.formattedElapsedTime)
+                    .font(AppTheme.Typography.numeric(28))
+                    .monospacedDigit()
+            }
+
+            Spacer()
+
+            Image(systemName: "timer")
+                .font(.title2)
+                .foregroundStyle(AppTheme.accent)
+        }
+        .padding(AppTheme.Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.cardBackground)
+        )
     }
 
     private func initializeStates() {
@@ -248,6 +276,7 @@ struct WorkoutSessionView: View {
         let log = WorkoutLog(
             workoutName: workout.name,
             date: Date(),
+            durationSeconds: activeWorkoutStore.currentDurationSeconds(),
             completedExercises: completedExercises
         )
 
@@ -312,7 +341,9 @@ struct WorkoutSessionView: View {
             total + (activeWorkoutStore.exerciseStates[exercise.id]?.loggedSets.count ?? 0)
         }
 
-        return completed.joined(separator: "\n") + "\n\nTotal sets: \(totalSets)"
+        return completed.joined(separator: "\n")
+            + "\n\nTotal sets: \(totalSets)"
+            + "\nDuration: \(activeWorkoutStore.formattedElapsedTime)"
     }
 
     private func deleteSet(setID: UUID, for exerciseID: UUID) {

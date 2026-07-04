@@ -4,7 +4,22 @@ struct WorkoutLog: Identifiable, Codable {
     var id = UUID()
     let workoutName: String
     let date: Date
+    let durationSeconds: Int?
     let completedExercises: [CompletedExercise]
+
+    init(
+        id: UUID = UUID(),
+        workoutName: String,
+        date: Date,
+        durationSeconds: Int? = nil,
+        completedExercises: [CompletedExercise]
+    ) {
+        self.id = id
+        self.workoutName = workoutName
+        self.date = date
+        self.durationSeconds = durationSeconds
+        self.completedExercises = completedExercises
+    }
 }
 
 struct CompletedExercise: Identifiable, Codable {

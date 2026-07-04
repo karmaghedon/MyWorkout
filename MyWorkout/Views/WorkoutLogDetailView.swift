@@ -4,9 +4,27 @@ struct WorkoutLogDetailView: View {
     let log: WorkoutLog
 
     @EnvironmentObject var settingsStore: UserSettingsStore
-    
+
     var body: some View {
         List {
+            Section("Summary") {
+                HStack {
+                    Text("Date")
+                    Spacer()
+                    Text(log.date.formatted(date: .abbreviated, time: .shortened))
+                        .foregroundStyle(.secondary)
+                }
+
+                if let durationSeconds = log.durationSeconds {
+                    HStack {
+                        Text("Duration")
+                        Spacer()
+                        Text(ActiveWorkoutStore.formatDuration(durationSeconds))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             ForEach(log.completedExercises) { exercise in
                 Section(exercise.exerciseName) {
                     ForEach(exercise.sets) { set in

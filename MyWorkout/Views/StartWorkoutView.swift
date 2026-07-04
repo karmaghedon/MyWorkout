@@ -6,6 +6,8 @@ struct StartWorkoutView: View {
     @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
 
     @State private var showWorkoutSession = false
+    @State private var templatePendingStart: WorkoutTemplate?
+    @State private var showActiveWorkoutWarning = false
 
     var body: some View {
         List {
@@ -18,7 +20,7 @@ struct StartWorkoutView: View {
                             Text("Resume \(activeWorkout.name)")
                                 .font(.headline)
 
-                            Text("Workout in progress")
+                            Text("Workout in progress • \(activeWorkoutStore.formattedElapsedTime)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -35,13 +37,7 @@ struct StartWorkoutView: View {
             Section("Templates") {
                 ForEach(templateStore.templates) { template in
                     Button {
-                        let workout = Workout(
-                            name: template.name,
-                            exercises: template.exercises
-                        )
-
-                        activeWorkoutStore.start(workout)
-                        showWorkoutSession = true
+                        handleTemplateTap(template)
                     } label: {
                         row(for: template)
                     }
@@ -58,6 +54,49 @@ struct StartWorkoutView: View {
         .navigationDestination(isPresented: $showWorkoutSession) {
             WorkoutSessionView()
         }
+        .confirmationDialog(
+            "Active workout in progress",
+            isPresented: $showActiveWorkoutWarning,
+            titleVisibility: .visible
+        ) {
+            Button("Resume Active Workout") {
+                templatePendingStart = nil
+                showWorkoutSession = true
+            }
+
+            Button("Cancel Active Workout and Start New", role: .destructive) {
+                guard let template = templatePendingStart else { return }
+
+                activeWorkoutStore.cancel()
+                startWorkout(from: template)
+                templatePendingStart = nil
+            }
+
+            Button("Do Nothing", role: .cancel) {
+                templatePendingStart = nil
+            }
+        } message: {
+            Text("You already have a workout running. Starting a new one will discard the active session.")
+        }
+    }
+
+    private func handleTemplateTap(_ template: WorkoutTemplate) {
+        if activeWorkoutStore.hasActiveWorkout {
+            templatePendingStart = template
+            showActiveWorkoutWarning = true
+        } else {
+            startWorkout(from: template)
+        }
+    }
+
+    private func startWorkout(from template: WorkoutTemplate) {
+        let workout = Workout(
+            name: template.name,
+            exercises: template.exercises
+        )
+
+        activeWorkoutStore.start(workout)
+        showWorkoutSession = true
     }
 
     private func row(for template: WorkoutTemplate) -> some View {
