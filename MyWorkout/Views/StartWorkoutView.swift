@@ -3,19 +3,49 @@ import SwiftUI
 struct StartWorkoutView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var logStore: WorkoutLogStore
+    @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
+
+    @State private var showWorkoutSession = false
 
     var body: some View {
         List {
-            ForEach(templateStore.templates) { template in
-                NavigationLink {
-                    WorkoutSessionView(
-                        workout: Workout(
+            if let activeWorkout = activeWorkoutStore.activeWorkout {
+                Section("Active Workout") {
+                    Button {
+                        showWorkoutSession = true
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Resume \(activeWorkout.name)")
+                                .font(.headline)
+
+                            Text("Workout in progress")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Button(role: .destructive) {
+                        activeWorkoutStore.cancel()
+                    } label: {
+                        Label("Cancel Active Workout", systemImage: "xmark.circle")
+                    }
+                }
+            }
+
+            Section("Templates") {
+                ForEach(templateStore.templates) { template in
+                    Button {
+                        let workout = Workout(
                             name: template.name,
                             exercises: template.exercises
                         )
-                    )
-                } label: {
-                    row(for: template)
+
+                        activeWorkoutStore.start(workout)
+                        showWorkoutSession = true
+                    } label: {
+                        row(for: template)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -25,6 +55,9 @@ struct StartWorkoutView: View {
             }
         }
         .navigationTitle("Start Workout")
+        .navigationDestination(isPresented: $showWorkoutSession) {
+            WorkoutSessionView()
+        }
     }
 
     private func row(for template: WorkoutTemplate) -> some View {
@@ -51,6 +84,12 @@ struct StartWorkoutView: View {
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
         .padding(.vertical, 4)
     }

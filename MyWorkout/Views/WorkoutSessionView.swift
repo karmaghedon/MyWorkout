@@ -2,78 +2,60 @@ import SwiftUI
 
 struct ExerciseSessionState {
     var reps: Int = 10
-    var weight: Int = 45
+    var weight: Int = 0
     var loggedSets: [LoggedSet] = []
     var suggestionMessage: String? = nil
     var notes: String = ""
 }
 
 struct WorkoutSessionView: View {
-    let workout: Workout
-
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var settingsStore: UserSettingsStore
+    @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
+    @Environment(\.dismiss) private var dismiss
 
-    @State private var exerciseStates: [UUID: ExerciseSessionState] = [:]
     @State private var activeRestExerciseID: UUID?
     @State private var restSecondsRemaining = 0
     @State private var restTotalSeconds = 0
     @State private var restTimer: Timer?
     @State private var showFinishSummary = false
+    @State private var showLeaveConfirmation = false
+    @State private var showCancelConfirmation = false
+
+    private var workout: Workout? {
+        activeWorkoutStore.activeWorkout
+    }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(spacing: AppTheme.Spacing.lg) {
-                    ForEach(workout.exercises) { exercise in
-                        ExerciseSessionCardView(
-                            exercise: exercise,
-                            state: binding(for: exercise.id),
-                            previousSets: logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? [],
-                            weightStep: exercise.usesBarbell
-                                ? equipmentStore.smallestPlateIncrement()
-                                : 5,
-                            equipmentInventory: equipmentStore.inventory,
-                            isResting: activeRestExerciseID == exercise.id && restSecondsRemaining > 0,
-                            restSecondsRemaining: restSecondsRemaining,
-                            restTotalSeconds: restTotalSeconds,
-                            onLogSet: {
-                                logSet(for: exercise.id)
-                                startRestTimer(for: exercise)
-                            },
-                            onStopRest: stopRestTimer,
-                            onDeleteSet: { setID in
-                                deleteSet(setID: setID, for: exercise.id)
-                            }
-                        )
-                    }
-                }
-                .padding(AppTheme.Spacing.lg)
-                .animation(.default, value: activeRestExerciseID)
+        Group {
+            if let workout {
+                workoutContent(workout)
+            } else {
+                ContentUnavailableView(
+                    "No Active Workout",
+                    systemImage: "figure.strengthtraining.traditional",
+                    description: Text("Start a workout from a template.")
+                )
             }
-            .background(AppTheme.groupedBackground)
-
-            Divider()
-
-            Button {
-                showFinishSummary = true
-            } label: {
-                Text("Finish Workout")
-                    .font(AppTheme.Typography.label)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(AppTheme.accent)
-            .controlSize(.large)
-            .padding(AppTheme.Spacing.lg)
-            .background(.bar)
         }
-        .navigationTitle(workout.name)
+        .background(AppTheme.groupedBackground)
+        .navigationTitle(workout?.name ?? "Workout")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .navigationBarBackButtonHidden(activeWorkoutStore.hasLoggedSets)
+        .toolbar {
+            if activeWorkoutStore.hasLoggedSets {
+                ToolbarItem(placement: .navigation) {
+                    Button {
+                        showLeaveConfirmation = true
+                    } label: {
+                        Label("Back", systemImage: "chevron.left")
+                    }
+                }
+            }
+        }
         .onAppear {
             initializeStates()
         }
@@ -93,11 +75,99 @@ struct WorkoutSessionView: View {
         } message: {
             Text(workoutSummaryText())
         }
+        .confirmationDialog(
+            "Leave workout?",
+            isPresented: $showLeaveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Keep Workout Running") {
+                dismiss()
+            }
+
+            Button("Cancel Workout", role: .destructive) {
+                activeWorkoutStore.cancel()
+                dismiss()
+            }
+
+            Button("Stay Here", role: .cancel) {}
+        } message: {
+            Text("Your logged sets will remain active if you keep the workout running.")
+        }
+        .confirmationDialog(
+            "Cancel Workout?",
+            isPresented: $showCancelConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Cancel Workout", role: .destructive) {
+                activeWorkoutStore.cancel()
+                dismiss()
+            }
+
+            Button("Keep Workout", role: .cancel) {}
+        } message: {
+            Text("This will discard the current workout and all logged sets.")
+        }
+    }
+
+    private func workoutContent(_ workout: Workout) -> some View {
+        ScrollView {
+            LazyVStack(spacing: AppTheme.Spacing.lg) {
+                ForEach(workout.exercises) { exercise in
+                    ExerciseSessionCardView(
+                        exercise: exercise,
+                        state: binding(for: exercise.id),
+                        previousSets: logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? [],
+                        weightStep: exercise.usesBarbell
+                            ? equipmentStore.smallestPlateIncrement()
+                            : 5,
+                        equipmentInventory: equipmentStore.inventory,
+                        isResting: activeRestExerciseID == exercise.id && restSecondsRemaining > 0,
+                        restSecondsRemaining: restSecondsRemaining,
+                        restTotalSeconds: restTotalSeconds,
+                        onLogSet: {
+                            logSet(for: exercise.id)
+                            startRestTimer(for: exercise)
+                        },
+                        onStopRest: stopRestTimer,
+                        onDeleteSet: { setID in
+                            deleteSet(setID: setID, for: exercise.id)
+                        }
+                    )
+                }
+
+                Button {
+                    showFinishSummary = true
+                } label: {
+                    Text("Finish Workout")
+                        .font(AppTheme.Typography.label)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(AppTheme.accent)
+                .controlSize(.large)
+                .padding(.top, AppTheme.Spacing.lg)
+
+                Button(role: .destructive) {
+                    showCancelConfirmation = true
+                } label: {
+                    Text("Cancel Workout")
+                        .font(AppTheme.Typography.label)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .padding(.bottom, AppTheme.Spacing.xl)
+            }
+            .padding(AppTheme.Spacing.lg)
+            .animation(.default, value: activeRestExerciseID)
+        }
     }
 
     private func initializeStates() {
+        guard let workout else { return }
+
         for exercise in workout.exercises {
-            if exerciseStates[exercise.id] == nil {
+            if activeWorkoutStore.exerciseStates[exercise.id] == nil {
                 if let latestExercise = logStore.lastPerformances(for: exercise, limit: 1).first,
                    let latestSet = latestExercise.sets.last {
 
@@ -112,7 +182,7 @@ struct WorkoutSessionView: View {
                         previousPerformances: Array(previous.dropFirst())
                     )
 
-                    exerciseStates[exercise.id] = ExerciseSessionState(
+                    activeWorkoutStore.exerciseStates[exercise.id] = ExerciseSessionState(
                         reps: latestSet.reps,
                         weight: suggestion?.suggestedWeight ?? latestSet.weight,
                         loggedSets: [],
@@ -120,16 +190,29 @@ struct WorkoutSessionView: View {
                         notes: ""
                     )
                 } else {
-                    exerciseStates[exercise.id] = ExerciseSessionState(
-                        suggestionMessage: "No history yet"
+                    activeWorkoutStore.exerciseStates[exercise.id] = ExerciseSessionState(
+                        reps: 10,
+                        weight: defaultStartingWeight(for: exercise),
+                        loggedSets: [],
+                        suggestionMessage: "No history yet",
+                        notes: ""
                     )
                 }
             }
         }
     }
 
+    private func defaultStartingWeight(for exercise: Exercise) -> Int {
+        switch exercise.exerciseType {
+        case .bodyweight:
+            return 0
+        case .compound, .isolation:
+            return exercise.usesBarbell ? Int(equipmentStore.inventory.barbellWeight.rounded()) : 0
+        }
+    }
+
     private func logSet(for exerciseID: UUID) {
-        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+        var state = activeWorkoutStore.exerciseStates[exerciseID] ?? ExerciseSessionState()
 
         let newSet = LoggedSet(
             setNumber: state.loggedSets.count + 1,
@@ -138,14 +221,16 @@ struct WorkoutSessionView: View {
         )
 
         state.loggedSets.append(newSet)
-        exerciseStates[exerciseID] = state
+        activeWorkoutStore.exerciseStates[exerciseID] = state
 
         Haptics.setLogged()
     }
 
     private func finishWorkout() {
+        guard let workout else { return }
+
         let completedExercises = workout.exercises.compactMap { exercise -> CompletedExercise? in
-            guard let state = exerciseStates[exercise.id],
+            guard let state = activeWorkoutStore.exerciseStates[exercise.id],
                   !state.loggedSets.isEmpty else {
                 return nil
             }
@@ -167,16 +252,17 @@ struct WorkoutSessionView: View {
         )
 
         logStore.add(log)
+        activeWorkoutStore.finish()
         dismiss()
     }
 
     private func binding(for exerciseID: UUID) -> Binding<ExerciseSessionState> {
         Binding(
             get: {
-                exerciseStates[exerciseID] ?? ExerciseSessionState()
+                activeWorkoutStore.exerciseStates[exerciseID] ?? ExerciseSessionState()
             },
             set: {
-                exerciseStates[exerciseID] = $0
+                activeWorkoutStore.exerciseStates[exerciseID] = $0
             }
         )
     }
@@ -206,13 +292,15 @@ struct WorkoutSessionView: View {
     private func stopRestTimer() {
         restTimer?.invalidate()
         restTimer = nil
-        activeRestExerciseID = nil
         restSecondsRemaining = 0
+        activeRestExerciseID = nil
     }
 
     private func workoutSummaryText() -> String {
+        guard let workout else { return "No active workout." }
+
         let completed = workout.exercises.compactMap { exercise -> String? in
-            guard let state = exerciseStates[exercise.id],
+            guard let state = activeWorkoutStore.exerciseStates[exercise.id],
                   !state.loggedSets.isEmpty else {
                 return nil
             }
@@ -221,14 +309,14 @@ struct WorkoutSessionView: View {
         }
 
         let totalSets = workout.exercises.reduce(0) { total, exercise in
-            total + (exerciseStates[exercise.id]?.loggedSets.count ?? 0)
+            total + (activeWorkoutStore.exerciseStates[exercise.id]?.loggedSets.count ?? 0)
         }
 
         return completed.joined(separator: "\n") + "\n\nTotal sets: \(totalSets)"
     }
 
     private func deleteSet(setID: UUID, for exerciseID: UUID) {
-        guard var state = exerciseStates[exerciseID] else { return }
+        guard var state = activeWorkoutStore.exerciseStates[exerciseID] else { return }
 
         state.loggedSets.removeAll { $0.id == setID }
 
@@ -240,6 +328,6 @@ struct WorkoutSessionView: View {
             )
         }
 
-        exerciseStates[exerciseID] = state
+        activeWorkoutStore.exerciseStates[exerciseID] = state
     }
 }

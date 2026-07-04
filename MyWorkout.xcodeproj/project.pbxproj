@@ -58,6 +58,8 @@
 		F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B32FF83B9D00991F1D /* Haptics.swift */; };
 		F59350B62FF848AD00991F1D /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B52FF848AD00991F1D /* TemplatesView.swift */; };
 		F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */; };
+		F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5BF30342FF9473400AB5AD9 /* LaunchScreen.storyboard */; };
+		F5BF30372FF9662900AB5AD9 /* ActiveWorkoutStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -114,6 +116,8 @@
 		F59350B32FF83B9D00991F1D /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		F59350B52FF848AD00991F1D /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatesView.swift; sourceTree = "<group>"; };
 		F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
+		F5BF30342FF9473400AB5AD9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +162,7 @@
 				F54004B62FF0C7030079CC05 /* Assets.xcassets */,
 				F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */,
 				F54004B82FF0C7030079CC05 /* Preview Content */,
+				F5BF30342FF9473400AB5AD9 /* LaunchScreen.storyboard */,
 			);
 			path = MyWorkout;
 			sourceTree = "<group>";
@@ -231,6 +236,7 @@
 				F54004D42FF0CF5C0079CC05 /* WorkoutLogStore.swift */,
 				F54004F22FF41DC50079CC05 /* EquipmentInventoryStore.swift */,
 				F540050D2FF598060079CC05 /* UserSettingsStore.swift */,
+				F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -324,6 +330,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */,
 				F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */,
 				F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */,
 			);
@@ -359,6 +366,7 @@
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
 				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
 				F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */,
+				F5BF30372FF9662900AB5AD9 /* ActiveWorkoutStore.swift in Sources */,
 				F54004C52FF0C83E0079CC05 /* Exercise.swift in Sources */,
 				F54004CB2FF0C8640079CC05 /* SeedData.swift in Sources */,
 				F54004E72FF338CE0079CC05 /* ExerciseType.swift in Sources */,
@@ -523,6 +531,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -554,6 +564,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

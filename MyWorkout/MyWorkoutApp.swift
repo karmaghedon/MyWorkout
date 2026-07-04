@@ -12,6 +12,7 @@ struct MyWorkoutApp: App {
     @StateObject private var templateStore = WorkoutTemplateStore()
     @StateObject private var equipmentStore = EquipmentInventoryStore()
     @StateObject private var settingsStore = UserSettingsStore()
+    @StateObject private var activeWorkoutStore = ActiveWorkoutStore()
     
     var body: some Scene {
         WindowGroup {
@@ -20,6 +21,7 @@ struct MyWorkoutApp: App {
                 .environmentObject(templateStore)
                 .environmentObject(equipmentStore)
                 .environmentObject(settingsStore)
+                .environmentObject(activeWorkoutStore)
         }
     }
 }
