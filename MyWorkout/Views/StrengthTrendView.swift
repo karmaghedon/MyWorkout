@@ -39,37 +39,43 @@ struct StrengthTrendView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Picker("Exercise", selection: $selectedExerciseName) {
-                ForEach(exerciseNames, id: \.self) { name in
-                    Text(name).tag(name)
-                }
-            }
-            .pickerStyle(.menu)
-
-            if trendData.isEmpty {
-                Text("No strength trend data yet")
-                    .foregroundColor(.secondary)
+            if exerciseNames.isEmpty {
+                emptyState
             } else {
-                Chart(trendData) { point in
-                    LineMark(
-                        x: .value("Date", point.date),
-                        y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
-                    )
-
-                    PointMark(
-                        x: .value("Date", point.date),
-                        y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
-                    )
-                }
-                .frame(height: 300)
-
-                List(trendData.reversed()) { point in
-                    HStack {
-                        Text(point.date.formatted(date: .abbreviated, time: .omitted))
-                        Spacer()
-                        Text("\(settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded()))) \(settingsStore.settings.weightUnitLabel)")
-                            .bold()
+                Picker("Exercise", selection: $selectedExerciseName) {
+                    ForEach(exerciseNames, id: \.self) { name in
+                        Text(name).tag(name)
                     }
+                }
+                .pickerStyle(.menu)
+
+                if let latest = trendData.last {
+                    currentBestCard(latest: latest)
+
+                    Chart(trendData) { point in
+                        LineMark(
+                            x: .value("Date", point.date),
+                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
+                        )
+
+                        PointMark(
+                            x: .value("Date", point.date),
+                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
+                        )
+                    }
+                    .frame(height: 300)
+
+                    List(trendData.reversed()) { point in
+                        HStack {
+                            Text(point.date.formatted(date: .abbreviated, time: .omitted))
+                            Spacer()
+                            Text("\(settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded()))) \(settingsStore.settings.weightUnitLabel)")
+                                .bold()
+                        }
+                    }
+                } else {
+                    Text("No strength trend data yet")
+                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -80,6 +86,44 @@ struct StrengthTrendView: View {
                 selectedExerciseName = exerciseNames.first ?? ""
             }
         }
+    }
+
+    @ViewBuilder
+    private func currentBestCard(latest: StrengthPoint) -> some View {
+        let displayValue = settingsStore.settings.displayWeight(Int(latest.estimatedOneRepMax.rounded()))
+
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Current Est. 1RM")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text("\(displayValue) \(settingsStore.settings.weightUnitLabel)")
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(AppTheme.accentMuted)
+        )
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+
+            Text("No Strength Data Yet")
+                .font(.headline)
+
+            Text("Log a few workouts and your estimated 1RM trends will show up here.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
     }
 
     private func estimatedOneRepMax(weight: Int, reps: Int) -> Double {
