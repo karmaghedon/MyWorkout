@@ -21,7 +21,7 @@ final class WorkoutTemplateStore: ObservableObject {
     }
 
     func add(_ template: WorkoutTemplate) {
-        templates.append(template)
+        templates.append(refreshed(template))
         save()
     }
 
@@ -37,9 +37,11 @@ final class WorkoutTemplateStore: ObservableObject {
     }
 
     func duplicate(_ template: WorkoutTemplate) {
+        let refreshedTemplate = refreshed(template)
+
         let copy = WorkoutTemplate(
-            name: "\(template.name) Copy",
-            exercises: template.exercises
+            name: "\(refreshedTemplate.name) Copy",
+            exercises: refreshedTemplate.exercises
         )
 
         templates.append(copy)
