@@ -39,84 +39,126 @@ struct ExportView: View {
     @State private var showCSVExporter = false
     @State private var csvDocument = CSVDocument(text: "")
 
+    // Import is destructive (it replaces all local data), so a picked file
+    // is held here and only actually applied after the user confirms.
+    @State private var pendingImportURL: URL?
+    @State private var showImportConfirmation = false
+
+    @State private var importResultMessage: String?
+    @State private var showImportResult = false
+
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-            Text("Export")
-                .font(AppTheme.Typography.sectionTitle)
+        Form {
+            Section {
+                Text("Export your workout history as a CSV file that can be opened in Excel, Numbers, or Google Sheets.")
+                    .foregroundStyle(.secondary)
 
-            Text("Export your workout history as a CSV file that can be opened in Excel, Numbers, or Google Sheets.")
-                .foregroundStyle(.secondary)
-
-            Button("Export Workout History CSV") {
-                csvDocument = CSVDocument(text: csvText())
-                showCSVExporter = true
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(AppTheme.accent)
-            .fileExporter(
-                isPresented: $showCSVExporter,
-                document: csvDocument,
-                contentType: .commaSeparatedText,
-                defaultFilename: filename()
-            ) { result in
-                switch result {
-                case .success(let url):
-                    print("CSV exported to: \(url)")
-                case .failure(let error):
-                    print("Failed to export CSV: \(error)")
+                Button {
+                    csvDocument = CSVDocument(text: csvText())
+                    showCSVExporter = true
+                } label: {
+                    Label("Export Workout History CSV", systemImage: "tablecells")
                 }
-            }
-            
-            Button("Export Full Backup JSON") {
-                backupDocument = BackupDocument(
-                    backup: AppBackup(
-                        version: 1,
-                        exportedAt: Date(),
-                        logs: logStore.logs,
-                        templates: templateStore.templates,
-                        equipment: equipmentStore.inventory,
-                        settings: settingsStore.settings
+                .fileExporter(
+                    isPresented: $showCSVExporter,
+                    document: csvDocument,
+                    contentType: .commaSeparatedText,
+                    defaultFilename: filename()
+                ) { result in
+                    switch result {
+                    case .success(let url):
+                        print("CSV exported to: \(url)")
+                    case .failure(let error):
+                        print("Failed to export CSV: \(error)")
+                    }
+                }
+
+                Button {
+                    backupDocument = BackupDocument(
+                        backup: AppBackup(
+                            version: 1,
+                            exportedAt: Date(),
+                            logs: logStore.logs,
+                            templates: templateStore.templates,
+                            equipment: equipmentStore.inventory,
+                            settings: settingsStore.settings
+                        )
                     )
-                )
-                showJSONExporter = true
-            }
-            .buttonStyle(.bordered)
-            .fileExporter(
-                isPresented: $showJSONExporter,
-                document: backupDocument,
-                contentType: .json,
-                defaultFilename: jsonFilename()
-            ) { result in
-                switch result {
-                case .success(let url):
-                    print("JSON backup exported to: \(url)")
-                case .failure(let error):
-                    print("Failed to export JSON backup: \(error)")
+                    showJSONExporter = true
+                } label: {
+                    Label("Export Full Backup JSON", systemImage: "arrow.down.doc.fill")
                 }
+                .fileExporter(
+                    isPresented: $showJSONExporter,
+                    document: backupDocument,
+                    contentType: .json,
+                    defaultFilename: jsonFilename()
+                ) { result in
+                    switch result {
+                    case .success(let url):
+                        print("JSON backup exported to: \(url)")
+                    case .failure(let error):
+                        print("Failed to export JSON backup: \(error)")
+                    }
+                }
+            } header: {
+                Label("Export", systemImage: "square.and.arrow.up")
             }
 
-            Button("Import Full Backup JSON") {
-                showJSONImporter = true
-            }
-            .buttonStyle(.bordered)
-            .fileImporter(
-                isPresented: $showJSONImporter,
-                allowedContentTypes: [.json],
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    guard let url = urls.first else { return }
-                    importBackup(from: url)
-                case .failure(let error):
-                    print("Failed to import JSON backup: \(error)")
+            Section {
+                Button(role: .destructive) {
+                    showJSONImporter = true
+                } label: {
+                    Label("Import Full Backup JSON", systemImage: "arrow.up.doc.fill")
                 }
+                .fileImporter(
+                    isPresented: $showJSONImporter,
+                    allowedContentTypes: [.json],
+                    allowsMultipleSelection: false
+                ) { result in
+                    switch result {
+                    case .success(let urls):
+                        guard let url = urls.first else { return }
+                        pendingImportURL = url
+                        showImportConfirmation = true
+                    case .failure(let error):
+                        importResultMessage = "Couldn't open that file: \(error.localizedDescription)"
+                        showImportResult = true
+                    }
+                }
+            } header: {
+                Label("Import", systemImage: "square.and.arrow.down")
+            } footer: {
+                Text("Importing replaces all current workouts, templates, equipment, and settings with the contents of the backup file. This can't be undone.")
             }
-
-            Spacer()
         }
-        .padding(AppTheme.Spacing.lg)
         .navigationTitle("Backup & Export")
+        .confirmationDialog(
+            "Replace All Data?",
+            isPresented: $showImportConfirmation,
+            titleVisibility: .visible,
+            presenting: pendingImportURL
+        ) { url in
+            Button("Replace Data", role: .destructive) {
+                performImport(from: url)
+                pendingImportURL = nil
+            }
+
+            Button("Cancel", role: .cancel) {
+                pendingImportURL = nil
+            }
+        } message: { _ in
+            Text("This will permanently replace all your current workouts, templates, equipment, and settings with the contents of this backup file.")
+        }
+        .alert(
+            "Import Backup",
+            isPresented: $showImportResult,
+            presenting: importResultMessage
+        ) { _ in
+            Button("OK", role: .cancel) {}
+        } message: { message in
+            Text(message)
+        }
     }
 
     private func csvText() -> String {
@@ -138,7 +180,17 @@ struct ExportView: View {
         return "MyWorkout_Backup_\(formatter.string(from: Date())).json"
     }
 
-    private func importBackup(from url: URL) {
+    private func performImport(from url: URL) {
+        // Files handed back by .fileImporter may require security-scoped
+        // access (e.g. files picked from iCloud Drive/Files); without this,
+        // reading can silently fail for files outside the app's sandbox.
+        let didStartAccessing = url.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccessing {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
         do {
             let data = try Data(contentsOf: url)
 
@@ -152,9 +204,11 @@ struct ExportView: View {
             equipmentStore.replace(with: backup.equipment)
             settingsStore.replace(with: backup.settings)
 
-            print("Backup imported successfully")
+            importResultMessage = "Backup imported successfully."
         } catch {
-            print("Failed to import backup: \(error)")
+            importResultMessage = "Failed to import backup: \(error.localizedDescription)"
         }
+
+        showImportResult = true
     }
 }
