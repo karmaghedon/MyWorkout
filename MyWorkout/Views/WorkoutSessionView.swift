@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ExerciseSessionState {
+struct ExerciseSessionState: Codable {
     var reps: Int = 10
     var weight: Int = 0
     var loggedSets: [LoggedSet] = []
@@ -15,10 +15,6 @@ struct WorkoutSessionView: View {
     @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var activeRestExerciseID: UUID?
-    @State private var restSecondsRemaining = 0
-    @State private var restTotalSeconds = 0
-    @State private var restTimer: Timer?
     @State private var showFinishSummary = false
     @State private var showLeaveConfirmation = false
     @State private var showCancelConfirmation = false
@@ -61,7 +57,7 @@ struct WorkoutSessionView: View {
             initializeStates()
         }
         .onDisappear {
-            stopRestTimer()
+            // Keep rest timer running in ActiveWorkoutStore
         }
         .confirmationDialog(
             "Finish Workout?",
@@ -124,9 +120,9 @@ struct WorkoutSessionView: View {
                             ? equipmentStore.smallestPlateIncrement()
                             : 5,
                         equipmentInventory: equipmentStore.inventory,
-                        isResting: activeRestExerciseID == exercise.id && restSecondsRemaining > 0,
-                        restSecondsRemaining: restSecondsRemaining,
-                        restTotalSeconds: restTotalSeconds,
+                        isResting: activeWorkoutStore.activeRestExerciseID == exercise.id && activeWorkoutStore.restSecondsRemaining > 0,
+                        restSecondsRemaining: activeWorkoutStore.restSecondsRemaining,
+                        restTotalSeconds: activeWorkoutStore.restTotalSeconds,
                         onLogSet: {
                             logSet(for: exercise.id)
                             startRestTimer(for: exercise)
@@ -162,7 +158,7 @@ struct WorkoutSessionView: View {
                 .padding(.bottom, AppTheme.Spacing.xl)
             }
             .padding(AppTheme.Spacing.lg)
-            .animation(.default, value: activeRestExerciseID)
+            .animation(.default, value: activeWorkoutStore.activeRestExerciseID)
         }
     }
 
@@ -297,32 +293,19 @@ struct WorkoutSessionView: View {
     }
 
     private func startRestTimer(for exercise: Exercise) {
-        stopRestTimer()
-
-        activeRestExerciseID = exercise.id
-        restTotalSeconds = RestTimerRule.seconds(
+        let seconds = RestTimerRule.seconds(
             for: exercise.exerciseType,
             settings: settingsStore.settings
         )
-        restSecondsRemaining = restTotalSeconds
 
-        restTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-            if restSecondsRemaining > 0 {
-                restSecondsRemaining -= 1
-            } else {
-                timer.invalidate()
-                restTimer = nil
-                activeRestExerciseID = nil
-                Haptics.restComplete()
-            }
-        }
+        activeWorkoutStore.startRestTimer(
+            for: exercise.id,
+            totalSeconds: seconds
+        )
     }
 
     private func stopRestTimer() {
-        restTimer?.invalidate()
-        restTimer = nil
-        restSecondsRemaining = 0
-        activeRestExerciseID = nil
+        activeWorkoutStore.stopRestTimer()
     }
 
     private func workoutSummaryText() -> String {
