@@ -76,6 +76,13 @@ struct ExerciseSessionCardView: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
+            Text(exercise.name)
+                .font(.title2.bold())
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+
+            Spacer(minLength: AppTheme.Spacing.md)
+
             VStack(alignment: .trailing, spacing: 4) {
                 Text(exercise.exerciseType.rawValue.capitalized)
                     .font(AppTheme.Typography.caption)
