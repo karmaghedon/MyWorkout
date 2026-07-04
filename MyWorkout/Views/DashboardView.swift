@@ -6,10 +6,13 @@ struct DashboardView: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var settingsStore: UserSettingsStore
 
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
+    private var columns: [GridItem] {
+        #if os(iOS)
+        [GridItem(.flexible())]
+        #else
+        [GridItem(.flexible()), GridItem(.flexible())]
+        #endif
+    }
 
     var body: some View {
         NavigationStack {
