@@ -85,7 +85,7 @@ struct AnalyticsView: View {
 
     var body: some View {
         List {
-            Section("Overview") {
+            Section {
                 HStack {
                     Text("Total Workouts")
                     Spacer()
@@ -106,9 +106,11 @@ struct AnalyticsView: View {
                     Text(mostRecentWorkoutName)
                         .bold()
                 }
+            } header: {
+                Label("Overview", systemImage: "chart.bar.fill")
             }
 
-            Section("Recovery / Fatigue") {
+            Section {
                 if recoveryWarnings.isEmpty {
                     Text("No recovery warnings")
                         .foregroundStyle(.secondary)
@@ -139,9 +141,11 @@ struct AnalyticsView: View {
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Label("Recovery / Fatigue", systemImage: "heart.text.square.fill")
             }
 
-            Section("Performance Warnings") {
+            Section {
                 if performanceWarnings.isEmpty {
                     Text("No performance warnings")
                         .foregroundStyle(.secondary)
@@ -157,9 +161,11 @@ struct AnalyticsView: View {
                         }
                     }
                 }
+            } header: {
+                Label("Performance Warnings", systemImage: "exclamationmark.triangle.fill")
             }
 
-            Section("Volume by Muscle Group") {
+            Section {
                 if volumeByMuscleGroup.isEmpty {
                     Text("No volume data yet")
                         .foregroundStyle(.secondary)
@@ -173,42 +179,67 @@ struct AnalyticsView: View {
                         }
                     }
                 }
+            } header: {
+                Label("Volume by Muscle Group", systemImage: "chart.pie.fill")
             }
 
-            Section("Personal Records") {
+            Section {
                 if personalRecords.isEmpty {
                     Text("No PRs yet")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(personalRecords, id: \.exercise) { pr in
-                        HStack {
+                        HStack(spacing: AppTheme.Spacing.sm) {
+                            Image(systemName: "trophy.fill")
+                                .foregroundStyle(.yellow)
+                                .accessibilityHidden(true)
+
                             Text(pr.exercise)
+
                             Spacer()
+
                             Text("\(settingsStore.settings.displayWeight(pr.weight)) \(settingsStore.settings.weightUnitLabel) × \(pr.reps)")
                                 .bold()
                         }
                     }
                 }
+            } header: {
+                Label("Personal Records", systemImage: "trophy.fill")
             }
 
-            Section("Recent Workouts") {
+            Section {
                 ForEach(logStore.logs.prefix(5)) { log in
                     NavigationLink {
                         WorkoutLogDetailView(log: log)
                     } label: {
-                        VStack(alignment: .leading) {
-                            Text(log.workoutName)
-                                .font(.headline)
+                        HStack(spacing: AppTheme.Spacing.md) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(AppTheme.accentMuted)
 
-                            Text(log.date.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundStyle(AppTheme.accent)
+                            }
+                            .frame(width: 44, height: 44)
+                            .accessibilityHidden(true)
 
-                            Text("\(setCount(for: log)) sets")
-                                .font(.caption)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(log.workoutName)
+                                    .font(.headline)
+
+                                Text(log.date.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                Text("\(setCount(for: log)) sets")
+                                    .font(.caption)
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Label("Recent Workouts", systemImage: "clock.arrow.circlepath")
             }
         }
         .navigationTitle("Analytics")
