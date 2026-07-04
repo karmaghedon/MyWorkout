@@ -31,6 +31,7 @@ struct WorkoutSessionView: View {
                         ExerciseSessionCardView(
                             exercise: exercise,
                             state: binding(for: exercise.id),
+                            previousSets: logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? [],
                             weightStep: exercise.usesBarbell
                                 ? equipmentStore.smallestPlateIncrement()
                                 : 5,
