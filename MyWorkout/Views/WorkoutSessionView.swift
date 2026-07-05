@@ -136,28 +136,14 @@ struct WorkoutSessionView: View {
                     )
                 }
 
-                Button {
-                    showFinishSummary = true
-                } label: {
-                    Text("Finish Workout")
-                        .font(AppTheme.Typography.label)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(AppTheme.accent)
-                .controlSize(.large)
-                .padding(.top, AppTheme.Spacing.lg)
-
-                Button(role: .destructive) {
-                    showCancelConfirmation = true
-                } label: {
-                    Text("Cancel Workout")
-                        .font(AppTheme.Typography.label)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .padding(.bottom, AppTheme.Spacing.xl)
+                WorkoutSessionActionsView(
+                    onFinish: {
+                        showFinishSummary = true
+                    },
+                    onCancel: {
+                        showCancelConfirmation = true
+                    }
+                )
             }
             .padding(AppTheme.Spacing.lg)
             .animation(.default, value: activeWorkoutStore.activeRestExerciseID)

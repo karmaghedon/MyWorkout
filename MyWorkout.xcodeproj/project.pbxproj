@@ -79,6 +79,7 @@
 		F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */; };
 		F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */; };
 		F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */; };
+		F5BF30692FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +160,7 @@
 		F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesSectionView.swift; sourceTree = "<group>"; };
 		F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEngine..swift; sourceTree = "<group>"; };
 		F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimerCardView.swift; sourceTree = "<group>"; };
+		F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionActionsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +373,7 @@
 				F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */,
 				F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */,
 				F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */,
+				F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -483,6 +486,7 @@
 				F54004E72FF338CE0079CC05 /* ExerciseType.swift in Sources */,
 				F54005012FF4783D0079CC05 /* TemplateEditorView.swift in Sources */,
 				F54004E52FF16A750079CC05 /* ProgressionEngine.swift in Sources */,
+				F5BF30692FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift in Sources */,
 				F5BF304C2FF9E70900AB5AD9 /* ExerciseWarningsView.swift in Sources */,
 				F5BF30462FF9E28700AB5AD9 /* FlowLayout.swift in Sources */,
 				F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */,
