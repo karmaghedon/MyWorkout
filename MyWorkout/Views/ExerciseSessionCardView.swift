@@ -97,7 +97,7 @@ struct ExerciseSessionCardView: View {
             .font(AppTheme.Typography.label)
             .tint(AppTheme.accent)
 
-            notesSection
+            NotesSectionView(notes: $state.notes)
         }
     }
 
@@ -113,35 +113,6 @@ struct ExerciseSessionCardView: View {
             )
     }
 
-    private var warmupSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-            Text("WARM-UP")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-
-            ForEach(warmups) { warmup in
-                HStack {
-                    Text("\(settingsStore.settings.displayWeight(warmup.weight)) \(weightUnit) × \(warmup.reps)")
-                        .font(AppTheme.Typography.caption)
-
-                    if exercise.usesBarbell {
-                        Spacer()
-                        let loading = PlateCalculator.loading(for: warmup.weight, inventory: equipmentInventory)
-
-                        Text("\(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side")
-                            .font(AppTheme.Typography.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .padding(AppTheme.Spacing.sm)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
-    }
-
     private var workingLoadRow: some View {
         let loading = PlateCalculator.loading(for: state.weight, inventory: equipmentInventory)
 
@@ -151,34 +122,6 @@ struct ExerciseSessionCardView: View {
         )
         .font(AppTheme.Typography.caption)
         .foregroundStyle(.secondary)
-    }
-
-    private var notesSection: some View {
-        DisclosureGroup("Notes") {
-            ZStack(alignment: .topLeading) {
-                if state.notes.isEmpty {
-                    Text("How did it feel?")
-                        .font(AppTheme.Typography.caption)
-                        .foregroundStyle(.tertiary)
-                        .padding(.top, 8)
-                        .padding(.leading, 5)
-                        .allowsHitTesting(false)
-                }
-
-                TextEditor(text: $state.notes)
-                    .font(AppTheme.Typography.caption)
-                    .frame(minHeight: 60)
-                    .scrollContentBackground(.hidden)
-            }
-            .padding(AppTheme.Spacing.xs)
-            .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
-                    .fill(AppTheme.subtleFill)
-            )
-            .padding(.top, AppTheme.Spacing.sm)
-        }
-        .font(AppTheme.Typography.label)
-        .tint(AppTheme.accent)
     }
 
     private var weightDisplayBinding: Binding<Int> {

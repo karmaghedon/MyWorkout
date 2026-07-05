@@ -76,6 +76,7 @@
 		F5BF305D2FFA70FA00AB5AD9 /* LoggedSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF305C2FFA70FA00AB5AD9 /* LoggedSetsView.swift */; };
 		F5BF305F2FFA734200AB5AD9 /* WarmupSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */; };
 		F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */; };
+		F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +154,7 @@
 		F5BF305C2FFA70FA00AB5AD9 /* LoggedSetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedSetsView.swift; sourceTree = "<group>"; };
 		F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmupSectionView.swift; sourceTree = "<group>"; };
 		F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionCard.swift; sourceTree = "<group>"; };
+		F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesSectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -362,6 +364,7 @@
 				F5BF305C2FFA70FA00AB5AD9 /* LoggedSetsView.swift */,
 				F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */,
 				F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */,
+				F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -456,6 +459,7 @@
 				F54004D72FF0CFBA0079CC05 /* HistoryView.swift in Sources */,
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
+				F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */,
 				F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */,
 				F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */,
 				F54005032FF47B0C0079CC05 /* DashboardCard.swift in Sources */,
