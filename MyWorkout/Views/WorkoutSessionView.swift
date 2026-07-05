@@ -65,7 +65,11 @@ struct WorkoutSessionView: View {
             showFinishSummary: $showFinishSummary,
             showLeaveConfirmation: $showLeaveConfirmation,
             showCancelConfirmation: $showCancelConfirmation,
-            summaryText: workoutSummaryText(),
+            summaryText: WorkoutSessionEngine.summaryText(
+                workout: workout,
+                states: activeWorkoutStore.exerciseStates,
+                formattedElapsedTime: activeWorkoutStore.formattedElapsedTime
+            ),
             onFinish: finishWorkout,
             onKeepWorkoutRunning: {
                 dismiss()
@@ -131,13 +135,5 @@ struct WorkoutSessionView: View {
         logStore.add(log)
         activeWorkoutStore.finish()
         dismiss()
-    }
-
-    private func workoutSummaryText() -> String {
-        WorkoutSessionEngine.summaryText(
-            workout: workout,
-            states: activeWorkoutStore.exerciseStates,
-            formattedElapsedTime: activeWorkoutStore.formattedElapsedTime
-        )
     }
 }
