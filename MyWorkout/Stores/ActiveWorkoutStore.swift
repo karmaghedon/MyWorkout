@@ -166,6 +166,21 @@ final class ActiveWorkoutStore: ObservableObject {
         }
     }
 
+    func startRestTimer(
+        for exercise: Exercise,
+        settings: UserSettings
+    ) {
+        let seconds = RestTimerRule.seconds(
+            for: exercise.exerciseType,
+            settings: settings
+        )
+
+        startRestTimer(
+            for: exercise.id,
+            totalSeconds: seconds
+        )
+    }
+    
     private func stopTimer() {
         workoutTimer?.invalidate()
         workoutTimer = nil

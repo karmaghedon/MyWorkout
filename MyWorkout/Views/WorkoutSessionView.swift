@@ -204,14 +204,9 @@ struct WorkoutSessionView: View {
     }
 
     private func startRestTimer(for exercise: Exercise) {
-        let seconds = RestTimerRule.seconds(
-            for: exercise.exerciseType,
-            settings: settingsStore.settings
-        )
-
         activeWorkoutStore.startRestTimer(
-            for: exercise.id,
-            totalSeconds: seconds
+            for: exercise,
+            settings: settingsStore.settings
         )
     }
 
