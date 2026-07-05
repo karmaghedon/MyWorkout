@@ -31,15 +31,33 @@ struct ExerciseSessionCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-            header
+            ExerciseSessionHeaderView(
+                exerciseName: exercise.name,
+                exerciseType: exercise.exerciseType.rawValue.capitalized,
+                progressionStrategy: exercise.progressionStrategy.displayName,
+                nextSetNumber: nextSetNumber
+            )
 
             if let suggestion = state.suggestionMessage {
                 suggestionBanner(suggestion)
             }
 
-            previousPerformanceSection
+            PreviousPerformanceView(
+                previousSets: previousSets,
+                displayWeight: settingsStore.settings.displayWeight,
+                weightUnit: weightUnit
+            )
 
-            currentSetPanel
+            CurrentSetCardView(
+                weight: weightDisplayBinding,
+                reps: $state.reps,
+                weightRange: 0...500,
+                weightStep: displayWeightStep,
+                weightUnit: weightUnit,
+                repRange: 1...50,
+                nextSetNumber: nextSetNumber,
+                onLogSet: onLogSet
+            )
 
             if isResting {
                 RestTimerBadge(
@@ -77,34 +95,6 @@ struct ExerciseSessionCardView: View {
         )
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(exercise.name)
-                    .font(.title2.bold())
-                    .fixedSize(horizontal: false, vertical: true)
-                    .layoutPriority(1)
-
-                Spacer(minLength: AppTheme.Spacing.md)
-
-                Text("Set \(nextSetNumber)")
-                    .font(AppTheme.Typography.label)
-                    .foregroundStyle(AppTheme.accent)
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.vertical, 6)
-                    .background(Capsule().fill(AppTheme.accentMuted))
-            }
-
-            HStack(spacing: AppTheme.Spacing.sm) {
-                Text(exercise.exerciseType.rawValue.capitalized)
-                Text("•")
-                Text(exercise.progressionStrategy.displayName)
-            }
-            .font(AppTheme.Typography.caption)
-            .foregroundStyle(.secondary)
-        }
-    }
-
     private func suggestionBanner(_ text: String) -> some View {
         Label(text, systemImage: "arrow.up.right.circle.fill")
             .font(AppTheme.Typography.caption)
@@ -115,73 +105,6 @@ struct ExerciseSessionCardView: View {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
                     .fill(AppTheme.accentMuted)
             )
-    }
-
-    private var previousPerformanceSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("PREVIOUS")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-
-            if previousSets.isEmpty {
-                Text("No previous sets recorded")
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                HStack(spacing: AppTheme.Spacing.sm) {
-                    ForEach(previousSets.prefix(3)) { set in
-                        Text("\(settingsStore.settings.displayWeight(set.weight)) × \(set.reps)")
-                            .font(AppTheme.Typography.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, AppTheme.Spacing.sm)
-                            .padding(.vertical, 6)
-                            .background(Capsule().fill(AppTheme.subtleFill))
-                    }
-                }
-            }
-        }
-    }
-
-    private var currentSetPanel: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
-            Text("CURRENT SET")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack(spacing: AppTheme.Spacing.md) {
-                BigStepperControl(
-                    title: "Weight",
-                    value: weightDisplayBinding,
-                    range: 0...500,
-                    step: displayWeightStep,
-                    suffix: weightUnit
-                )
-
-                BigStepperControl(
-                    title: "Reps",
-                    value: $state.reps,
-                    range: 1...50,
-                    step: 1,
-                    suffix: nil
-                )
-            }
-
-            Button(action: onLogSet) {
-                Label("Log Set \(nextSetNumber)", systemImage: "checkmark.circle.fill")
-                    .font(.system(.headline, design: .rounded).weight(.bold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppTheme.Spacing.sm)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(AppTheme.accent)
-            .controlSize(.large)
-        }
-        .padding(AppTheme.Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.subtleFill)
-        )
     }
 
     private var warmupSection: some View {
@@ -306,58 +229,5 @@ struct ExerciseSessionCardView: View {
         case .kilograms:
             return max(1, Int((Double(weightStep) * 0.453592).rounded()))
         }
-    }
-}
-
-private struct BigStepperControl: View {
-    let title: String
-    @Binding var value: Int
-    let range: ClosedRange<Int>
-    let step: Int
-    let suffix: String?
-
-    var body: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Text(title.uppercased())
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-
-            Text(valueText)
-                .font(AppTheme.Typography.numeric(30))
-                .minimumScaleFactor(0.75)
-                .lineLimit(1)
-
-            HStack(spacing: AppTheme.Spacing.sm) {
-                Button {
-                    value = max(range.lowerBound, value - step)
-                } label: {
-                    Image(systemName: "minus")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-
-                Button {
-                    value = min(range.upperBound, value + step)
-                } label: {
-                    Image(systemName: "plus")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-            }
-        }
-        .padding(AppTheme.Spacing.md)
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
-    }
-
-    private var valueText: String {
-        if let suffix {
-            return "\(value) \(suffix)"
-        }
-
-        return "\(value)"
     }
 }

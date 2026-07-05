@@ -69,6 +69,10 @@
 		F5BF30482FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30472FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift */; };
 		F5BF304A2FF9E6E800AB5AD9 /* ExerciseTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30492FF9E6E800AB5AD9 /* ExerciseTipsView.swift */; };
 		F5BF304C2FF9E70900AB5AD9 /* ExerciseWarningsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF304B2FF9E70900AB5AD9 /* ExerciseWarningsView.swift */; };
+		F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */; };
+		F5BF30572FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30562FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift */; };
+		F5BF30592FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30582FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift */; };
+		F5BF305B2FF9FFD900AB5AD9 /* CurrentSetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF305A2FF9FFD900AB5AD9 /* CurrentSetCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +143,10 @@
 		F5BF304E2FF9F29200AB5AD9 /* MyWorkoutArchitecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MyWorkoutArchitecture.md; sourceTree = "<group>"; };
 		F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
 		F5BF30522FF9F34600AB5AD9 /* Architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Architecture.md; sourceTree = "<group>"; };
+		F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigStepperControl.swift; sourceTree = "<group>"; };
+		F5BF30562FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSessionHeaderView.swift; sourceTree = "<group>"; };
+		F5BF30582FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousPerformanceView.swift; sourceTree = "<group>"; };
+		F5BF305A2FF9FFD900AB5AD9 /* CurrentSetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentSetCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -301,6 +309,7 @@
 		F5BF303E2FF9DFC600AB5AD9 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30532FF9FA3500AB5AD9 /* WorkoutSession */,
 				F5BF30442FF9E27600AB5AD9 /* Common */,
 				F5BF30412FF9E1AE00AB5AD9 /* Exercise */,
 				F5BF303F2FF9DFE100AB5AD9 /* InfoBadge.swift */,
@@ -335,6 +344,17 @@
 				F5BF30522FF9F34600AB5AD9 /* Architecture.md */,
 			);
 			path = Docs;
+			sourceTree = "<group>";
+		};
+		F5BF30532FF9FA3500AB5AD9 /* WorkoutSession */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */,
+				F5BF30562FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift */,
+				F5BF30582FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift */,
+				F5BF305A2FF9FFD900AB5AD9 /* CurrentSetCardView.swift */,
+			);
+			path = WorkoutSession;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -408,6 +428,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5BF30592FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift in Sources */,
 				F5BF30392FF9DC1800AB5AD9 /* ExerciseRowView.swift in Sources */,
 				F54004E02FF1640A0079CC05 /* CreateWorkoutTemplateView.swift in Sources */,
 				F54004F12FF41D800079CC05 /* EquipmentInventory.swift in Sources */,
@@ -448,6 +469,7 @@
 				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
+				F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
@@ -462,8 +484,10 @@
 				F54004F92FF472700079CC05 /* AnalyticsView.swift in Sources */,
 				F5BF30482FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift in Sources */,
 				F59350B62FF848AD00991F1D /* TemplatesView.swift in Sources */,
+				F5BF305B2FF9FFD900AB5AD9 /* CurrentSetCardView.swift in Sources */,
 				F540051E2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift in Sources */,
 				F54004DE2FF163F10079CC05 /* WorkoutTemplateStore.swift in Sources */,
+				F5BF30572FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
 				F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */,
 				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
