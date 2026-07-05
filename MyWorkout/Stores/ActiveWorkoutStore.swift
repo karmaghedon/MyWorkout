@@ -50,7 +50,7 @@ final class ActiveWorkoutStore: ObservableObject {
     var formattedElapsedTime: String {
         Self.formatDuration(elapsedSeconds)
     }
-
+    // MARK: - Workout lifecycle
     func start(_ workout: Workout) {
         activeWorkout = workout
         exerciseStates = [:]
@@ -87,41 +87,7 @@ final class ActiveWorkoutStore: ObservableObject {
         return max(0, Int(Date().timeIntervalSince(startedAt)))
     }
     
-    func startRestTimer(for exerciseID: UUID, totalSeconds: Int) {
-        stopRestTimer(clearPersistedState: true)
-
-        activeRestExerciseID = exerciseID
-        restStartedAt = Date()
-        restTotalSeconds = totalSeconds
-        restSecondsRemaining = totalSeconds
-
-        startRestTimerIfNeeded()
-        persistActiveWorkout()
-    }
-
-    func stopRestTimer(clearPersistedState: Bool = true) {
-        restTimer?.invalidate()
-        restTimer = nil
-        restSecondsRemaining = 0
-
-        if clearPersistedState {
-            activeRestExerciseID = nil
-            restStartedAt = nil
-            restTotalSeconds = 0
-            persistActiveWorkout()
-        }
-    }
-
-    func restoreRestTimerIfNeeded() {
-        updateRestSecondsRemaining()
-
-        if restSecondsRemaining > 0 {
-            startRestTimerIfNeeded()
-        } else {
-            stopRestTimer(clearPersistedState: true)
-        }
-    }
-
+    // MARK: - Exercise state
     func binding(for exerciseID: UUID) -> Binding<ExerciseSessionState> {
         Binding(
             get: {
@@ -133,61 +99,13 @@ final class ActiveWorkoutStore: ObservableObject {
         )
     }
     
-    private func startRestTimerIfNeeded() {
-        guard restTimer == nil else { return }
-        guard activeRestExerciseID != nil else { return }
-        guard restTotalSeconds > 0 else { return }
-
-        restTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.updateRestSecondsRemaining()
-        }
-    }
-
-    private func updateRestSecondsRemaining() {
-        guard let restStartedAt else {
-            restSecondsRemaining = 0
-            return
-        }
-
-        let elapsed = Int(Date().timeIntervalSince(restStartedAt))
-        let remaining = max(0, restTotalSeconds - elapsed)
-        restSecondsRemaining = remaining
-
-        if remaining == 0 {
-            stopRestTimer(clearPersistedState: true)
-        }
-    }
-
-    private func startTimerIfNeeded() {
-        guard workoutTimer == nil else { return }
-
-        workoutTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.updateElapsedSeconds()
-        }
-    }
-
-    func startRestTimer(
-        for exercise: Exercise,
-        settings: UserSettings
-    ) {
-        let seconds = RestTimerRule.seconds(
-            for: exercise.exerciseType,
-            settings: settings
-        )
-
-        startRestTimer(
-            for: exercise.id,
-            totalSeconds: seconds
-        )
-    }
-    
     func logSet(for exerciseID: UUID) {
         WorkoutSessionEngine.logSet(
             for: exerciseID,
             in: &exerciseStates
         )
     }
-
+    
     func deleteSet(setID: UUID, for exerciseID: UUID) {
         WorkoutSessionEngine.deleteSet(
             setID: setID,
@@ -218,6 +136,91 @@ final class ActiveWorkoutStore: ObservableObject {
         }
     }
     
+    // MARK: - Rest timer
+    func startRestTimer(for exerciseID: UUID, totalSeconds: Int) {
+        stopRestTimer(clearPersistedState: true)
+
+        activeRestExerciseID = exerciseID
+        restStartedAt = Date()
+        restTotalSeconds = totalSeconds
+        restSecondsRemaining = totalSeconds
+
+        startRestTimerIfNeeded()
+        persistActiveWorkout()
+    }
+    
+    func startRestTimer(
+        for exercise: Exercise,
+        settings: UserSettings
+    ) {
+        let seconds = RestTimerRule.seconds(
+            for: exercise.exerciseType,
+            settings: settings
+        )
+
+        startRestTimer(
+            for: exercise.id,
+            totalSeconds: seconds
+        )
+    }
+
+    func stopRestTimer(clearPersistedState: Bool = true) {
+        restTimer?.invalidate()
+        restTimer = nil
+        restSecondsRemaining = 0
+
+        if clearPersistedState {
+            activeRestExerciseID = nil
+            restStartedAt = nil
+            restTotalSeconds = 0
+            persistActiveWorkout()
+        }
+    }
+
+    func restoreRestTimerIfNeeded() {
+        updateRestSecondsRemaining()
+
+        if restSecondsRemaining > 0 {
+            startRestTimerIfNeeded()
+        } else {
+            stopRestTimer(clearPersistedState: true)
+        }
+    }
+
+    private func startRestTimerIfNeeded() {
+        guard restTimer == nil else { return }
+        guard activeRestExerciseID != nil else { return }
+        guard restTotalSeconds > 0 else { return }
+
+        restTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.updateRestSecondsRemaining()
+        }
+    }
+
+    private func updateRestSecondsRemaining() {
+        guard let restStartedAt else {
+            restSecondsRemaining = 0
+            return
+        }
+
+        let elapsed = Int(Date().timeIntervalSince(restStartedAt))
+        let remaining = max(0, restTotalSeconds - elapsed)
+        restSecondsRemaining = remaining
+
+        if remaining == 0 {
+            stopRestTimer(clearPersistedState: true)
+        }
+    }
+
+    // MARK: - Workout timer
+    private func startTimerIfNeeded() {
+        guard workoutTimer == nil else { return }
+
+        workoutTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.updateElapsedSeconds()
+        }
+    }
+
     private func stopTimer() {
         workoutTimer?.invalidate()
         workoutTimer = nil
@@ -227,6 +230,7 @@ final class ActiveWorkoutStore: ObservableObject {
         elapsedSeconds = currentDurationSeconds()
     }
 
+    // MARK: - Persistence
     private func clearActiveWorkout() {
         isRestoring = true
         activeWorkout = nil
@@ -298,6 +302,7 @@ final class ActiveWorkoutStore: ObservableObject {
         }
     }
 
+    // MARK: - Formatting
     static func formatDuration(_ seconds: Int) -> String {
         let hours = seconds / 3600
         let minutes = (seconds % 3600) / 60
