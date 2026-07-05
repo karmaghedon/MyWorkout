@@ -113,28 +113,30 @@ struct WorkoutSessionView: View {
                     elapsedTime: activeWorkoutStore.formattedElapsedTime
                 )
 
-                ForEach(workout.exercises) { exercise in
-                    ExerciseSessionCardView(
-                        exercise: exercise,
-                        state: activeWorkoutStore.binding(for: exercise.id),
-                        previousSets: logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? [],
-                        weightStep: exercise.usesBarbell
-                            ? equipmentStore.smallestPlateIncrement()
-                            : 5,
-                        equipmentInventory: equipmentStore.inventory,
-                        isResting: activeWorkoutStore.activeRestExerciseID == exercise.id && activeWorkoutStore.restSecondsRemaining > 0,
-                        restSecondsRemaining: activeWorkoutStore.restSecondsRemaining,
-                        restTotalSeconds: activeWorkoutStore.restTotalSeconds,
-                        onLogSet: {
-                            logSet(for: exercise.id)
-                            startRestTimer(for: exercise)
-                        },
-                        onStopRest: stopRestTimer,
-                        onDeleteSet: { setID in
-                            deleteSet(setID: setID, for: exercise.id)
-                        }
-                    )
-                }
+                WorkoutExerciseListView(
+                    exercises: workout.exercises,
+                    stateForExercise: { exerciseID in
+                        activeWorkoutStore.binding(for: exerciseID)
+                    },
+                    previousSetsForExercise: { exercise in
+                        logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? []
+                    },
+                    weightStepForExercise: { exercise in
+                        exercise.usesBarbell ? equipmentStore.smallestPlateIncrement() : 5
+                    },
+                    equipmentInventory: equipmentStore.inventory,
+                    activeRestExerciseID: activeWorkoutStore.activeRestExerciseID,
+                    restSecondsRemaining: activeWorkoutStore.restSecondsRemaining,
+                    restTotalSeconds: activeWorkoutStore.restTotalSeconds,
+                    onLogSet: { exercise in
+                        logSet(for: exercise.id)
+                        startRestTimer(for: exercise)
+                    },
+                    onStopRest: stopRestTimer,
+                    onDeleteSet: { setID, exercise in
+                        deleteSet(setID: setID, for: exercise.id)
+                    }
+                )
 
                 WorkoutSessionActionsView(
                     onFinish: {

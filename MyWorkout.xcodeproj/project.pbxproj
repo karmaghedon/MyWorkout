@@ -80,6 +80,7 @@
 		F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */; };
 		F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */; };
 		F5BF30692FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */; };
+		F5BF306B2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -161,6 +162,7 @@
 		F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEngine..swift; sourceTree = "<group>"; };
 		F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimerCardView.swift; sourceTree = "<group>"; };
 		F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionActionsView.swift; sourceTree = "<group>"; };
+		F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -374,6 +376,7 @@
 				F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */,
 				F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */,
 				F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */,
+				F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
 				F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */,
 				F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */,
+				F5BF306B2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift in Sources */,
 				F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */,
 				F54005032FF47B0C0079CC05 /* DashboardCard.swift in Sources */,
 				F54004CF2FF0C87E0079CC05 /* ExerciseLibraryView.swift in Sources */,
