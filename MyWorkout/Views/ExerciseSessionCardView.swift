@@ -30,7 +30,7 @@ struct ExerciseSessionCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+        WorkoutSessionCard {
             ExerciseSessionHeaderView(
                 exerciseName: exercise.name,
                 exerciseType: exercise.exerciseType.rawValue.capitalized,
@@ -79,7 +79,13 @@ struct ExerciseSessionCardView: View {
             DisclosureGroup("Warm-up & plates") {
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
                     if !warmups.isEmpty {
-                        warmupSection
+                        WarmupSectionView(
+                            warmups: warmups,
+                            usesBarbell: exercise.usesBarbell,
+                            equipmentInventory: equipmentInventory,
+                            displayWeight: settingsStore.settings.displayWeight,
+                            weightUnit: weightUnit
+                        )
                     }
 
                     if exercise.usesBarbell {
@@ -93,11 +99,6 @@ struct ExerciseSessionCardView: View {
 
             notesSection
         }
-        .padding(AppTheme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
     }
 
     private func suggestionBanner(_ text: String) -> some View {
