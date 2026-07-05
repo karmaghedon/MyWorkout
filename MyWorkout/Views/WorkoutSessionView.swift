@@ -216,7 +216,10 @@ struct WorkoutSessionView: View {
                 } else {
                     activeWorkoutStore.exerciseStates[exercise.id] = ExerciseSessionState(
                         reps: 10,
-                        weight: defaultStartingWeight(for: exercise),
+                        weight: WorkoutSessionEngine.defaultStartingWeight(
+                            for: exercise,
+                            equipmentInventory: equipmentStore.inventory
+                        ),
                         loggedSets: [],
                         suggestionMessage: "No history yet",
                         notes: ""
@@ -226,26 +229,11 @@ struct WorkoutSessionView: View {
         }
     }
 
-    private func defaultStartingWeight(for exercise: Exercise) -> Int {
-        switch exercise.exerciseType {
-        case .bodyweight:
-            return 0
-        case .compound, .isolation:
-            return exercise.usesBarbell ? Int(equipmentStore.inventory.barbellWeight.rounded()) : 0
-        }
-    }
-
     private func logSet(for exerciseID: UUID) {
-        var state = activeWorkoutStore.exerciseStates[exerciseID] ?? ExerciseSessionState()
-
-        let newSet = LoggedSet(
-            setNumber: state.loggedSets.count + 1,
-            weight: state.weight,
-            reps: state.reps
+        WorkoutSessionEngine.logSet(
+            for: exerciseID,
+            in: &activeWorkoutStore.exerciseStates
         )
-
-        state.loggedSets.append(newSet)
-        activeWorkoutStore.exerciseStates[exerciseID] = state
 
         Haptics.setLogged()
     }
@@ -309,39 +297,18 @@ struct WorkoutSessionView: View {
     }
 
     private func workoutSummaryText() -> String {
-        guard let workout else { return "No active workout." }
-
-        let completed = workout.exercises.compactMap { exercise -> String? in
-            guard let state = activeWorkoutStore.exerciseStates[exercise.id],
-                  !state.loggedSets.isEmpty else {
-                return nil
-            }
-
-            return "\(exercise.name): \(state.loggedSets.count) set(s)"
-        }
-
-        let totalSets = workout.exercises.reduce(0) { total, exercise in
-            total + (activeWorkoutStore.exerciseStates[exercise.id]?.loggedSets.count ?? 0)
-        }
-
-        return completed.joined(separator: "\n")
-            + "\n\nTotal sets: \(totalSets)"
-            + "\nDuration: \(activeWorkoutStore.formattedElapsedTime)"
+        WorkoutSessionEngine.summaryText(
+            workout: workout,
+            states: activeWorkoutStore.exerciseStates,
+            formattedElapsedTime: activeWorkoutStore.formattedElapsedTime
+        )
     }
 
     private func deleteSet(setID: UUID, for exerciseID: UUID) {
-        guard var state = activeWorkoutStore.exerciseStates[exerciseID] else { return }
-
-        state.loggedSets.removeAll { $0.id == setID }
-
-        state.loggedSets = state.loggedSets.enumerated().map { index, set in
-            LoggedSet(
-                setNumber: index + 1,
-                weight: set.weight,
-                reps: set.reps
-            )
-        }
-
-        activeWorkoutStore.exerciseStates[exerciseID] = state
+        WorkoutSessionEngine.deleteSet(
+            setID: setID,
+            for: exerciseID,
+            in: &activeWorkoutStore.exerciseStates
+        )
     }
 }

@@ -77,6 +77,7 @@
 		F5BF305F2FFA734200AB5AD9 /* WarmupSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */; };
 		F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */; };
 		F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */; };
+		F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -155,6 +156,7 @@
 		F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmupSectionView.swift; sourceTree = "<group>"; };
 		F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionCard.swift; sourceTree = "<group>"; };
 		F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesSectionView.swift; sourceTree = "<group>"; };
+		F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEngine..swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -294,6 +296,7 @@
 				F540051D2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift */,
 				F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */,
 				F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */,
+				F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -485,6 +488,7 @@
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
+				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
