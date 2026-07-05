@@ -1,136 +1,90 @@
-//import SwiftUI
-//
-//struct ExerciseDetailView: View {
-//    let exercise: Exercise
-//
-//    var body: some View {
-//        ScrollView {
-//            VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-//                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-//                    Text(exercise.muscleGroup)
-//                        .font(.subheadline)
-//                        .foregroundStyle(.secondary)
-//
-//                    Text(exercise.equipment)
-//                        .font(.caption)
-//                        .foregroundStyle(.secondary)
-//                }
-//
-//                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-//                    Text("Instructions")
-//                        .font(AppTheme.Typography.sectionTitle)
-//
-//                    Text(exercise.instructions)
-//                        .font(.body)
-//                }
-//            }
-//            .padding(AppTheme.Spacing.lg)
-//        }
-//        .navigationTitle(exercise.name)
-//        #if os(iOS)
-//        .navigationBarTitleDisplayMode(.inline)
-//        #endif
-//    }
-//}
-
-
 import SwiftUI
 
 struct ExerciseDetailView: View {
-
     let exercise: Exercise
-    
+
     @Environment(\.dismiss) private var dismiss
     var showsDoneButton: Bool = false
 
     var body: some View {
-        NavigationStack {
-            List {
+        List {
+            Section {
+                ExerciseHeaderView(exercise: exercise)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+            }
+            
+            Section("Overview") {
+                DetailRow(title: "Muscle Group", value: exercise.muscleGroup)
+                DetailRow(title: "Equipment", value: exercise.equipment)
+                DetailRow(title: "Difficulty", value: exercise.difficulty)
+                DetailRow(title: "Type", value: exercise.exerciseType.rawValue.capitalized)
+                DetailRow(title: "Progression", value: exercise.progressionStrategy.displayName)
+            }
 
-                Section("Overview") {
-                    DetailRow(title: "Muscle Group", value: exercise.muscleGroup)
-                    DetailRow(title: "Equipment", value: exercise.equipment)
-                    DetailRow(title: "Difficulty", value: exercise.difficulty)
-                    DetailRow(title: "Type", value: exercise.exerciseType.rawValue.capitalized)
-                }
-
-                if !exercise.primaryMuscles.isEmpty {
-                    Section("Primary Muscles") {
-                        ForEach(exercise.primaryMuscles, id: \.self) {
-                            Text($0)
-                        }
-                    }
-                }
-
-                if !exercise.secondaryMuscles.isEmpty {
-                    Section("Secondary Muscles") {
-                        ForEach(exercise.secondaryMuscles, id: \.self) {
-                            Text($0)
-                        }
-                    }
-                }
-
-                Section("Instructions") {
-                    Text(exercise.instructions)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if !exercise.tips.isEmpty {
-                    Section("Tips") {
-                        ForEach(exercise.tips, id: \.self) {
-                            Label($0, systemImage: "checkmark.circle.fill")
-                        }
-                    }
-                }
-
-                if !exercise.commonMistakes.isEmpty {
-                    Section("Common Mistakes") {
-                        ForEach(exercise.commonMistakes, id: \.self) {
-                            Label($0, systemImage: "exclamationmark.triangle")
-                        }
-                    }
-                }
-
-                if !exercise.warnings.isEmpty {
-                    Section("Safety") {
-                        ForEach(exercise.warnings, id: \.self) {
-                            Label($0, systemImage: "shield")
-                        }
+            if !exercise.primaryMuscles.isEmpty {
+                Section("Primary Muscles") {
+                    ForEach(exercise.primaryMuscles, id: \.self) { muscle in
+                        Text(muscle)
                     }
                 }
             }
-            .navigationTitle(exercise.name)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                if showsDoneButton {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Done") {
-                            dismiss()
-                        }
+
+            if !exercise.secondaryMuscles.isEmpty {
+                Section("Secondary Muscles") {
+                    ForEach(exercise.secondaryMuscles, id: \.self) { muscle in
+                        Text(muscle)
+                    }
+                }
+            }
+
+            Section("Instructions") {
+                Text(exercise.instructions.isEmpty ? "No instructions available yet." : exercise.instructions)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if !exercise.tips.isEmpty {
+                Section("Tips") {
+                    ForEach(exercise.tips, id: \.self) { tip in
+                        Label(tip, systemImage: "checkmark.circle")
+                    }
+                }
+            }
+
+            if !exercise.commonMistakes.isEmpty {
+                Section("Common Mistakes") {
+                    ForEach(exercise.commonMistakes, id: \.self) { mistake in
+                        Label(mistake, systemImage: "exclamationmark.triangle")
+                    }
+                }
+            }
+
+            if !exercise.warnings.isEmpty {
+                Section("Safety") {
+                    ForEach(exercise.warnings, id: \.self) { warning in
+                        Label(warning, systemImage: "shield")
                     }
                 }
             }
         }
-    }
-}
-
-private struct DetailRow: View {
-
-    let title: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(title)
-
-            Spacer()
-
-            Text(value)
-                .foregroundStyle(.secondary)
+        .navigationTitle(exercise.name)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .toolbar {
+            if showsDoneButton {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
         }
     }
 }
 
 #Preview {
-    ExerciseDetailView(exercise: SeedData.exercises.first!)
+    NavigationStack {
+        ExerciseDetailView(exercise: SeedData.exercises.first!)
+    }
 }

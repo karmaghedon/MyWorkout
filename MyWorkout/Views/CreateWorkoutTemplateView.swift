@@ -41,14 +41,7 @@ struct CreateWorkoutTemplateView: View {
                     toggle(exercise)
                 } label: {
                     HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(exercise.name)
-                                .font(.headline)
-
-                            Text("\(exercise.muscleGroup) • \(exercise.equipment) • \(exercise.exerciseType.rawValue)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        ExerciseRowView(exercise: exercise)
 
                         Spacer()
 

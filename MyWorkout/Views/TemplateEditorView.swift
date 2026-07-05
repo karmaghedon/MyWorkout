@@ -106,14 +106,7 @@ struct TemplateEditorView: View {
                         showingAddExercises = false
                     } label: {
                         HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(exercise.name)
-                                    .font(.headline)
-
-                                Text("\(exercise.muscleGroup) • \(exercise.equipment)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
+                            ExerciseRowView(exercise: exercise)
 
                             Spacer()
 
@@ -131,14 +124,7 @@ struct TemplateEditorView: View {
 
     private func exerciseRow(index: Int, exercise: Exercise) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(exercise.name)
-                    .font(.headline)
-
-                Text("\(exercise.muscleGroup) • \(exercise.equipment)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            ExerciseRowView(exercise: exercise)
 
             #if os(macOS)
             Spacer()

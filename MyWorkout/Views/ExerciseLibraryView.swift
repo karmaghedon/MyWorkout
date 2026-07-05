@@ -19,15 +19,7 @@ struct ExerciseLibraryView: View {
                         NavigationLink {
                             ExerciseDetailView(exercise: exercise)
                         } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(exercise.name)
-                                    .font(.headline)
-
-                                Text("\(exercise.equipment) • \(exercise.exerciseType.rawValue.capitalized)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.vertical, 2)
+                            ExerciseRowView(exercise: exercise)
                         }
                     }
                 }
