@@ -21,13 +21,11 @@ struct ExerciseHeaderView: View {
                     .multilineTextAlignment(.center)
             }
 
-            Text(exercise.difficulty)
-                .font(.caption)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.thinMaterial)
-                .clipShape(Capsule())
+            HStack(spacing: 8) {
+                InfoBadge(text: exercise.muscleGroup)
+                InfoBadge(text: exercise.equipment, systemImage: iconName)
+                InfoBadge(text: exercise.difficulty)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
