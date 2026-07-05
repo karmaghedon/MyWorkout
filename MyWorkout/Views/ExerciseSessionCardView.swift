@@ -68,7 +68,12 @@ struct ExerciseSessionCardView: View {
             }
 
             if !state.loggedSets.isEmpty {
-                loggedSetsSection
+                LoggedSetsView(
+                    sets: state.loggedSets,
+                    displayWeight: settingsStore.settings.displayWeight,
+                    weightUnit: weightUnit,
+                    onDeleteSet: onDeleteSet
+                )
             }
 
             DisclosureGroup("Warm-up & plates") {
@@ -145,42 +150,6 @@ struct ExerciseSessionCardView: View {
         )
         .font(AppTheme.Typography.caption)
         .foregroundStyle(.secondary)
-    }
-
-    private var loggedSetsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("TODAY")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(.secondary)
-
-            ForEach(state.loggedSets) { set in
-                HStack(spacing: AppTheme.Spacing.sm) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(AppTheme.success)
-
-                    Text("Set \(set.setNumber)")
-                        .font(AppTheme.Typography.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-
-                    Spacer()
-
-                    Text("\(settingsStore.settings.displayWeight(set.weight)) \(weightUnit) × \(set.reps)")
-                        .font(AppTheme.Typography.numeric(16))
-
-                    Button {
-                        onDeleteSet(set.id)
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 28, height: 28)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Delete set \(set.setNumber)")
-                }
-                .padding(.vertical, 6)
-            }
-        }
     }
 
     private var notesSection: some View {
