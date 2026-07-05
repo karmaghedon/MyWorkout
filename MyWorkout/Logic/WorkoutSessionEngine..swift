@@ -95,4 +95,40 @@ enum WorkoutSessionEngine {
             )
         }
     }
+    
+    static func initialState(
+        for exercise: Exercise,
+        latestPerformance: CompletedExercise?,
+        previousPerformances: [CompletedExercise],
+        equipmentInventory: EquipmentInventory
+    ) -> ExerciseSessionState {
+        if let latestPerformance,
+           let latestSet = latestPerformance.sets.last {
+
+            let suggestion = ProgressionEngine.suggestion(
+                exercise: exercise,
+                currentSets: latestPerformance.sets,
+                previousPerformances: previousPerformances
+            )
+
+            return ExerciseSessionState(
+                reps: latestSet.reps,
+                weight: suggestion?.suggestedWeight ?? latestSet.weight,
+                loggedSets: [],
+                suggestionMessage: suggestion?.message,
+                notes: ""
+            )
+        }
+
+        return ExerciseSessionState(
+            reps: 10,
+            weight: defaultStartingWeight(
+                for: exercise,
+                equipmentInventory: equipmentInventory
+            ),
+            loggedSets: [],
+            suggestionMessage: "No history yet",
+            notes: ""
+        )
+    }
 }

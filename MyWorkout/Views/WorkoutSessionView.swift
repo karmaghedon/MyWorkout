@@ -192,39 +192,17 @@ struct WorkoutSessionView: View {
 
         for exercise in workout.exercises {
             if activeWorkoutStore.exerciseStates[exercise.id] == nil {
-                if let latestExercise = logStore.lastPerformances(for: exercise, limit: 1).first,
-                   let latestSet = latestExercise.sets.last {
+                let performances = logStore.lastPerformances(
+                    for: exercise,
+                    limit: exercise.progressionRule.stallLimit
+                )
 
-                    let previous = logStore.lastPerformances(
-                        for: exercise,
-                        limit: exercise.progressionRule.stallLimit
-                    )
-
-                    let suggestion = ProgressionEngine.suggestion(
-                        exercise: exercise,
-                        currentSets: latestExercise.sets,
-                        previousPerformances: Array(previous.dropFirst())
-                    )
-
-                    activeWorkoutStore.exerciseStates[exercise.id] = ExerciseSessionState(
-                        reps: latestSet.reps,
-                        weight: suggestion?.suggestedWeight ?? latestSet.weight,
-                        loggedSets: [],
-                        suggestionMessage: suggestion?.message,
-                        notes: ""
-                    )
-                } else {
-                    activeWorkoutStore.exerciseStates[exercise.id] = ExerciseSessionState(
-                        reps: 10,
-                        weight: WorkoutSessionEngine.defaultStartingWeight(
-                            for: exercise,
-                            equipmentInventory: equipmentStore.inventory
-                        ),
-                        loggedSets: [],
-                        suggestionMessage: "No history yet",
-                        notes: ""
-                    )
-                }
+                activeWorkoutStore.exerciseStates[exercise.id] = WorkoutSessionEngine.initialState(
+                    for: exercise,
+                    latestPerformance: performances.first,
+                    previousPerformances: Array(performances.dropFirst()),
+                    equipmentInventory: equipmentStore.inventory
+                )
             }
         }
     }
