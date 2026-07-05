@@ -23,7 +23,7 @@ struct ExerciseLibraryView: View {
                                 Text(exercise.name)
                                     .font(.headline)
 
-                                Text(exercise.equipment)
+                                Text("\(exercise.equipment) • \(exercise.exerciseType.rawValue.capitalized)")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
