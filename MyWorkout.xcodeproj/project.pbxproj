@@ -136,6 +136,9 @@
 		F5BF30472FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInstructionsView.swift; sourceTree = "<group>"; };
 		F5BF30492FF9E6E800AB5AD9 /* ExerciseTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTipsView.swift; sourceTree = "<group>"; };
 		F5BF304B2FF9E70900AB5AD9 /* ExerciseWarningsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseWarningsView.swift; sourceTree = "<group>"; };
+		F5BF304E2FF9F29200AB5AD9 /* MyWorkoutArchitecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MyWorkoutArchitecture.md; sourceTree = "<group>"; };
+		F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
+		F5BF30522FF9F34600AB5AD9 /* Architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Architecture.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +171,7 @@
 		F54004AF2FF0C6FE0079CC05 /* MyWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF304D2FF9F23400AB5AD9 /* Docs */,
 				F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */,
 				F54004B22FF0C6FE0079CC05 /* ContentView.swift */,
 				F54004C12FF0C7F90079CC05 /* Models */,
@@ -321,6 +325,16 @@
 				F5BF30452FF9E28700AB5AD9 /* FlowLayout.swift */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		F5BF304D2FF9F23400AB5AD9 /* Docs */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF304E2FF9F29200AB5AD9 /* MyWorkoutArchitecture.md */,
+				F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */,
+				F5BF30522FF9F34600AB5AD9 /* Architecture.md */,
+			);
+			path = Docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
