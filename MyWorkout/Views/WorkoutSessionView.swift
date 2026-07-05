@@ -109,7 +109,9 @@ struct WorkoutSessionView: View {
     private func workoutContent(_ workout: Workout) -> some View {
         ScrollView {
             LazyVStack(spacing: AppTheme.Spacing.lg) {
-                workoutTimerCard
+                WorkoutTimerCardView(
+                    elapsedTime: activeWorkoutStore.formattedElapsedTime
+                )
 
                 ForEach(workout.exercises) { exercise in
                     ExerciseSessionCardView(
@@ -160,31 +162,6 @@ struct WorkoutSessionView: View {
             .padding(AppTheme.Spacing.lg)
             .animation(.default, value: activeWorkoutStore.activeRestExerciseID)
         }
-    }
-
-    private var workoutTimerCard: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("WORKOUT TIME")
-                    .font(AppTheme.Typography.eyebrow)
-                    .foregroundStyle(.secondary)
-
-                Text(activeWorkoutStore.formattedElapsedTime)
-                    .font(AppTheme.Typography.numeric(28))
-                    .monospacedDigit()
-            }
-
-            Spacer()
-
-            Image(systemName: "timer")
-                .font(.title2)
-                .foregroundStyle(AppTheme.accent)
-        }
-        .padding(AppTheme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
     }
 
     private func initializeStates() {

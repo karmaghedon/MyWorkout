@@ -78,6 +78,7 @@
 		F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */; };
 		F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */; };
 		F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */; };
+		F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -157,6 +158,7 @@
 		F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionCard.swift; sourceTree = "<group>"; };
 		F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesSectionView.swift; sourceTree = "<group>"; };
 		F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEngine..swift; sourceTree = "<group>"; };
+		F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimerCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -368,6 +370,7 @@
 				F5BF305E2FFA734200AB5AD9 /* WarmupSectionView.swift */,
 				F5BF30602FFA74D300AB5AD9 /* WorkoutSessionCard.swift */,
 				F5BF30622FFA77E700AB5AD9 /* NotesSectionView.swift */,
+				F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -509,6 +512,7 @@
 				F5BF305D2FFA70FA00AB5AD9 /* LoggedSetsView.swift in Sources */,
 				F5BF30572FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
+				F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */,
 				F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */,
 				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
 			);
