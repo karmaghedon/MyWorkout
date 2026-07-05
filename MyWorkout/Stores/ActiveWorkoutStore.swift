@@ -181,6 +181,43 @@ final class ActiveWorkoutStore: ObservableObject {
         )
     }
     
+    func logSet(for exerciseID: UUID) {
+        WorkoutSessionEngine.logSet(
+            for: exerciseID,
+            in: &exerciseStates
+        )
+    }
+
+    func deleteSet(setID: UUID, for exerciseID: UUID) {
+        WorkoutSessionEngine.deleteSet(
+            setID: setID,
+            for: exerciseID,
+            in: &exerciseStates
+        )
+    }
+    
+    func initializeExerciseStates(
+        for workout: Workout,
+        logStore: WorkoutLogStore,
+        equipmentInventory: EquipmentInventory
+    ) {
+        for exercise in workout.exercises {
+            if exerciseStates[exercise.id] == nil {
+                let performances = logStore.lastPerformances(
+                    for: exercise,
+                    limit: exercise.progressionRule.stallLimit
+                )
+
+                exerciseStates[exercise.id] = WorkoutSessionEngine.initialState(
+                    for: exercise,
+                    latestPerformance: performances.first,
+                    previousPerformances: Array(performances.dropFirst()),
+                    equipmentInventory: equipmentInventory
+                )
+            }
+        }
+    }
+    
     private func stopTimer() {
         workoutTimer?.invalidate()
         workoutTimer = nil

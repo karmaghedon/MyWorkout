@@ -81,6 +81,9 @@
 		F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */; };
 		F5BF30692FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */; };
 		F5BF306B2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */; };
+		F5BF306D2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF306C2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift */; };
+		F5BF306F2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF306E2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift */; };
+		F5BF30712FFB17E200AB5AD9 /* WorkoutSessionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30702FFB17E200AB5AD9 /* WorkoutSessionContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +166,9 @@
 		F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimerCardView.swift; sourceTree = "<group>"; };
 		F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionActionsView.swift; sourceTree = "<group>"; };
 		F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseListView.swift; sourceTree = "<group>"; };
+		F5BF306C2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoActiveWorkoutView.swift; sourceTree = "<group>"; };
+		F5BF306E2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionDialogs.swift; sourceTree = "<group>"; };
+		F5BF30702FFB17E200AB5AD9 /* WorkoutSessionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,6 +383,9 @@
 				F5BF30662FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift */,
 				F5BF30682FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift */,
 				F5BF306A2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift */,
+				F5BF306C2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift */,
+				F5BF306E2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift */,
+				F5BF30702FFB17E200AB5AD9 /* WorkoutSessionContentView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -495,6 +504,7 @@
 				F5BF30462FF9E28700AB5AD9 /* FlowLayout.swift in Sources */,
 				F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */,
 				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
+				F5BF306D2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */,
@@ -510,6 +520,7 @@
 				F54004F52FF41DEA0079CC05 /* EquipmentInventoryView.swift in Sources */,
 				F54004C72FF0C8490079CC05 /* Workout.swift in Sources */,
 				F54004B12FF0C6FE0079CC05 /* MyWorkoutApp.swift in Sources */,
+				F5BF30712FFB17E200AB5AD9 /* WorkoutSessionContentView.swift in Sources */,
 				F54004E32FF169390079CC05 /* ProgressionRule.swift in Sources */,
 				F54004F92FF472700079CC05 /* AnalyticsView.swift in Sources */,
 				F5BF30482FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift in Sources */,
@@ -521,6 +532,7 @@
 				F5BF30572FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
 				F5BF30672FFA9F5400AB5AD9 /* WorkoutTimerCardView.swift in Sources */,
+				F5BF306F2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift in Sources */,
 				F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */,
 				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
 			);

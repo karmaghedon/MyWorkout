@@ -131,4 +131,27 @@ enum WorkoutSessionEngine {
             notes: ""
         )
     }
+    
+    static func workoutLog(
+        for workout: Workout,
+        states: [UUID: ExerciseSessionState],
+        durationSeconds: Int,
+        date: Date = Date()
+    ) -> WorkoutLog? {
+        let completedExercises = completedExercises(
+            for: workout,
+            states: states
+        )
+
+        guard !completedExercises.isEmpty else {
+            return nil
+        }
+
+        return WorkoutLog(
+            workoutName: workout.name,
+            date: date,
+            durationSeconds: durationSeconds,
+            completedExercises: completedExercises
+        )
+    }
 }
