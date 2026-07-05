@@ -1,3 +1,4 @@
+import SwiftUI
 import Foundation
 
 final class ActiveWorkoutStore: ObservableObject {
@@ -121,6 +122,17 @@ final class ActiveWorkoutStore: ObservableObject {
         }
     }
 
+    func binding(for exerciseID: UUID) -> Binding<ExerciseSessionState> {
+        Binding(
+            get: {
+                self.exerciseStates[exerciseID] ?? ExerciseSessionState()
+            },
+            set: { newState in
+                self.exerciseStates[exerciseID] = newState
+            }
+        )
+    }
+    
     private func startRestTimerIfNeeded() {
         guard restTimer == nil else { return }
         guard activeRestExerciseID != nil else { return }

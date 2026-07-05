@@ -76,4 +76,23 @@ enum WorkoutSessionEngine {
             + "\n\nTotal sets: \(totalSets)"
             + "\nDuration: \(formattedElapsedTime)"
     }
+    
+    static func completedExercises(
+        for workout: Workout,
+        states: [UUID: ExerciseSessionState]
+    ) -> [CompletedExercise] {
+        workout.exercises.compactMap { exercise in
+            guard let state = states[exercise.id],
+                  !state.loggedSets.isEmpty else {
+                return nil
+            }
+
+            return CompletedExercise(
+                exerciseID: exercise.id,
+                exerciseName: exercise.name,
+                sets: state.loggedSets,
+                notes: state.notes
+            )
+        }
+    }
 }

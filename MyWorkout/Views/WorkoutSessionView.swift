@@ -114,7 +114,7 @@ struct WorkoutSessionView: View {
                 ForEach(workout.exercises) { exercise in
                     ExerciseSessionCardView(
                         exercise: exercise,
-                        state: binding(for: exercise.id),
+                        state: activeWorkoutStore.binding(for: exercise.id),
                         previousSets: logStore.lastPerformances(for: exercise, limit: 1).first?.sets ?? [],
                         weightStep: exercise.usesBarbell
                             ? equipmentStore.smallestPlateIncrement()
@@ -241,19 +241,10 @@ struct WorkoutSessionView: View {
     private func finishWorkout() {
         guard let workout else { return }
 
-        let completedExercises = workout.exercises.compactMap { exercise -> CompletedExercise? in
-            guard let state = activeWorkoutStore.exerciseStates[exercise.id],
-                  !state.loggedSets.isEmpty else {
-                return nil
-            }
-
-            return CompletedExercise(
-                exerciseID: exercise.id,
-                exerciseName: exercise.name,
-                sets: state.loggedSets,
-                notes: state.notes
-            )
-        }
+        let completedExercises = WorkoutSessionEngine.completedExercises(
+            for: workout,
+            states: activeWorkoutStore.exerciseStates
+        )
 
         guard !completedExercises.isEmpty else { return }
 
@@ -267,17 +258,6 @@ struct WorkoutSessionView: View {
         logStore.add(log)
         activeWorkoutStore.finish()
         dismiss()
-    }
-
-    private func binding(for exerciseID: UUID) -> Binding<ExerciseSessionState> {
-        Binding(
-            get: {
-                activeWorkoutStore.exerciseStates[exerciseID] ?? ExerciseSessionState()
-            },
-            set: {
-                activeWorkoutStore.exerciseStates[exerciseID] = $0
-            }
-        )
     }
 
     private func startRestTimer(for exercise: Exercise) {
