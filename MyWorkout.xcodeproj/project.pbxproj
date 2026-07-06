@@ -88,6 +88,7 @@
 		F5BF30762FFB23E600AB5AD9 /* InventorySectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30752FFB23E600AB5AD9 /* InventorySectionCard.swift */; };
 		F5BF30782FFB25C600AB5AD9 /* InventoryItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30772FFB25C600AB5AD9 /* InventoryItemRow.swift */; };
 		F5BF307A2FFB288F00AB5AD9 /* InventoryAddItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30792FFB288F00AB5AD9 /* InventoryAddItemRow.swift */; };
+		F5BF307C2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307B2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -177,6 +178,7 @@
 		F5BF30752FFB23E600AB5AD9 /* InventorySectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySectionCard.swift; sourceTree = "<group>"; };
 		F5BF30772FFB25C600AB5AD9 /* InventoryItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemRow.swift; sourceTree = "<group>"; };
 		F5BF30792FFB288F00AB5AD9 /* InventoryAddItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAddItemRow.swift; sourceTree = "<group>"; };
+		F5BF307B2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseOverviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -357,6 +359,7 @@
 				F5BF30472FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift */,
 				F5BF30492FF9E6E800AB5AD9 /* ExerciseTipsView.swift */,
 				F5BF304B2FF9E70900AB5AD9 /* ExerciseWarningsView.swift */,
+				F5BF307B2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift */,
 			);
 			path = Exercise;
 			sourceTree = "<group>";
@@ -535,6 +538,7 @@
 				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
+				F5BF307C2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift in Sources */,
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
 				F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */,
 				F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */,

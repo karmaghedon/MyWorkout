@@ -14,13 +14,7 @@ struct ExerciseDetailView: View {
                     .listRowBackground(Color.clear)
             }
             
-            Section("Overview") {
-                    DetailRow(title: "Muscle Group", value: exercise.muscleGroup)
-                    DetailRow(title: "Equipment", value: exercise.equipment)
-                    DetailRow(title: "Difficulty", value: exercise.difficulty)
-                    DetailRow(title: "Type", value: exercise.exerciseType.rawValue.capitalized)
-                    DetailRow(title: "Progression", value: exercise.progressionStrategy.rawValue.capitalized)
-                }
+            ExerciseOverviewView(exercise: exercise)
 
             ExerciseMusclesView(exercise: exercise)
             ExerciseInstructionsView(exercise: exercise)
