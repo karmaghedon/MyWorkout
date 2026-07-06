@@ -62,6 +62,16 @@ final class EquipmentInventoryStore: ObservableObject {
         inventory.dumbbells.remove(atOffsets: offsets)
         save()
     }
+    
+    func deletePlate(id: UUID) {
+        inventory.plates.removeAll { $0.id == id }
+        save()
+    }
+
+    func deleteDumbbell(id: UUID) {
+        inventory.dumbbells.removeAll { $0.id == id }
+        save()
+    }
 
     func replace(with newInventory: EquipmentInventory) {
         inventory = newInventory
