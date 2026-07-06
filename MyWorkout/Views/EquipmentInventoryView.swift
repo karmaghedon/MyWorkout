@@ -25,36 +25,17 @@ struct EquipmentInventoryView: View {
         }
         .navigationTitle("Equipment Inventory")
         .onAppear {
-            if equipmentStore.inventory.unitSystem != settingsStore.settings.unitSystem {
-                equipmentStore.convertInventory(
-                    to: settingsStore.settings.unitSystem,
-                    from: equipmentStore.inventory.unitSystem
-                )
-            }
-        }
-    }
-
-    private var inventoryUnitSection: some View {
-        sectionCard(title: "Inventory Units") {
-            Picker("Inventory Unit", selection: $equipmentStore.inventory.unitSystem) {
-                ForEach(UnitSystem.allCases) { unit in
-                    Text(unit.rawValue).tag(unit)
-                }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: equipmentStore.inventory.unitSystem) { _ in
-                equipmentStore.save()
-            }
+            syncInventoryUnitIfNeeded()
         }
     }
 
     private var barbellSection: some View {
-        sectionCard(title: "Barbell") {
+        InventorySectionCard(title: "Barbell") {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: AppTheme.Spacing.md) {
                     Text("Barbell weight")
 
-                    weightField($equipmentStore.inventory.barbellWeight)
+                    barbellWeightField
 
                     Text(unit)
                         .foregroundStyle(.secondary)
@@ -66,7 +47,7 @@ struct EquipmentInventoryView: View {
                     Text("Barbell weight")
 
                     HStack(spacing: AppTheme.Spacing.md) {
-                        weightField($equipmentStore.inventory.barbellWeight)
+                        barbellWeightField
 
                         Text(unit)
                             .foregroundStyle(.secondary)
@@ -75,190 +56,91 @@ struct EquipmentInventoryView: View {
                     }
                 }
             }
-            .onChange(of: equipmentStore.inventory.barbellWeight) { _ in
-                equipmentStore.save()
-            }
 
             Button("Reset Inventory to Default") {
-                equipmentStore.resetToDefault(unit: settingsStore.settings.unitSystem)
+                equipmentStore.resetToDefault(
+                    unit: settingsStore.settings.unitSystem
+                )
             }
             .foregroundStyle(.red)
         }
     }
 
     private var platesSection: some View {
-        sectionCard(title: "Plates") {
+        InventorySectionCard(title: "Plates") {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                 ForEach(equipmentStore.inventory.plates) { plate in
-                    inventoryRow(
+                    InventoryItemRow(
                         weight: bindingForPlateWeight(id: plate.id),
                         quantity: bindingForPlateQuantity(id: plate.id),
-                        deleteAction: {
+                        unit: unit,
+                        onDelete: {
                             deletePlate(id: plate.id)
                         }
                     )
                 }
 
-                addRow(
+                InventoryAddItemRow(
                     title: "Add Plate",
-                    weightText: $newPlateWeight,
-                    quantityText: $newPlateQuantity,
-                    placeholder: "Plate weight",
-                    action: addPlate
+                    unit: unit,
+                    weight: $newPlateWeight,
+                    quantity: $newPlateQuantity,
+                    onAdd: addPlate
                 )
             }
         }
     }
 
     private var dumbbellsSection: some View {
-        sectionCard(title: "Dumbbells") {
+        InventorySectionCard(title: "Dumbbells") {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                 ForEach(equipmentStore.inventory.dumbbells) { dumbbell in
-                    inventoryRow(
+                    InventoryItemRow(
                         weight: bindingForDumbbellWeight(id: dumbbell.id),
                         quantity: bindingForDumbbellQuantity(id: dumbbell.id),
-                        deleteAction: {
+                        unit: unit,
+                        onDelete: {
                             deleteDumbbell(id: dumbbell.id)
                         }
                     )
                 }
 
-                addRow(
+                InventoryAddItemRow(
                     title: "Add Dumbbell",
-                    weightText: $newDumbbellWeight,
-                    quantityText: $newDumbbellQuantity,
-                    placeholder: "Dumbbell weight",
-                    action: addDumbbell
+                    unit: unit,
+                    weight: $newDumbbellWeight,
+                    quantity: $newDumbbellQuantity,
+                    onAdd: addDumbbell
                 )
             }
         }
     }
 
-    private func sectionCard<Content: View>(
-        title: String,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text(title)
-                .font(AppTheme.Typography.sectionTitle)
-
-            content()
-        }
-        .padding(AppTheme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.cardBackground)
+    private var barbellWeightField: some View {
+        TextField(
+            "Weight",
+            value: $equipmentStore.inventory.barbellWeight,
+            format: .number
         )
-    }
-
-    private func inventoryRow(
-        weight: Binding<Double>,
-        quantity: Binding<Int>,
-        deleteAction: @escaping () -> Void
-    ) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: AppTheme.Spacing.md) {
-                weightField(weight)
-
-                Text(unit)
-                    .foregroundStyle(.secondary)
-
-                Stepper(value: quantity, in: 0...20) {
-                    Text("Qty: \(quantity.wrappedValue)")
-                }
-                .fixedSize()
-
-                Spacer(minLength: 0)
-
-                deleteButton(action: deleteAction)
-            }
-
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                HStack(spacing: AppTheme.Spacing.md) {
-                    weightField(weight)
-
-                    Text(unit)
-                        .foregroundStyle(.secondary)
-
-                    Spacer(minLength: 0)
-
-                    deleteButton(action: deleteAction)
-                }
-
-                Stepper(value: quantity, in: 0...20) {
-                    Text("Qty: \(quantity.wrappedValue)")
-                }
-            }
+        .textFieldStyle(.roundedBorder)
+        #if os(iOS)
+        .keyboardType(.decimalPad)
+        #endif
+        .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
+        .onChange(of: equipmentStore.inventory.barbellWeight) { _ in
+            equipmentStore.save()
         }
     }
 
-    private func weightField(_ weight: Binding<Double>) -> some View {
-        TextField("Weight", value: weight, format: .number)
-            .textFieldStyle(.roundedBorder)
-            #if os(iOS)
-            .keyboardType(.decimalPad)
-            #endif
-            .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
-    }
-
-    private func deleteButton(action: @escaping () -> Void) -> some View {
-        Button(role: .destructive, action: action) {
-            Image(systemName: "trash")
+    private func syncInventoryUnitIfNeeded() {
+        guard equipmentStore.inventory.unitSystem != settingsStore.settings.unitSystem else {
+            return
         }
-        .accessibilityLabel("Delete")
-    }
 
-    private func addRow(
-        title: String,
-        weightText: Binding<String>,
-        quantityText: Binding<String>,
-        placeholder: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: AppTheme.Spacing.md) {
-                addRowFields(weightText: weightText, quantityText: quantityText, placeholder: placeholder)
-
-                Button("Add", action: action)
-                    .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
-                    .accessibilityLabel(title)
-
-                Spacer(minLength: 0)
-            }
-
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                addRowFields(weightText: weightText, quantityText: quantityText, placeholder: placeholder)
-
-                Button("Add", action: action)
-                    .disabled(!canAdd(weightText: weightText.wrappedValue, quantityText: quantityText.wrappedValue))
-                    .accessibilityLabel(title)
-            }
-        }
-    }
-
-    private func addRowFields(
-        weightText: Binding<String>,
-        quantityText: Binding<String>,
-        placeholder: String
-    ) -> some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            TextField(placeholder, text: weightText)
-                .textFieldStyle(.roundedBorder)
-                #if os(iOS)
-                .keyboardType(.decimalPad)
-                #endif
-                .frame(minWidth: 90, idealWidth: 120, maxWidth: 140)
-
-            Text(unit)
-                .foregroundStyle(.secondary)
-
-            TextField("Qty", text: quantityText)
-                .textFieldStyle(.roundedBorder)
-                #if os(iOS)
-                .keyboardType(.numberPad)
-                #endif
-                .frame(minWidth: 44, idealWidth: 60, maxWidth: 70)
-        }
+        equipmentStore.convertInventory(
+            to: settingsStore.settings.unitSystem,
+            from: equipmentStore.inventory.unitSystem
+        )
     }
 
     private func bindingForPlateWeight(id: UUID) -> Binding<Double> {
@@ -317,17 +199,15 @@ struct EquipmentInventoryView: View {
         )
     }
 
-    private func canAdd(weightText: String, quantityText: String) -> Bool {
-        guard let quantity = Int(quantityText), quantity > 0 else { return false }
-        return Double(weightText) != nil
-    }
-
     private func addPlate() {
         guard let weight = Double(newPlateWeight),
               let quantity = Int(newPlateQuantity),
-              quantity > 0 else { return }
+              quantity > 0 else {
+            return
+        }
 
         equipmentStore.addPlate(weight: weight, quantity: quantity)
+
         newPlateWeight = ""
         newPlateQuantity = ""
     }
@@ -335,9 +215,12 @@ struct EquipmentInventoryView: View {
     private func addDumbbell() {
         guard let weight = Double(newDumbbellWeight),
               let quantity = Int(newDumbbellQuantity),
-              quantity > 0 else { return }
+              quantity > 0 else {
+            return
+        }
 
         equipmentStore.addDumbbell(weight: weight, quantity: quantity)
+
         newDumbbellWeight = ""
         newDumbbellQuantity = ""
     }
