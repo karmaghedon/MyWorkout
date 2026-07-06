@@ -226,12 +226,10 @@ struct EquipmentInventoryView: View {
     }
 
     private func deletePlate(id: UUID) {
-        equipmentStore.inventory.plates.removeAll { $0.id == id }
-        equipmentStore.save()
+        equipmentStore.deletePlate(id: id)
     }
 
     private func deleteDumbbell(id: UUID) {
-        equipmentStore.inventory.dumbbells.removeAll { $0.id == id }
-        equipmentStore.save()
+        equipmentStore.deleteDumbbell(id: id)
     }
 }
