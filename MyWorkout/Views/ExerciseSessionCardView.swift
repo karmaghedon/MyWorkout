@@ -121,12 +121,6 @@ struct ExerciseSessionCardView: View {
     private var workingLoadRow: some View {
         let loading = PlateCalculator.loading(for: state.weight, inventory: equipmentInventory)
 
-//        return Label(
-//            "Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side",
-//            systemImage: "circle.grid.2x2.fill"
-//        )
-//        .font(AppTheme.Typography.caption)
-//        .foregroundStyle(.secondary)
         return VStack(alignment: .leading, spacing: 2) {
             Label(
                 "Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side",
@@ -136,7 +130,7 @@ struct ExerciseSessionCardView: View {
             .foregroundStyle(.secondary)
             
             if loading.hasResidue {
-                Text("Plates can't match exactlu - closest achievable load")
+                Text("Plates can't match exactly — closest achievable load shown.")
                     .font(.caption2)
                     .foregroundStyle(.orange)
             }

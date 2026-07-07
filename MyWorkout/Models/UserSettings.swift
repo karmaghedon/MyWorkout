@@ -42,7 +42,7 @@ struct UserSettings: Codable {
         case .pounds:
             return pounds
         case .kilograms:
-            return (pounds * 0.453592 * 10) / 10
+            return (pounds * 0.453592 * 10).rounded() / 10
         }
     }
 
@@ -51,7 +51,8 @@ struct UserSettings: Codable {
         case .pounds:
             return value
         case .kilograms:
-            return (value * 0.453592 * 10) / 10
+//            return (value * 0.453592 * 10) / 10
+            return value / 0.453592
         }
     }
 }

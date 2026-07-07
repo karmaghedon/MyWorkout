@@ -38,18 +38,12 @@ struct TemplateEditorView: View {
                 ForEach(Array(editableTemplate.exercises.enumerated()), id: \.element.id) { index, exercise in
                     exerciseRow(index: index, exercise: exercise)
                 }
-                #if os(iOS)
                 .onMove(perform: moveExercises)
                 .onDelete(perform: deleteExercises)
-                #endif
             } header: {
                 Text("Exercises")
             } footer: {
-                #if os(iOS)
                 Text("Tap Edit to reorder or remove exercises.")
-                #else
-                Text("Use the arrows to reorder, or the trash icon to remove an exercise.")
-                #endif
             }
 
             Section {
@@ -75,14 +69,15 @@ struct TemplateEditorView: View {
                     dismiss()
                 }
                 .fontWeight(.semibold)
-                .disabled(editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty || editableTemplate.exercises.isEmpty)
+                .disabled(
+                    editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty ||
+                    editableTemplate.exercises.isEmpty
+                )
             }
 
-            #if os(iOS)
             ToolbarItem(placement: .primaryAction) {
                 EditButton()
             }
-            #endif
         }
     }
 
@@ -123,41 +118,7 @@ struct TemplateEditorView: View {
     }
 
     private func exerciseRow(index: Int, exercise: Exercise) -> some View {
-        HStack {
-            ExerciseRowView(exercise: exercise)
-
-            #if os(macOS)
-            Spacer()
-
-            VStack(spacing: 4) {
-                Button {
-                    moveExercise(at: index, offset: -1)
-                } label: {
-                    Image(systemName: "chevron.up")
-                }
-                .buttonStyle(.borderless)
-                .disabled(index == 0)
-                .accessibilityLabel("Move \(exercise.name) up")
-
-                Button {
-                    moveExercise(at: index, offset: 1)
-                } label: {
-                    Image(systemName: "chevron.down")
-                }
-                .buttonStyle(.borderless)
-                .disabled(index == editableTemplate.exercises.count - 1)
-                .accessibilityLabel("Move \(exercise.name) down")
-            }
-
-            Button(role: .destructive) {
-                deleteExercise(at: index)
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.borderless)
-            .accessibilityLabel("Delete \(exercise.name)")
-            #endif
-        }
+        ExerciseRowView(exercise: exercise)
     }
 
     private func moveExercises(from source: IndexSet, to destination: Int) {
@@ -167,18 +128,6 @@ struct TemplateEditorView: View {
     private func deleteExercises(at offsets: IndexSet) {
         editableTemplate.exercises.remove(atOffsets: offsets)
     }
-
-    #if os(macOS)
-    private func moveExercise(at index: Int, offset: Int) {
-        let destination = index + offset
-        guard editableTemplate.exercises.indices.contains(destination) else { return }
-        editableTemplate.exercises.swapAt(index, destination)
-    }
-
-    private func deleteExercise(at index: Int) {
-        editableTemplate.exercises.remove(at: index)
-    }
-    #endif
 
     private var availableExercises: [Exercise] {
         SeedData.exercises.filter { exercise in

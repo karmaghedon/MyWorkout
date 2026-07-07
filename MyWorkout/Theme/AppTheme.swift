@@ -28,10 +28,10 @@ enum AppTheme {
     static let cardBackground = Color(.secondarySystemBackground)
     static let subtleFill = Color(.tertiarySystemFill)
     static let groupedBackground = Color(.systemGroupedBackground)
-    #elseif os(macOS)
-    static let cardBackground = Color(nsColor: .controlBackgroundColor)
-    static let subtleFill = Color(nsColor: .underPageBackgroundColor)
-    static let groupedBackground = Color(nsColor: .windowBackgroundColor)
+//    #elseif os(macOS)
+//    static let cardBackground = Color(nsColor: .controlBackgroundColor)
+//    static let subtleFill = Color(nsColor: .underPageBackgroundColor)
+//    static let groupedBackground = Color(nsColor: .windowBackgroundColor)
     #endif
 
     // MARK: - Spacing

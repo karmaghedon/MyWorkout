@@ -64,7 +64,7 @@ struct LoggedSet: Identifiable, Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        id = try container.decode(UUID.self, forKey: .id) ?? UUID()
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         setNumber = try container.decode(Int.self, forKey: .setNumber)
         reps = try container.decode(Int.self, forKey: .reps)
         
