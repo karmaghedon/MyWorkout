@@ -55,6 +55,7 @@ struct TemplateEditorView: View {
                 }
             }
         }
+        .dismissKeyboardOnTap()
         .navigationTitle("Edit Template")
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {

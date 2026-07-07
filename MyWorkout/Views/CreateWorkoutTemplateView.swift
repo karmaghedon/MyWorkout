@@ -63,6 +63,7 @@ struct CreateWorkoutTemplateView: View {
             .disabled(templateName.isEmpty || selectedExerciseIDs.isEmpty)
         }
         .padding()
+        .dismissKeyboardOnTap()
         .navigationTitle("Create Template")
     }
 

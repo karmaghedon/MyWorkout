@@ -24,6 +24,7 @@ struct EquipmentInventoryView: View {
             .padding(AppTheme.Spacing.lg)
             .frame(maxWidth: 760, alignment: .leading)
         }
+        .dismissKeyboardOnTap()
         .navigationTitle("Equipment Inventory")
         .onAppear {
             syncInventoryUnitIfNeeded()

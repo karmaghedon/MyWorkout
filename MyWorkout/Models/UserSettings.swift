@@ -37,21 +37,22 @@ struct UserSettings: Codable {
         unitSystem.rawValue
     }
 
+    /// Stored value is always pounds.
     func displayWeight(_ pounds: Double) -> Double {
         switch unitSystem {
         case .pounds:
-            return pounds
+            return pounds.rounded()
         case .kilograms:
             return (pounds * 0.453592 * 10).rounded() / 10
         }
     }
 
+    /// Converts displayed user input back to stored pounds.
     func storageWeight(fromDisplayed value: Double) -> Double {
         switch unitSystem {
         case .pounds:
             return value
         case .kilograms:
-//            return (value * 0.453592 * 10) / 10
             return value / 0.453592
         }
     }

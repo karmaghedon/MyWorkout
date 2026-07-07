@@ -91,6 +91,7 @@
 		F5BF307E2FFC74D000AB5AD9 /* ExerciseRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307D2FFC74D000AB5AD9 /* ExerciseRegistry.swift */; };
 		F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */; };
 		F5BF30822FFD328500AB5AD9 /* AnalyticsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */; };
+		F5BF30852FFD9E5000AB5AD9 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -183,6 +184,7 @@
 		F5BF307D2FFC74D000AB5AD9 /* ExerciseRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRegistry.swift; sourceTree = "<group>"; };
 		F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightFormatter.swift; sourceTree = "<group>"; };
 		F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsCache.swift; sourceTree = "<group>"; };
+		F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,6 +225,7 @@
 				F54004C22FF0C8150079CC05 /* Data */,
 				F54004E12FF169210079CC05 /* Logic */,
 				F54005042FF562580079CC05 /* Theme */,
+				F5BF30832FFD9E2300AB5AD9 /* Utilities */,
 				F59350B22FF83B5D00991F1D /* Helper */,
 				F54004B62FF0C7030079CC05 /* Assets.xcassets */,
 				F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */,
@@ -419,6 +422,14 @@
 			path = Inventory;
 			sourceTree = "<group>";
 		};
+		F5BF30832FFD9E2300AB5AD9 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -560,6 +571,7 @@
 				F5BF30762FFB23E600AB5AD9 /* InventorySectionCard.swift in Sources */,
 				F54004F92FF472700079CC05 /* AnalyticsView.swift in Sources */,
 				F5BF30482FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift in Sources */,
+				F5BF30852FFD9E5000AB5AD9 /* Keyboard.swift in Sources */,
 				F59350B62FF848AD00991F1D /* TemplatesView.swift in Sources */,
 				F5BF305B2FF9FFD900AB5AD9 /* CurrentSetCardView.swift in Sources */,
 				F540051E2FF6E0CD0079CC05 /* ExercisePerformanceAnalyzer.swift in Sources */,
