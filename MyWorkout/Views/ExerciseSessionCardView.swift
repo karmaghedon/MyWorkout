@@ -22,7 +22,12 @@ struct ExerciseSessionCardView: View {
     }
 
     private var warmups: [WarmupSet] {
-        WarmupEngine.generateWarmups(for: state.weight, exerciseType: exercise.exerciseType)
+        WarmupEngine.generateWarmups(
+            for: state.weight,
+            exerciseType: exercise.exerciseType,
+            usesBarbell: exercise.usesBarbell,
+            barbellWeight: equipmentInventory.barbellWeight
+        )
     }
 
     private var nextSetNumber: Int {
@@ -51,7 +56,7 @@ struct ExerciseSessionCardView: View {
             CurrentSetCardView(
                 weight: weightDisplayBinding,
                 reps: $state.reps,
-                weightRange: 0...500,
+                weightRange: 0...500.0,
                 weightStep: displayWeightStep,
                 weightUnit: weightUnit,
                 repRange: 1...50,
@@ -116,15 +121,29 @@ struct ExerciseSessionCardView: View {
     private var workingLoadRow: some View {
         let loading = PlateCalculator.loading(for: state.weight, inventory: equipmentInventory)
 
-        return Label(
-            "Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side",
-            systemImage: "circle.grid.2x2.fill"
-        )
-        .font(AppTheme.Typography.caption)
-        .foregroundStyle(.secondary)
+//        return Label(
+//            "Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side",
+//            systemImage: "circle.grid.2x2.fill"
+//        )
+//        .font(AppTheme.Typography.caption)
+//        .foregroundStyle(.secondary)
+        return VStack(alignment: .leading, spacing: 2) {
+            Label(
+                "Working load: \(loading.displayText(in: equipmentInventory.unitSystem)) \(equipmentInventory.unitSystem.rawValue) / side",
+                systemImage: "circle.grid.2x2.fill"
+            )
+            .font(AppTheme.Typography.caption)
+            .foregroundStyle(.secondary)
+            
+            if loading.hasResidue {
+                Text("Plates can't match exactlu - closest achievable load")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            }
+        }
     }
 
-    private var weightDisplayBinding: Binding<Int> {
+    private var weightDisplayBinding: Binding<Double> {
         Binding(
             get: {
                 settingsStore.settings.displayWeight(state.weight)
@@ -135,12 +154,13 @@ struct ExerciseSessionCardView: View {
         )
     }
 
-    private var displayWeightStep: Int {
+    private var displayWeightStep: Double {
         switch settingsStore.settings.unitSystem {
         case .pounds:
-            return weightStep
+            return Double(weightStep)
         case .kilograms:
-            return max(1, Int((Double(weightStep) * 0.453592).rounded()))
+            let raw = Double(weightStep) * 0.453592
+            return max(0.5, (raw * 2).rounded() / 2) // round to nearest 0.5kg
         }
     }
 }

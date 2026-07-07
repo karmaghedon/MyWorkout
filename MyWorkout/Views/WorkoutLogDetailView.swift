@@ -28,7 +28,7 @@ struct WorkoutLogDetailView: View {
             ForEach(log.completedExercises) { exercise in
                 Section(exercise.exerciseName) {
                     ForEach(exercise.sets) { set in
-                        Text("Set \(set.setNumber): \(settingsStore.settings.displayWeight(set.weight)) \(settingsStore.settings.weightUnitLabel) × \(set.reps)")
+                        Text("Set \(set.setNumber): \(formatWeight(settingsStore.settings.displayWeight(set.weight))) \(settingsStore.settings.weightUnitLabel) × \(set.reps)")
                     }
 
                     if !exercise.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

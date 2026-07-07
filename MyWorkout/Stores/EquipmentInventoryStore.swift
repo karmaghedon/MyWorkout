@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class EquipmentInventoryStore: ObservableObject {
     @Published var inventory: EquipmentInventory
     @Published private(set) var lastSaveError: String?
@@ -42,12 +43,14 @@ final class EquipmentInventoryStore: ObservableObject {
     }
 
     func addPlate(weight: Double, quantity: Int) {
+        guard weight > 0, quantity > 0 else {return}
         inventory.plates.append(PlateInventory(weight: weight, quantity: quantity))
         sort()
         save()
     }
 
     func addDumbbell(weight: Double, quantity: Int) {
+        guard weight > 0, quantity > 0 else {return}
         inventory.dumbbells.append(DumbbellInventory(weight: weight, quantity: quantity))
         sort()
         save()
@@ -99,9 +102,9 @@ final class EquipmentInventoryStore: ObservableObject {
         func convert(_ value: Double) -> Double {
             switch (oldUnit, newUnit) {
             case (.pounds, .kilograms):
-                return roundToHalf(value * 0.453592)
+                return roundToQuarter(value * 0.453592)
             case (.kilograms, .pounds):
-                return roundToHalf(value / 0.453592)
+                return roundToQuarter(value / 0.453592)
             default:
                 return value
             }
@@ -135,7 +138,7 @@ final class EquipmentInventoryStore: ObservableObject {
         inventory.dumbbells.sort { $0.weight < $1.weight }
     }
 
-    private func roundToHalf(_ value: Double) -> Double {
-        (value * 2).rounded() / 2
+    private func roundToQuarter(_ value: Double) -> Double {
+        (value * 4).rounded() / 4
     }
 }

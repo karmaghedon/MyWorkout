@@ -3,7 +3,7 @@ import SwiftUI
 struct PreviousPerformanceView: View {
     
     let previousSets: [LoggedSet]
-    let displayWeight: (Int) -> Int
+    let displayWeight: (Double) -> Double
     let weightUnit: String
     
     var body: some View {
@@ -20,7 +20,7 @@ struct PreviousPerformanceView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: AppTheme.Spacing.sm) {
                         ForEach(previousSets.prefix(3)) { set in
-                            Text("\(displayWeight(set.weight)) \(weightUnit) × \(set.reps)")
+                            Text("\(formatWeight(displayWeight(set.weight))) \(weightUnit) × \(set.reps)")
                                 .font(AppTheme.Typography.caption)
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, AppTheme.Spacing.sm)

@@ -3,85 +3,86 @@ import SwiftUI
 struct AnalyticsView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var settingsStore: UserSettingsStore
+    @EnvironmentObject var analyticsCache: AnalyticsCache
 
     var totalWorkouts: Int {
         logStore.logs.count
     }
 
-    var totalSets: Int {
-        logStore.logs.reduce(0) { total, log in
-            total + log.completedExercises.reduce(0) { exerciseTotal, exercise in
-                exerciseTotal + exercise.sets.count
-            }
-        }
-    }
+//    var totalSets: Int {
+//        logStore.logs.reduce(0) { total, log in
+//            total + log.completedExercises.reduce(0) { exerciseTotal, exercise in
+//                exerciseTotal + exercise.sets.count
+//            }
+//        }
+//    }
 
     var mostRecentWorkoutName: String {
         logStore.logs.first?.workoutName ?? "No workouts yet"
     }
 
-    var recoveryWarnings: [RecoveryWarning] {
-        RecoveryAnalyzer.warnings(logs: logStore.logs)
-    }
-
-    var performanceWarnings: [ExercisePerformanceWarning] {
-        ExercisePerformanceAnalyzer.warnings(logs: logStore.logs)
-    }
-
-    var volumeByMuscleGroup: [(muscle: String, sets: Int)] {
-        var result: [String: Int] = [:]
-
-        for log in logStore.logs {
-            for completedExercise in log.completedExercises {
-                guard let exercise = SeedData.exercises.first(where: {
-                    if let completedID = completedExercise.exerciseID {
-                        return $0.id == completedID
-                    }
-
-                    return $0.name == completedExercise.exerciseName
-                }) else {
-                    continue
-                }
-
-                result[exercise.muscleGroup, default: 0] += completedExercise.sets.count
-            }
-        }
-
-        return result
-            .map { (muscle: $0.key, sets: $0.value) }
-            .sorted { $0.sets > $1.sets }
-    }
-
-    var personalRecords: [(exercise: String, weight: Int, reps: Int)] {
-        var bestByExercise: [String: (name: String, set: LoggedSet)] = [:]
-
-        for log in logStore.logs {
-            for completedExercise in log.completedExercises {
-                let key = completedExercise.exerciseID?.uuidString ?? completedExercise.exerciseName
-
-                for set in completedExercise.sets {
-                    let currentBest = bestByExercise[key]?.set
-
-                    if currentBest == nil || isBetter(set, than: currentBest!) {
-                        bestByExercise[key] = (
-                            name: completedExercise.exerciseName,
-                            set: set
-                        )
-                    }
-                }
-            }
-        }
-
-        return bestByExercise
-            .map {
-                (
-                    exercise: $0.value.name,
-                    weight: $0.value.set.weight,
-                    reps: $0.value.set.reps
-                )
-            }
-            .sorted { $0.exercise < $1.exercise }
-    }
+//    var recoveryWarnings: [RecoveryWarning] {
+//        RecoveryAnalyzer.warnings(logs: logStore.logs)
+//    }
+//
+//    var performanceWarnings: [ExercisePerformanceWarning] {
+//        ExercisePerformanceAnalyzer.warnings(logs: logStore.logs)
+//    }
+//
+//    var volumeByMuscleGroup: [(muscle: String, sets: Int)] {
+//        var result: [String: Int] = [:]
+//
+//        for log in logStore.logs {
+//            for completedExercise in log.completedExercises {
+//                guard let exercise = SeedData.exercises.first(where: {
+//                    if let completedID = completedExercise.exerciseID {
+//                        return $0.id == completedID
+//                    }
+//
+//                    return $0.name == completedExercise.exerciseName
+//                }) else {
+//                    continue
+//                }
+//
+//                result[exercise.muscleGroup, default: 0] += completedExercise.sets.count
+//            }
+//        }
+//
+//        return result
+//            .map { (muscle: $0.key, sets: $0.value) }
+//            .sorted { $0.sets > $1.sets }
+//    }
+//
+//    var personalRecords: [(exercise: String, weight: Int, reps: Int)] {
+//        var bestByExercise: [String: (name: String, set: LoggedSet)] = [:]
+//
+//        for log in logStore.logs {
+//            for completedExercise in log.completedExercises {
+//                let key = completedExercise.exerciseID?.uuidString ?? completedExercise.exerciseName
+//
+//                for set in completedExercise.sets {
+//                    let currentBest = bestByExercise[key]?.set
+//
+//                    if currentBest == nil || isBetter(set, than: currentBest!) {
+//                        bestByExercise[key] = (
+//                            name: completedExercise.exerciseName,
+//                            set: set
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//
+//        return bestByExercise
+//            .map {
+//                (
+//                    exercise: $0.value.name,
+//                    weight: $0.value.set.weight,
+//                    reps: $0.value.set.reps
+//                )
+//            }
+//            .sorted { $0.exercise < $1.exercise }
+//    }
 
     var body: some View {
         List {
@@ -96,7 +97,7 @@ struct AnalyticsView: View {
                 HStack {
                     Text("Total Sets")
                     Spacer()
-                    Text("\(totalSets)")
+                    Text("\(analyticsCache.totalSets)")
                         .bold()
                 }
 
@@ -111,11 +112,11 @@ struct AnalyticsView: View {
             }
 
             Section {
-                if recoveryWarnings.isEmpty {
+                if analyticsCache.recoveryWarnings.isEmpty {
                     Text("No recovery warnings")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(recoveryWarnings) { warning in
+                    ForEach(analyticsCache.recoveryWarnings) { warning in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(warning.title)
@@ -146,11 +147,11 @@ struct AnalyticsView: View {
             }
 
             Section {
-                if performanceWarnings.isEmpty {
+                if analyticsCache.performanceWarnings.isEmpty {
                     Text("No performance warnings")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(performanceWarnings) { warning in
+                    ForEach(analyticsCache.performanceWarnings) { warning in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(warning.exerciseName)
                                 .font(.headline)
@@ -166,11 +167,11 @@ struct AnalyticsView: View {
             }
 
             Section {
-                if volumeByMuscleGroup.isEmpty {
+                if analyticsCache.volumeByMuscleGroup.isEmpty {
                     Text("No volume data yet")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(volumeByMuscleGroup, id: \.muscle) { item in
+                    ForEach(analyticsCache.volumeByMuscleGroup, id: \.muscle) { item in
                         HStack {
                             Text(item.muscle)
                             Spacer()
@@ -184,11 +185,11 @@ struct AnalyticsView: View {
             }
 
             Section {
-                if personalRecords.isEmpty {
+                if analyticsCache.personalRecord.isEmpty {
                     Text("No PRs yet")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(personalRecords, id: \.exercise) { pr in
+                    ForEach(analyticsCache.personalRecord, id: \.exercise) { pr in
                         HStack(spacing: AppTheme.Spacing.sm) {
                             Image(systemName: "trophy.fill")
                                 .foregroundStyle(.yellow)
@@ -198,7 +199,7 @@ struct AnalyticsView: View {
 
                             Spacer()
 
-                            Text("\(settingsStore.settings.displayWeight(pr.weight)) \(settingsStore.settings.weightUnitLabel) × \(pr.reps)")
+                            Text("\(formatWeight(settingsStore.settings.displayWeight(pr.weight))) \(settingsStore.settings.weightUnitLabel) × \(pr.reps)")
                                 .bold()
                         }
                     }
@@ -251,15 +252,15 @@ struct AnalyticsView: View {
         }
     }
 
-    private func isBetter(_ newSet: LoggedSet, than oldSet: LoggedSet) -> Bool {
-        if newSet.weight > oldSet.weight {
-            return true
-        }
-
-        if newSet.weight == oldSet.weight && newSet.reps > oldSet.reps {
-            return true
-        }
-
-        return false
-    }
+//    private func isBetter(_ newSet: LoggedSet, than oldSet: LoggedSet) -> Bool {
+//        if newSet.weight > oldSet.weight {
+//            return true
+//        }
+//
+//        if newSet.weight == oldSet.weight && newSet.reps > oldSet.reps {
+//            return true
+//        }
+//
+//        return false
+//    }
 }

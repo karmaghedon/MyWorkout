@@ -7,18 +7,19 @@ import SwiftUI
 struct HistoryView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
 
-    private var groupedLogs: [(date: Date, logs: [WorkoutLog])] {
-        let calendar = Calendar.current
-
-        let grouped = Dictionary(grouping: logStore.logs) { log in
-            calendar.startOfDay(for: log.date)
-        }
-
-        return grouped
-            .map { (date: $0.key, logs: $0.value) }
-            .sorted { $0.date > $1.date }
-    }
-
+//    private var groupedLogs: [(date: Date, logs: [WorkoutLog])] {
+//        let calendar = Calendar.current
+//
+//        let grouped = Dictionary(grouping: logStore.logs) { log in
+//            calendar.startOfDay(for: log.date)
+//        }
+//
+//        return grouped
+//            .map { (date: $0.key, logs: $0.value) }
+//            .sorted { $0.date > $1.date }
+//    }
+    @State private var groupedLogs: [(date: Date, logs: [WorkoutLog])] = []
+    
     var body: some View {
         List {
             ForEach(groupedLogs, id: \.date) { group in
@@ -62,6 +63,20 @@ struct HistoryView: View {
                 emptyState
             }
         }
+        .onAppear {regroup() }
+        .onChange(of: logStore.logs.count) {_, _ in regroup() }
+    }
+    
+    private func regroup() {
+        let calendar = Calendar.current
+
+        let grouped = Dictionary(grouping: logStore.logs) { log in
+            calendar.startOfDay(for: log.date)
+        }
+
+        groupedLogs = grouped
+            .map { (date: $0.key, logs: $0.value) }
+            .sorted { $0.date > $1.date }
     }
 
     private var emptyState: some View {

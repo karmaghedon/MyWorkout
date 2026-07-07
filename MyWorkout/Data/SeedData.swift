@@ -325,8 +325,8 @@ struct SeedData {
 
         minReps: Int = 8,
         maxReps: Int = 10,
-        increaseAmount: Int = 5,
-        deloadAmount: Int = 5,
+        increaseAmount: Double = 5,
+        deloadAmount: Double = 5,
         stallLimit: Int = 3,
         exerciseType: ExerciseType = .compound,
         progressionStrategy: ProgressionStrategy = .doubleProgression

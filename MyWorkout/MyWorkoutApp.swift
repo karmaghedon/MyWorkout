@@ -13,6 +13,7 @@ struct MyWorkoutApp: App {
     @StateObject private var equipmentStore = EquipmentInventoryStore()
     @StateObject private var settingsStore = UserSettingsStore()
     @StateObject private var activeWorkoutStore = ActiveWorkoutStore()
+    @StateObject private var analyticsCash = AnalyticsCache()
     
     var body: some Scene {
         WindowGroup {
@@ -22,6 +23,8 @@ struct MyWorkoutApp: App {
                 .environmentObject(equipmentStore)
                 .environmentObject(settingsStore)
                 .environmentObject(activeWorkoutStore)
+                .environmentObject(analyticsCash)
+                .onAppear {analyticsCash.bind(to: logStore)}
         }
     }
 }

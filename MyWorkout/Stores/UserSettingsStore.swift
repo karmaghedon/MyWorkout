@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class UserSettingsStore: ObservableObject {
     @Published var settings: UserSettings
     @Published private(set) var lastSaveError: String?

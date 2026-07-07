@@ -2,8 +2,14 @@ import Foundation
 
 struct PlateLoading: Identifiable {
     let id = UUID()
-    let totalWeight: Int
+    let totalWeight: Double
+    let achievedWeight: Double
     let platesPerSide: [Double]
+    
+    /// Whether the available plates can't match the requested weight exactly
+    var hasResidue: Bool {
+        abs(totalWeight - achievedWeight) > 0.01
+    }
 
     func displayText(in unit: UnitSystem) -> String {
         if platesPerSide.isEmpty {

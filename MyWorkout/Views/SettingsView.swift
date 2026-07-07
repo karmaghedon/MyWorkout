@@ -12,9 +12,7 @@ struct SettingsView: View {
                         Text(unit.rawValue).tag(unit)
                     }
                 }
-                .onChange(of: settingsStore.settings.unitSystem) { newUnit in
-                    let oldUnit = equipmentStore.inventory.unitSystem
-
+                .onChange(of: settingsStore.settings.unitSystem) { oldUnit, newUnit in
                     equipmentStore.convertInventory(
                         to: newUnit,
                         from: oldUnit
@@ -29,19 +27,19 @@ struct SettingsView: View {
                         value: $settingsStore.settings.compoundRestSeconds,
                         in: 30...600,
                         step: 15)
-                    .onChange(of: settingsStore.settings.compoundRestSeconds) { _ in settingsStore.save() }
+                    .onChange(of: settingsStore.settings.compoundRestSeconds) {_, _ in settingsStore.save() }
 
                 Stepper("Isolation: \(settingsStore.settings.isolationRestSeconds) sec",
                         value: $settingsStore.settings.isolationRestSeconds,
                         in: 30...600,
                         step: 15)
-                    .onChange(of: settingsStore.settings.isolationRestSeconds) { _ in settingsStore.save() }
+                    .onChange(of: settingsStore.settings.isolationRestSeconds) {_, _ in settingsStore.save() }
 
                 Stepper("Bodyweight: \(settingsStore.settings.bodyweightRestSeconds) sec",
                         value: $settingsStore.settings.bodyweightRestSeconds,
                         in: 30...600,
                         step: 15)
-                    .onChange(of: settingsStore.settings.bodyweightRestSeconds) { _ in settingsStore.save() }
+                    .onChange(of: settingsStore.settings.bodyweightRestSeconds) {_, _ in settingsStore.save() }
             }
 
             Section("Strength Formula") {
@@ -50,7 +48,7 @@ struct SettingsView: View {
                         Text(formula.rawValue).tag(formula)
                     }
                 }
-                .onChange(of: settingsStore.settings.oneRepMaxFormula) { _ in
+                .onChange(of: settingsStore.settings.oneRepMaxFormula) {_, _ in
                     settingsStore.save()
                 }
             }
@@ -60,13 +58,13 @@ struct SettingsView: View {
                         value: $settingsStore.settings.compoundIncrement,
                         in: 1...25,
                         step: 1)
-                    .onChange(of: settingsStore.settings.compoundIncrement) { _ in settingsStore.save() }
+                    .onChange(of: settingsStore.settings.compoundIncrement) {_, _ in settingsStore.save() }
 
                 Stepper("Isolation Increment: \(settingsStore.settings.isolationIncrement) \(settingsStore.settings.unitSystem.rawValue)",
                         value: $settingsStore.settings.isolationIncrement,
                         in: 1...25,
                         step: 1)
-                    .onChange(of: settingsStore.settings.isolationIncrement) { _ in settingsStore.save() }
+                    .onChange(of: settingsStore.settings.isolationIncrement) {_, _ in settingsStore.save() }
             }
         }
         .navigationTitle("Settings")

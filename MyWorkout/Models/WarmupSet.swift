@@ -2,6 +2,6 @@ import Foundation
 
 struct WarmupSet: Identifiable {
     let id = UUID()
-    let weight: Int
+    let weight: Double
     let reps: Int
 }

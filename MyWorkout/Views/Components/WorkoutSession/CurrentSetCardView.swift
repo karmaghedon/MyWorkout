@@ -2,11 +2,11 @@ import SwiftUI
 
 struct CurrentSetCardView: View {
     
-    @Binding var weight: Int
+    @Binding var weight: Double
     @Binding var reps: Int
 
-    let weightRange: ClosedRange<Int>
-    let weightStep: Int
+    let weightRange: ClosedRange<Double>
+    let weightStep: Double
     let weightUnit: String
 
     let repRange: ClosedRange<Int>
@@ -23,7 +23,7 @@ struct CurrentSetCardView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: AppTheme.Spacing.md) {
-                BigStepperControl(
+                DoubleBigStepperControl(
                     title: "Weight",
                     value: $weight,
                     range: weightRange,
@@ -34,7 +34,7 @@ struct CurrentSetCardView: View {
                 BigStepperControl(
                     title: "Reps",
                     value: $reps,
-                    range: weightRange,
+                    range: repRange,
                     step: 1,
                     suffix: nil
                 )

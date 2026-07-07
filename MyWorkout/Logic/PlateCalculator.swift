@@ -1,16 +1,16 @@
 import Foundation
 
 struct PlateCalculator {
-    static func loading(for totalWeight: Int, inventory: EquipmentInventory) -> PlateLoading {
+    static func loading(for totalWeight: Double, inventory: EquipmentInventory) -> PlateLoading {
         let barWeightLb = WeightConversion.toPounds(
             inventory.barbellWeight,
             from: inventory.unitSystem
         )
 
-        let targetPerSide = (Double(totalWeight) - barWeightLb) / 2.0
+        let targetPerSide = (totalWeight - barWeightLb) / 2.0
 
         guard targetPerSide > 0 else {
-            return PlateLoading(totalWeight: totalWeight, platesPerSide: [])
+            return PlateLoading(totalWeight: totalWeight, achievedWeight: barWeightLb, platesPerSide: [])
         }
 
         let platesPerSideInventory = inventory.plates
@@ -36,7 +36,8 @@ struct PlateCalculator {
                 used += 1
             }
         }
-
-        return PlateLoading(totalWeight: totalWeight, platesPerSide: result)
+        let loadedPerSide = result.reduce(0, +)
+        let achieved = barWeightLb + (loadedPerSide * 2)
+        return PlateLoading(totalWeight: totalWeight, achievedWeight: achieved, platesPerSide: result)
     }
 }

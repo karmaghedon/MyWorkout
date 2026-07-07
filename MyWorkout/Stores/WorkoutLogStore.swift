@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class WorkoutLogStore: ObservableObject {
     @Published var logs: [WorkoutLog] = []
 

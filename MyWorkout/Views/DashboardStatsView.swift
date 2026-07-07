@@ -3,16 +3,17 @@ import SwiftUI
 struct DashboardStatsView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
 
-    private var recoveryWarnings: [RecoveryWarning] {
-        RecoveryAnalyzer.warnings(logs: logStore.logs)
-    }
-
-    private var performanceWarnings: [ExercisePerformanceWarning] {
-        ExercisePerformanceAnalyzer.warnings(logs: logStore.logs)
-    }
-
+//    private var recoveryWarnings: [RecoveryWarning] {
+//        RecoveryAnalyzer.warnings(logs: logStore.logs)
+//    }
+//
+//    private var performanceWarnings: [ExercisePerformanceWarning] {
+//        ExercisePerformanceAnalyzer.warnings(logs: logStore.logs)
+//    }
+    @EnvironmentObject var analyticcsCache: AnalyticsCache
+    
     private var totalAlerts: Int {
-        recoveryWarnings.count + performanceWarnings.count
+        analyticcsCache.recoveryWarnings.count + analyticcsCache.performanceWarnings.count
     }
 
     private var totalWorkouts: Int {

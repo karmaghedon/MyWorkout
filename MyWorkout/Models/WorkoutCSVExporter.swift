@@ -20,7 +20,7 @@ struct WorkoutCSVExporter {
                         escape(log.workoutName),
                         escape(exercise.exerciseName),
                         "\(set.setNumber)",
-                        "\(displayWeight)",
+                        "\(formatWeight(displayWeight))",
                         settings.weightUnitLabel,
                         "\(set.reps)",
                         escapedNotes
@@ -35,5 +35,11 @@ struct WorkoutCSVExporter {
     private static func escape(_ value: String) -> String {
         let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
         return "\"\(escaped)\""
+    }
+    
+    private static func formatWeight(_ value: Double) -> String {
+        value.truncatingRemainder(dividingBy: 1) == 0
+        ? String(format: "%.0f", value)
+        : String(format: "%.1f", value)
     }
 }

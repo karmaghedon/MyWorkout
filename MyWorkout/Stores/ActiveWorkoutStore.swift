@@ -1,31 +1,32 @@
 import SwiftUI
 import Foundation
 
+@MainActor
 final class ActiveWorkoutStore: ObservableObject {
     @Published var activeWorkout: Workout? {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var exerciseStates: [UUID: ExerciseSessionState] = [:] {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var startedAt: Date? {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var elapsedSeconds: Int = 0
     
     @Published var activeRestExerciseID: UUID? {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var restStartedAt: Date? {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var restTotalSeconds: Int = 0 {
-        didSet { persistActiveWorkout() }
+        didSet { schedulePersist() }
     }
 
     @Published var restSecondsRemaining: Int = 0
@@ -34,6 +35,7 @@ final class ActiveWorkoutStore: ObservableObject {
     private var workoutTimer: Timer?
     private var isRestoring = false
     private var restTimer: Timer?
+    private var persistWorkItem: DispatchWorkItem?
 
     init() {
         restoreActiveWorkout()
@@ -52,6 +54,7 @@ final class ActiveWorkoutStore: ObservableObject {
     }
     // MARK: - Workout lifecycle
     func start(_ workout: Workout) {
+        persistWorkItem?.cancel()
         activeWorkout = workout
         exerciseStates = [:]
         startedAt = Date()
@@ -231,6 +234,15 @@ final class ActiveWorkoutStore: ObservableObject {
     }
 
     // MARK: - Persistence
+    private func schedulePersist() {
+        guard !isRestoring else { return}
+        persistWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.persistActiveWorkout()
+        }
+        persistWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: workItem)
+    }
     private func clearActiveWorkout() {
         isRestoring = true
         activeWorkout = nil

@@ -199,12 +199,32 @@ struct ExportView: View {
 
             let backup = try decoder.decode(AppBackup.self, from: data)
 
-            logStore.replaceAll(with: backup.logs)
-            templateStore.replaceAll(with: backup.templates)
-            equipmentStore.replace(with: backup.equipment)
-            settingsStore.replace(with: backup.settings)
-
-            importResultMessage = "Backup imported successfully."
+            guard backup.version <= AppBackup.currentVersion else {
+                importResultMessage = "This Backup was created by a newer version of the app (v\(backup.version). Release update MyWorkout before importing."
+                showImportResult = true
+                return
+            }
+            
+            //Snapshot current state for rollback
+            let previousLogs = logStore.logs
+            let previousTemplates = templateStore.templates
+            let previousEquipment = equipmentStore.inventory
+            let previousSettings = settingsStore.settings
+            
+            do {
+                logStore.replaceAll(with: backup.logs)
+                templateStore.replaceAll(with: backup.templates)
+                equipmentStore.replace(with: backup.equipment)
+                settingsStore.replace(with: backup.settings)
+                importResultMessage = "Backup imported successfully."
+            } catch {
+                // Rollback on partial failure
+                logStore.replaceAll(with: previousLogs)
+                templateStore.replaceAll(with: previousTemplates)
+                equipmentStore.replace(with: previousEquipment)
+                settingsStore.replace(with: previousSettings)
+                importResultMessage = "Import failed and was rolled back: \(error.localizedDescription)."
+            }
         } catch {
             importResultMessage = "Failed to import backup: \(error.localizedDescription)"
         }

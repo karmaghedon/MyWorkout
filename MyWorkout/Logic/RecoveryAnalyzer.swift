@@ -53,15 +53,17 @@ struct RecoveryAnalyzer {
     private static func hasLargeRepDropWithinWorkout(_ exercise: CompletedExercise) -> Bool {
         let sets = exercise.sets.sorted { $0.setNumber < $1.setNumber }
 
-        guard let first = sets.first,
-              let last = sets.last,
-              sets.count >= 3 else {
+        guard sets.count >= 3 else {
             return false
         }
 
-        let sameWeightSets = sets.filter { $0.weight == first.weight }
+        // Only compare sets at the same weight (first set's weight)
+        guard let firstWeight = sets.first?.weight else {return false}
+        let sameWeightSets = sets.filter { $0.weight == firstWeight }
 
-        guard sameWeightSets.count >= 3 else {
+        guard sameWeightSets.count >= 3,
+              let first = sameWeightSets.first,
+              let last = sameWeightSets.last else {
             return false
         }
 
@@ -183,13 +185,7 @@ struct RecoveryAnalyzer {
     }
 
     private static func matchingExercise(for completedExercise: CompletedExercise) -> Exercise? {
-        SeedData.exercises.first {
-            if let completedID = completedExercise.exerciseID {
-                return $0.id == completedID
-            }
-
-            return $0.name == completedExercise.exerciseName
-        }
+        ExerciseRegistry.find(for: completedExercise)
     }
 
     private static func bestSet(from sets: [LoggedSet]) -> LoggedSet? {

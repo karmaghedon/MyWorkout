@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		F54004B12FF0C6FE0079CC05 /* MyWorkoutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */; };
-		F54004B32FF0C6FE0079CC05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004B22FF0C6FE0079CC05 /* ContentView.swift */; };
 		F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54004B62FF0C7030079CC05 /* Assets.xcassets */; };
 		F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54004B92FF0C7030079CC05 /* Preview Assets.xcassets */; };
 		F54004C52FF0C83E0079CC05 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004C42FF0C83E0079CC05 /* Exercise.swift */; };
@@ -89,12 +88,14 @@
 		F5BF30782FFB25C600AB5AD9 /* InventoryItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30772FFB25C600AB5AD9 /* InventoryItemRow.swift */; };
 		F5BF307A2FFB288F00AB5AD9 /* InventoryAddItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30792FFB288F00AB5AD9 /* InventoryAddItemRow.swift */; };
 		F5BF307C2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307B2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift */; };
+		F5BF307E2FFC74D000AB5AD9 /* ExerciseRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307D2FFC74D000AB5AD9 /* ExerciseRegistry.swift */; };
+		F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */; };
+		F5BF30822FFD328500AB5AD9 /* AnalyticsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F54004AD2FF0C6FE0079CC05 /* MyWorkout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWorkout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWorkoutApp.swift; sourceTree = "<group>"; };
-		F54004B22FF0C6FE0079CC05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F54004B62FF0C7030079CC05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F54004B92FF0C7030079CC05 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyWorkout.entitlements; sourceTree = "<group>"; };
@@ -179,6 +180,9 @@
 		F5BF30772FFB25C600AB5AD9 /* InventoryItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemRow.swift; sourceTree = "<group>"; };
 		F5BF30792FFB288F00AB5AD9 /* InventoryAddItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAddItemRow.swift; sourceTree = "<group>"; };
 		F5BF307B2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseOverviewView.swift; sourceTree = "<group>"; };
+		F5BF307D2FFC74D000AB5AD9 /* ExerciseRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRegistry.swift; sourceTree = "<group>"; };
+		F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightFormatter.swift; sourceTree = "<group>"; };
+		F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,7 +217,6 @@
 			children = (
 				F5BF304D2FF9F23400AB5AD9 /* Docs */,
 				F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */,
-				F54004B22FF0C6FE0079CC05 /* ContentView.swift */,
 				F54004C12FF0C7F90079CC05 /* Models */,
 				F54004C32FF0C8290079CC05 /* Views */,
 				F54004DA2FF162CC0079CC05 /* Stores */,
@@ -263,6 +266,7 @@
 			children = (
 				F54004CA2FF0C8640079CC05 /* SeedData.swift */,
 				F54004F02FF41D800079CC05 /* EquipmentInventory.swift */,
+				F5BF307D2FFC74D000AB5AD9 /* ExerciseRegistry.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -304,6 +308,7 @@
 				F54004F22FF41DC50079CC05 /* EquipmentInventoryStore.swift */,
 				F540050D2FF598060079CC05 /* UserSettingsStore.swift */,
 				F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */,
+				F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -336,6 +341,7 @@
 			isa = PBXGroup;
 			children = (
 				F59350B32FF83B9D00991F1D /* Haptics.swift */,
+				F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -490,8 +496,8 @@
 				F54004F12FF41D800079CC05 /* EquipmentInventory.swift in Sources */,
 				F54004F32FF41DC50079CC05 /* EquipmentInventoryStore.swift in Sources */,
 				F54004EB2FF413EA0079CC05 /* WarmupEngine.swift in Sources */,
-				F54004B32FF0C6FE0079CC05 /* ContentView.swift in Sources */,
 				F5BF303D2FF9DE6D00AB5AD9 /* ExerciseHeaderView.swift in Sources */,
+				F5BF30822FFD328500AB5AD9 /* AnalyticsCache.swift in Sources */,
 				F540050C2FF597CB0079CC05 /* UserSettings.swift in Sources */,
 				F54004F72FF439FB0079CC05 /* RestTimerRule.swift in Sources */,
 				F54005122FF5C0990079CC05 /* WeightConversion.swift in Sources */,
@@ -504,6 +510,7 @@
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
 				F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */,
+				F5BF307E2FFC74D000AB5AD9 /* ExerciseRegistry.swift in Sources */,
 				F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */,
 				F5BF306B2FFAA6A200AB5AD9 /* WorkoutExerciseListView.swift in Sources */,
 				F5BF30732FFB227200AB5AD9 /* ExerciseSessionState.swift in Sources */,
@@ -512,6 +519,7 @@
 				F54004CF2FF0C87E0079CC05 /* ExerciseLibraryView.swift in Sources */,
 				F54004D12FF0C88A0079CC05 /* StartWorkoutView.swift in Sources */,
 				F540050E2FF598060079CC05 /* UserSettingsStore.swift in Sources */,
+				F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
 				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
 				F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */,

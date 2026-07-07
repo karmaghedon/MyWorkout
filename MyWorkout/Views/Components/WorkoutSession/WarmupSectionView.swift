@@ -4,7 +4,7 @@ struct WarmupSectionView: View {
     let warmups: [WarmupSet]
     let usesBarbell: Bool
     let equipmentInventory: EquipmentInventory
-    let displayWeight: (Int) -> Int
+    let displayWeight: (Double) -> Double
     let weightUnit: String
 
     var body: some View {
@@ -15,7 +15,7 @@ struct WarmupSectionView: View {
 
             ForEach(warmups) { warmup in
                 HStack {
-                    Text("\(displayWeight(warmup.weight)) \(weightUnit) × \(warmup.reps)")
+                    Text("\(formatWeight(displayWeight(warmup.weight))) \(weightUnit) × \(warmup.reps)")
                         .font(AppTheme.Typography.caption)
 
                     if usesBarbell {

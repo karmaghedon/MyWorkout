@@ -75,7 +75,7 @@ struct TemplateEditorView: View {
                     dismiss()
                 }
                 .fontWeight(.semibold)
-                .disabled(editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled(editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty || editableTemplate.exercises.isEmpty)
             }
 
             #if os(iOS)

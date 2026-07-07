@@ -8,6 +8,7 @@ struct EquipmentInventoryView: View {
     @State private var newPlateQuantity = ""
     @State private var newDumbbellWeight = ""
     @State private var newDumbbellQuantity = ""
+    @State private var showResetConfirmation = false
 
     private var unit: String {
         settingsStore.settings.weightUnitLabel
@@ -58,11 +59,23 @@ struct EquipmentInventoryView: View {
             }
 
             Button("Reset Inventory to Default") {
-                equipmentStore.resetToDefault(
-                    unit: settingsStore.settings.unitSystem
-                )
+                showResetConfirmation = true
             }
             .foregroundStyle(.red)
+            .confirmationDialog(
+                "Reset Inventory",
+                isPresented: $showResetConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Reset to Default", role: .destructive) {
+                    equipmentStore.resetToDefault(
+                        unit: settingsStore.settings.unitSystem
+                    )
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will replace all plates and dumbbells with the default set. This cannot be undone.")
+            }
         }
     }
 

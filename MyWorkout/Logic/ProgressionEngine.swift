@@ -2,8 +2,8 @@ import Foundation
 
 struct ProgressionSuggestion {
     let exerciseName: String
-    let currentWeight: Int
-    let suggestedWeight: Int
+    let currentWeight: Double
+    let suggestedWeight: Double
     let message: String
 }
 

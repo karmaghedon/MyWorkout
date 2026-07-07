@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class WorkoutTemplateStore: ObservableObject {
     @Published var templates: [WorkoutTemplate] = []
 
@@ -102,8 +103,8 @@ final class WorkoutTemplateStore: ObservableObject {
         guard let data = try? Data(contentsOf: fileURL) else { return }
 
         do {
-            templates = try JSONDecoder().decode([WorkoutTemplate].self, from: data)
-                .map { refreshed($0) }
+            let decoded = try JSONDecoder().decode([WorkoutTemplate].self, from: data)
+            templates = decoded.map { refreshed($0) }
             save()
             lastLoadError = nil
         } catch {
@@ -117,9 +118,7 @@ final class WorkoutTemplateStore: ObservableObject {
             id: template.id,
             name: template.name,
             exercises: template.exercises.map { savedExercise in
-                SeedData.exercises.first {
-                    $0.id == savedExercise.id || $0.name == savedExercise.name
-                } ?? savedExercise
+                ExerciseRegistry.find(id: savedExercise.id, name: savedExercise.name) ?? savedExercise
             }
         )
     }

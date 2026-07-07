@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LoggedSetsView: View {
     let sets: [LoggedSet]
-        let displayWeight: (Int) -> Int
+        let displayWeight: (Double) -> Double
         let weightUnit: String
         let onDeleteSet: (UUID) -> Void
     
@@ -23,7 +23,7 @@ struct LoggedSetsView: View {
 
                     Spacer()
 
-                    Text("\(displayWeight(set.weight)) \(weightUnit) × \(set.reps)")
+                    Text("\(formatWeight(displayWeight(set.weight))) \(weightUnit) × \(set.reps)")
                         .font(AppTheme.Typography.numeric(16))
 
                     Button {

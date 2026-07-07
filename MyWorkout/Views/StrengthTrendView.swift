@@ -2,9 +2,13 @@ import SwiftUI
 import Charts
 
 struct StrengthPoint: Identifiable {
-    let id = UUID()
+
     let date: Date
     let estimatedOneRepMax: Double
+    
+    var id: String {
+        "\(date.timeIntervalSince1970)-\(estimatedOneRepMax)"
+    }
 }
 
 struct StrengthTrendView: View {
@@ -55,12 +59,12 @@ struct StrengthTrendView: View {
                     Chart(trendData) { point in
                         LineMark(
                             x: .value("Date", point.date),
-                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
+                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(point.estimatedOneRepMax))
                         )
 
                         PointMark(
                             x: .value("Date", point.date),
-                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded())))
+                            y: .value("Estimated 1RM", settingsStore.settings.displayWeight(point.estimatedOneRepMax))
                         )
                     }
                     .frame(height: 300)
@@ -69,7 +73,7 @@ struct StrengthTrendView: View {
                         HStack {
                             Text(point.date.formatted(date: .abbreviated, time: .omitted))
                             Spacer()
-                            Text("\(settingsStore.settings.displayWeight(Int(point.estimatedOneRepMax.rounded()))) \(settingsStore.settings.weightUnitLabel)")
+                            Text("\(formatWeight(settingsStore.settings.displayWeight(point.estimatedOneRepMax))) \(settingsStore.settings.weightUnitLabel)")
                                 .bold()
                         }
                     }
@@ -90,7 +94,7 @@ struct StrengthTrendView: View {
 
     @ViewBuilder
     private func currentBestCard(latest: StrengthPoint) -> some View {
-        let displayValue = settingsStore.settings.displayWeight(Int(latest.estimatedOneRepMax.rounded()))
+        let displayValue = formatWeight(settingsStore.settings.displayWeight(latest.estimatedOneRepMax))
 
         VStack(alignment: .leading, spacing: 2) {
             Text("Current Est. 1RM")
@@ -126,8 +130,7 @@ struct StrengthTrendView: View {
         .padding()
     }
 
-    private func estimatedOneRepMax(weight: Int, reps: Int) -> Double {
-        let weight = Double(weight)
+    private func estimatedOneRepMax(weight: Double, reps: Int) -> Double {
         let reps = Double(reps)
 
         switch settingsStore.settings.oneRepMaxFormula {

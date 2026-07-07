@@ -5,13 +5,13 @@ enum WorkoutSessionEngine {
     static func defaultStartingWeight(
         for exercise: Exercise,
         equipmentInventory: EquipmentInventory
-    ) -> Int {
+    ) -> Double {
         switch exercise.exerciseType {
         case .bodyweight:
             return 0
         case .compound, .isolation:
             return exercise.usesBarbell
-                ? Int(equipmentInventory.barbellWeight.rounded())
+                ? equipmentInventory.barbellWeight
                 : 0
         }
     }

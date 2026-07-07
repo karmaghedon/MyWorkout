@@ -1,6 +1,8 @@
 import Foundation
 
 struct AppBackup: Codable {
+    static let currentVersion = 1
+    
     let version: Int
     let exportedAt: Date
     let logs: [WorkoutLog]
