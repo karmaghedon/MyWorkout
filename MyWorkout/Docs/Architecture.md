@@ -1,11 +1,13 @@
 If a future developer reads only one document before modifying MyWorkout, it should be this one.
 
-
 # MyWorkout Architecture
 
-Version: 1.0
+Version: 1.1
 
 Status: Living Document
+
+Note: This file replaces the former `MyWorkoutArchitecture.md`, which duplicated this document and had
+drifted out of sync with it. There is now a single source of truth for architecture decisions.
 
 ---
 
@@ -70,9 +72,18 @@ instead of duplicated SwiftUI.
 
 ## 3. Views assemble components
 
-Views should primarily compose reusable components.
+Views should primarily compose reusable components and be responsible for layout only.
 
-Business logic belongs elsewhere.
+Business logic belongs in:
+
+- Stores
+- Models
+- Services
+
+Views should stay small.
+
+Target: 150–200 lines maximum. Views that grow past this should be split into
+subcomponents (see `Views/Components/`).
 
 Example
 
@@ -106,13 +117,10 @@ Whenever possible, prefer native SwiftUI APIs.
 
 Examples
 
-NavigationStack
-
-Layout
-
-Observation
-
-SwiftData (future)
+- NavigationStack
+- Layout protocol
+- Observation
+- SwiftData (future)
 
 Avoid custom implementations when native solutions exist.
 
@@ -139,6 +147,26 @@ Assume the application will eventually contain:
 - years of user data
 
 Design accordingly.
+
+---
+
+## 7. Failures are surfaced, never swallowed
+
+Every store that persists data (`WorkoutLogStore`, `WorkoutTemplateStore`,
+`EquipmentInventoryStore`, `UserSettingsStore`, `ActiveWorkoutStore`) exposes
+`lastSaveError` / `lastLoadError` so the UI can inform the user instead of silently
+losing data. `print()`-only error handling is not acceptable for anything that
+touches user data — a store must always give the UI a way to know something failed.
+
+---
+
+## 8. Pure logic is unit tested
+
+Anything in `Logic/` (`ProgressionEngine`, `RecoveryAnalyzer`, `WarmupEngine`,
+`PlateCalculator`, `WeightConversion`, etc.) is pure and side-effect-free by design,
+specifically so it can be unit tested. New logic in this layer should ship with tests
+in `MyWorkoutTests/` covering at least its primary branches and edge cases (empty
+input, first-time use, stalled progression, etc.).
 
 ---
 
@@ -249,7 +277,7 @@ MyWorkout
 │
 ├── Stores
 │
-├── Services
+├── Logic
 │
 ├── Data
 │
@@ -258,26 +286,24 @@ MyWorkout
 ├── Components
 │   ├── Common
 │   ├── Exercise
-│   ├── Workout
-│   └── Dashboard
+│   ├── Inventory
+│   └── WorkoutSession
 │
-├── Exercise
+├── Helper
 │
-├── Workout
+├── Theme
 │
-├── Templates
+├── Utilities
 │
-├── Dashboard
-│
-├── History
-│
-└── Settings
+└── Docs
 
 ---
 
 # UI Architecture
 
 Reusable UI should be preferred over screen-specific implementations.
+
+Consistency matters more than creativity — every screen should feel like the same application.
 
 Current reusable components
 
@@ -307,6 +333,8 @@ Future
 - SectionCard
 - EmptyStateView
 - StatTile
+
+New components should be extracted before duplication occurs.
 
 ---
 
@@ -346,7 +374,7 @@ For every feature
 2. Identify reusable components.
 3. Build reusable components.
 4. Implement one polished example.
-5. Validate.
+5. Validate (including unit tests for any new pure logic).
 6. Roll out everywhere.
 
 Never duplicate work.
@@ -373,9 +401,7 @@ Every commit should
 
 # Long-Term Product Vision
 
-Phase 1
-
-Workout Logger
+Phase 1 — Workout Logger
 
 ✓ Templates
 
@@ -389,27 +415,35 @@ Workout Logger
 
 ---
 
-Phase 2
+Phase 2 — Exercise Encyclopedia
 
-Exercise Encyclopedia
+☑ Exercise Row
 
-Exercise Details
+☑ InfoBadge
 
-Exercise Education
+☑ FlowLayout
 
-Exercise Search
+☑ Exercise Detail
 
-Exercise Images
+☐ Exercise Header
 
-Exercise Videos
+☐ Exercise Images
 
-Muscle Diagrams
+☐ Exercise Videos
+
+☐ Muscle Diagram
+
+☐ Personal Records
+
+☐ Exercise History
+
+☐ Search
+
+☐ Favorites
 
 ---
 
-Phase 3
-
-Analytics
+Phase 3 — Analytics
 
 Personal Records
 
@@ -423,9 +457,7 @@ Training Consistency
 
 ---
 
-Phase 4
-
-Personal Trainer
+Phase 4 — Personal Trainer
 
 Workout Suggestions
 
@@ -439,9 +471,7 @@ Training Readiness
 
 ---
 
-Phase 5
-
-Platform Expansion
+Phase 5 — Platform Expansion
 
 Apple Health
 
@@ -470,6 +500,10 @@ A feature is complete when
 ✓ No unnecessary duplication
 
 ✓ Fits the product vision
+
+✓ Any new persistence path surfaces failures via `lastSaveError` / `lastLoadError`
+
+✓ Any new pure logic has unit test coverage in `MyWorkoutTests/`
 
 Working code is only the first milestone.
 

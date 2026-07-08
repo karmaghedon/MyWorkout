@@ -5,6 +5,7 @@ struct DashboardView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var settingsStore: UserSettingsStore
+    @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
 
     private var columns: [GridItem] {
         #if os(iOS)
@@ -83,6 +84,10 @@ struct DashboardView: View {
             }
 
             if let error = settingsStore.lastSaveError ?? settingsStore.lastLoadError {
+                errorBanner(error)
+            }
+
+            if let error = activeWorkoutStore.lastSaveError ?? activeWorkoutStore.lastLoadError {
                 errorBanner(error)
             }
         }

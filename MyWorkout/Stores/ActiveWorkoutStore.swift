@@ -31,6 +31,9 @@ final class ActiveWorkoutStore: ObservableObject {
 
     @Published var restSecondsRemaining: Int = 0
 
+    @Published private(set) var lastSaveError: String?
+    @Published private(set) var lastLoadError: String?
+
     private let persistenceKey = "active_workout_session"
     private var workoutTimer: Timer?
     private var isRestoring = false
@@ -279,8 +282,10 @@ final class ActiveWorkoutStore: ObservableObject {
         do {
             let data = try JSONEncoder().encode(snapshot)
             UserDefaults.standard.set(data, forKey: persistenceKey)
+            lastSaveError = nil
         } catch {
             print("Failed to persist active workout: \(error.localizedDescription)")
+            lastSaveError = "Couldn't save your active workout. If the app closes, you may lose progress on this session."
         }
     }
 
@@ -308,9 +313,12 @@ final class ActiveWorkoutStore: ObservableObject {
                 startTimerIfNeeded()
                 restoreRestTimerIfNeeded()
             }
+
+            lastLoadError = nil
         } catch {
             UserDefaults.standard.removeObject(forKey: persistenceKey)
             print("Failed to restore active workout: \(error.localizedDescription)")
+            lastLoadError = "Couldn't restore your in-progress workout. It may have been lost."
         }
     }
 

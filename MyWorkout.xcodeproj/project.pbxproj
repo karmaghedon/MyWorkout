@@ -92,7 +92,20 @@
 		F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */; };
 		F5BF30822FFD328500AB5AD9 /* AnalyticsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */; };
 		F5BF30852FFD9E5000AB5AD9 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */; };
+		F5BF30922FFDFF1600AB5AD9 /* MyWorkoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30912FFDFF1600AB5AD9 /* MyWorkoutTests.swift */; };
+		F5BF30982FFDFF3100AB5AD9 /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30872FFDFDFA00AB5AD9 /* ProgressionEngineTests.swift */; };
+		F5BF30992FFDFF3300AB5AD9 /* PlateCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30892FFDFE1200AB5AD9 /* PlateCalculatorTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F5BF30932FFDFF1600AB5AD9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F54004A52FF0C6FE0079CC05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F54004AC2FF0C6FE0079CC05;
+			remoteInfo = MyWorkout;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		F54004AD2FF0C6FE0079CC05 /* MyWorkout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWorkout.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,7 +171,6 @@
 		F5BF30472FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInstructionsView.swift; sourceTree = "<group>"; };
 		F5BF30492FF9E6E800AB5AD9 /* ExerciseTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTipsView.swift; sourceTree = "<group>"; };
 		F5BF304B2FF9E70900AB5AD9 /* ExerciseWarningsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseWarningsView.swift; sourceTree = "<group>"; };
-		F5BF304E2FF9F29200AB5AD9 /* MyWorkoutArchitecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MyWorkoutArchitecture.md; sourceTree = "<group>"; };
 		F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
 		F5BF30522FF9F34600AB5AD9 /* Architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Architecture.md; sourceTree = "<group>"; };
 		F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigStepperControl.swift; sourceTree = "<group>"; };
@@ -185,10 +197,21 @@
 		F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightFormatter.swift; sourceTree = "<group>"; };
 		F5BF30812FFD328500AB5AD9 /* AnalyticsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsCache.swift; sourceTree = "<group>"; };
 		F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
+		F5BF30872FFDFDFA00AB5AD9 /* ProgressionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngineTests.swift; sourceTree = "<group>"; };
+		F5BF30892FFDFE1200AB5AD9 /* PlateCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlateCalculatorTests.swift; sourceTree = "<group>"; };
+		F5BF308F2FFDFF1500AB5AD9 /* MyWorkoutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyWorkoutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5BF30912FFDFF1600AB5AD9 /* MyWorkoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWorkoutTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		F54004AA2FF0C6FE0079CC05 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BF308C2FFDFF1500AB5AD9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -202,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				F54004AF2FF0C6FE0079CC05 /* MyWorkout */,
+				F5BF30902FFDFF1600AB5AD9 /* MyWorkoutTests */,
 				F54004AE2FF0C6FE0079CC05 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -210,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				F54004AD2FF0C6FE0079CC05 /* MyWorkout.app */,
+				F5BF308F2FFDFF1500AB5AD9 /* MyWorkoutTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -384,7 +409,6 @@
 		F5BF304D2FF9F23400AB5AD9 /* Docs */ = {
 			isa = PBXGroup;
 			children = (
-				F5BF304E2FF9F29200AB5AD9 /* MyWorkoutArchitecture.md */,
 				F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */,
 				F5BF30522FF9F34600AB5AD9 /* Architecture.md */,
 			);
@@ -430,6 +454,16 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		F5BF30902FFDFF1600AB5AD9 /* MyWorkoutTests */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF30892FFDFE1200AB5AD9 /* PlateCalculatorTests.swift */,
+				F5BF30872FFDFDFA00AB5AD9 /* ProgressionEngineTests.swift */,
+				F5BF30912FFDFF1600AB5AD9 /* MyWorkoutTests.swift */,
+			);
+			path = MyWorkoutTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -450,6 +484,24 @@
 			productReference = F54004AD2FF0C6FE0079CC05 /* MyWorkout.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F5BF308E2FFDFF1500AB5AD9 /* MyWorkoutTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5BF30952FFDFF1600AB5AD9 /* Build configuration list for PBXNativeTarget "MyWorkoutTests" */;
+			buildPhases = (
+				F5BF308B2FFDFF1500AB5AD9 /* Sources */,
+				F5BF308C2FFDFF1500AB5AD9 /* Frameworks */,
+				F5BF308D2FFDFF1500AB5AD9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5BF30942FFDFF1600AB5AD9 /* PBXTargetDependency */,
+			);
+			name = MyWorkoutTests;
+			productName = MyWorkoutTests;
+			productReference = F5BF308F2FFDFF1500AB5AD9 /* MyWorkoutTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -462,6 +514,10 @@
 				TargetAttributes = {
 					F54004AC2FF0C6FE0079CC05 = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					F5BF308E2FFDFF1500AB5AD9 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = F54004AC2FF0C6FE0079CC05;
 					};
 				};
 			};
@@ -479,6 +535,7 @@
 			projectRoot = "";
 			targets = (
 				F54004AC2FF0C6FE0079CC05 /* MyWorkout */,
+				F5BF308E2FFDFF1500AB5AD9 /* MyWorkoutTests */,
 			);
 		};
 /* End PBXProject section */
@@ -491,6 +548,13 @@
 				F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */,
 				F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */,
 				F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BF308D2FFDFF1500AB5AD9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -586,7 +650,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F5BF308B2FFDFF1500AB5AD9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5BF30922FFDFF1600AB5AD9 /* MyWorkoutTests.swift in Sources */,
+				F5BF30982FFDFF3100AB5AD9 /* ProgressionEngineTests.swift in Sources */,
+				F5BF30992FFDFF3300AB5AD9 /* PlateCalculatorTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F5BF30942FFDFF1600AB5AD9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F54004AC2FF0C6FE0079CC05 /* MyWorkout */;
+			targetProxy = F5BF30932FFDFF1600AB5AD9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		F54004BC2FF0C7030079CC05 /* Debug */ = {
@@ -773,6 +855,45 @@
 			};
 			name = Release;
 		};
+		F5BF30962FFDFF1600AB5AD9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6XVQUYT5J7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MyWorkoutTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyWorkout.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyWorkout";
+			};
+			name = Debug;
+		};
+		F5BF30972FFDFF1600AB5AD9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6XVQUYT5J7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MyWorkoutTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyWorkout.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyWorkout";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -790,6 +911,15 @@
 			buildConfigurations = (
 				F54004BF2FF0C7030079CC05 /* Debug */,
 				F54004C02FF0C7030079CC05 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5BF30952FFDFF1600AB5AD9 /* Build configuration list for PBXNativeTarget "MyWorkoutTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5BF30962FFDFF1600AB5AD9 /* Debug */,
+				F5BF30972FFDFF1600AB5AD9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
