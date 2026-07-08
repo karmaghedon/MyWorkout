@@ -5,6 +5,7 @@ struct InventoryItemRow: View {
     @Binding var quantity: Int
 
     let unit: String
+    let itemLabel: String
     let onDelete: () -> Void
 
     var body: some View {
@@ -25,6 +26,8 @@ struct InventoryItemRow: View {
                 Text("Qty: \(quantity)")
             }
             .fixedSize()
+            .accessibilityLabel("\(itemLabel) quantity")
+            .accessibilityValue("\(quantity)")
 
             Spacer(minLength: 0)
 
@@ -48,6 +51,8 @@ struct InventoryItemRow: View {
             Stepper(value: $quantity, in: 0...20) {
                 Text("Qty: \(quantity)")
             }
+            .accessibilityLabel("\(itemLabel) quantity")
+            .accessibilityValue("\(quantity)")
         }
     }
 
@@ -58,12 +63,13 @@ struct InventoryItemRow: View {
             .keyboardType(.decimalPad)
             #endif
             .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
+            .accessibilityLabel("\(itemLabel) weight in \(unit)")
     }
 
     private var deleteButton: some View {
         Button(role: .destructive, action: onDelete) {
             Image(systemName: "trash")
         }
-        .accessibilityLabel("Delete")
+        .accessibilityLabel("Delete \(itemLabel.lowercased()), \(weight, specifier: "%g") \(unit)")
     }
 }

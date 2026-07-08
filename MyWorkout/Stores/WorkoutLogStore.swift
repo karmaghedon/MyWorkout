@@ -5,6 +5,7 @@ final class WorkoutLogStore: ObservableObject {
     @Published var logs: [WorkoutLog] = []
 
     @Published private(set) var lastSaveError: String?
+    @Published private(set) var lastLoadError: String?
 
     private let legacyDefaultsKey = "workout_logs"
 
@@ -143,9 +144,10 @@ final class WorkoutLogStore: ObservableObject {
 
         do {
             logs = try JSONDecoder().decode([WorkoutLog].self, from: data)
+            lastLoadError = nil
         } catch {
             print("Failed to load workout logs: \(error)")
-            lastSaveError = "Couldn't load your saved workouts. Recent data may be unavailable."
+            lastLoadError = "Couldn't load your saved workouts. Recent data may be unavailable."
         }
     }
 }
