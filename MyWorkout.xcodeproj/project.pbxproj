@@ -107,6 +107,13 @@
 		F5BF30B22FFED4B300AB5AD9 /* BarbellInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30AF2FFED4B200AB5AD9 /* BarbellInventorySection.swift */; };
 		F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B02FFED4B300AB5AD9 /* DumbbellsInventorySection.swift */; };
 		F5BF30B42FFED4B300AB5AD9 /* PlatesInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B12FFED4B300AB5AD9 /* PlatesInventorySection.swift */; };
+		F5BF30B82FFEDA7D00AB5AD9 /* ExportActionsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B62FFEDA7D00AB5AD9 /* ExportActionsSection.swift */; };
+		F5BF30B92FFEDA7D00AB5AD9 /* ImportActionsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */; };
+		F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */; };
+		F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */; };
+		F5BF30BF2FFEDD3600AB5AD9 /* CSVDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */; };
+		F5BF30C12FFF19E700AB5AD9 /* Rounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */; };
+		F5BF30C32FFF1A1C00AB5AD9 /* ErrorReportingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -225,6 +232,13 @@
 		F5BF30AF2FFED4B200AB5AD9 /* BarbellInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarbellInventorySection.swift; sourceTree = "<group>"; };
 		F5BF30B02FFED4B300AB5AD9 /* DumbbellsInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DumbbellsInventorySection.swift; sourceTree = "<group>"; };
 		F5BF30B12FFED4B300AB5AD9 /* PlatesInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatesInventorySection.swift; sourceTree = "<group>"; };
+		F5BF30B62FFEDA7D00AB5AD9 /* ExportActionsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportActionsSection.swift; sourceTree = "<group>"; };
+		F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportActionsSection.swift; sourceTree = "<group>"; };
+		F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackupImportHandler.swift; sourceTree = "<group>"; };
+		F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleBigStepperControl.swift; sourceTree = "<group>"; };
+		F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVDocument.swift; sourceTree = "<group>"; };
+		F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rounding.swift; sourceTree = "<group>"; };
+		F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorReportingStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -295,6 +309,7 @@
 		F54004C12FF0C7F90079CC05 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */,
 				F54004C42FF0C83E0079CC05 /* Exercise.swift */,
 				F54004C62FF0C8490079CC05 /* Workout.swift */,
 				F54004C82FF0C8570079CC05 /* WorkoutLog.swift */,
@@ -355,6 +370,7 @@
 		F54004DA2FF162CC0079CC05 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */,
 				F54004DD2FF163F10079CC05 /* WorkoutTemplateStore.swift */,
 				F54004D42FF0CF5C0079CC05 /* WorkoutLogStore.swift */,
 				F54004F22FF41DC50079CC05 /* EquipmentInventoryStore.swift */,
@@ -368,6 +384,8 @@
 		F54004E12FF169210079CC05 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */,
+				F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */,
 				F54004E42FF16A750079CC05 /* ProgressionEngine.swift */,
 				F54004EA2FF413EA0079CC05 /* WarmupEngine.swift */,
 				F54004EE2FF41AD90079CC05 /* PlateCalculator.swift */,
@@ -401,6 +419,7 @@
 		F5BF303E2FF9DFC600AB5AD9 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30B52FFEDA7D00AB5AD9 /* Export */,
 				F5BF30A22FFED42000AB5AD9 /* Analytics */,
 				F5BF30742FFB23D000AB5AD9 /* Inventory */,
 				F5BF30532FF9FA3500AB5AD9 /* WorkoutSession */,
@@ -443,6 +462,7 @@
 		F5BF30532FF9FA3500AB5AD9 /* WorkoutSession */ = {
 			isa = PBXGroup;
 			children = (
+				F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */,
 				F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */,
 				F5BF30562FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift */,
 				F5BF30582FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift */,
@@ -506,6 +526,15 @@
 				F5BF30A82FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift */,
 			);
 			path = Analytics;
+			sourceTree = "<group>";
+		};
+		F5BF30B52FFEDA7D00AB5AD9 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF30B62FFEDA7D00AB5AD9 /* ExportActionsSection.swift */,
+				F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */,
+			);
+			path = Export;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -609,6 +638,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5BF30B92FFEDA7D00AB5AD9 /* ImportActionsSection.swift in Sources */,
 				F5BF30592FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift in Sources */,
 				F5BF30392FF9DC1800AB5AD9 /* ExerciseRowView.swift in Sources */,
 				F54004E02FF1640A0079CC05 /* CreateWorkoutTemplateView.swift in Sources */,
@@ -625,6 +655,7 @@
 				F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */,
 				F54005162FF5CF8D0079CC05 /* WorkoutCSVExporter.swift in Sources */,
 				F54004E92FF413830079CC05 /* WarmupSet.swift in Sources */,
+				F5BF30C12FFF19E700AB5AD9 /* Rounding.swift in Sources */,
 				F5BF304A2FF9E6E800AB5AD9 /* ExerciseTipsView.swift in Sources */,
 				F54004D72FF0CFBA0079CC05 /* HistoryView.swift in Sources */,
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
@@ -643,6 +674,7 @@
 				F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
 				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
+				F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */,
 				F5BF30AE2FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift in Sources */,
 				F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */,
 				F5BF30B42FFED4B300AB5AD9 /* PlatesInventorySection.swift in Sources */,
@@ -662,14 +694,17 @@
 				F5BF304C2FF9E70900AB5AD9 /* ExerciseWarningsView.swift in Sources */,
 				F5BF30AD2FFED42000AB5AD9 /* RecoveryWarningsSection.swift in Sources */,
 				F5BF30462FF9E28700AB5AD9 /* FlowLayout.swift in Sources */,
+				F5BF30BF2FFEDD3600AB5AD9 /* CSVDocument.swift in Sources */,
 				F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */,
 				F5BF30B22FFED4B300AB5AD9 /* BarbellInventorySection.swift in Sources */,
 				F5BF30AC2FFED42000AB5AD9 /* RecentWorkoutsSection.swift in Sources */,
 				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
+				F5BF30C32FFF1A1C00AB5AD9 /* ErrorReportingStore.swift in Sources */,
 				F5BF306D2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */,
+				F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
@@ -678,6 +713,7 @@
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
 				F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */,
 				F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */,
+				F5BF30B82FFEDA7D00AB5AD9 /* ExportActionsSection.swift in Sources */,
 				F5BF30402FF9DFE100AB5AD9 /* InfoBadge.swift in Sources */,
 				F54004EF2FF41AD90079CC05 /* PlateCalculator.swift in Sources */,
 				F54004F52FF41DEA0079CC05 /* EquipmentInventoryView.swift in Sources */,

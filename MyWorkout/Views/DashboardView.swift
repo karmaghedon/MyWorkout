@@ -69,26 +69,18 @@ struct DashboardView: View {
         }
     }
 
+    private var errorReportingStores: [any ErrorReportingStore] {
+        [logStore, templateStore, equipmentStore, settingsStore, activeWorkoutStore]
+    }
+
+    private var currentErrorMessages: [String] {
+        errorReportingStores.compactMap(\.currentError)
+    }
+
     private var errorBanners: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let error = logStore.lastSaveError {
-                errorBanner(error)
-            }
-
-            if let error = templateStore.lastSaveError ?? templateStore.lastLoadError {
-                errorBanner(error)
-            }
-
-            if let error = equipmentStore.lastSaveError ?? equipmentStore.lastLoadError {
-                errorBanner(error)
-            }
-
-            if let error = settingsStore.lastSaveError ?? settingsStore.lastLoadError {
-                errorBanner(error)
-            }
-
-            if let error = activeWorkoutStore.lastSaveError ?? activeWorkoutStore.lastLoadError {
-                errorBanner(error)
+            ForEach(Array(currentErrorMessages.enumerated()), id: \.offset) { _, message in
+                errorBanner(message)
             }
         }
     }

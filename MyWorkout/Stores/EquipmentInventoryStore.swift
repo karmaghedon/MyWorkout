@@ -102,9 +102,9 @@ final class EquipmentInventoryStore: ObservableObject {
         func convert(_ value: Double) -> Double {
             switch (oldUnit, newUnit) {
             case (.pounds, .kilograms):
-                return roundToQuarter(value * 0.453592)
+                return roundToQuarter(WeightConversion.fromPounds(value, to: .kilograms))
             case (.kilograms, .pounds):
-                return roundToQuarter(value / 0.453592)
+                return roundToQuarter(WeightConversion.toPounds(value, from: .kilograms))
             default:
                 return value
             }
@@ -139,6 +139,6 @@ final class EquipmentInventoryStore: ObservableObject {
     }
 
     private func roundToQuarter(_ value: Double) -> Double {
-        (value * 4).rounded() / 4
+        Rounding.toNearestMultiple(value, of: 0.25)
     }
 }

@@ -8,6 +8,7 @@ struct StartWorkoutView: View {
     @State private var showWorkoutSession = false
     @State private var templatePendingStart: WorkoutTemplate?
     @State private var showActiveWorkoutWarning = false
+    @State private var showCancelActiveWorkoutConfirmation = false
 
     var body: some View {
         List {
@@ -27,10 +28,11 @@ struct StartWorkoutView: View {
                     }
 
                     Button(role: .destructive) {
-                        activeWorkoutStore.cancel()
+                        showCancelActiveWorkoutConfirmation = true
                     } label: {
                         Label("Cancel Active Workout", systemImage: "xmark.circle")
                     }
+                    .accessibilityHint("Discards this workout and all logged sets. Asks for confirmation first.")
                 }
             }
 
@@ -77,6 +79,19 @@ struct StartWorkoutView: View {
             }
         } message: {
             Text("You already have a workout running. Starting a new one will discard the active session.")
+        }
+        .confirmationDialog(
+            "Cancel Active Workout?",
+            isPresented: $showCancelActiveWorkoutConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Cancel Workout", role: .destructive) {
+                activeWorkoutStore.cancel()
+            }
+
+            Button("Keep Workout", role: .cancel) {}
+        } message: {
+            Text("This will discard the current workout and all logged sets. This cannot be undone.")
         }
     }
 

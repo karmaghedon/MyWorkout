@@ -153,7 +153,7 @@ struct ExerciseSessionCardView: View {
         case .pounds:
             return Double(weightStep)
         case .kilograms:
-            let raw = Double(weightStep) * 0.453592
+            let raw = WeightConversion.fromPounds(Double(weightStep), to: .kilograms)
             return max(0.5, (raw * 2).rounded() / 2) // round to nearest 0.5kg
         }
     }

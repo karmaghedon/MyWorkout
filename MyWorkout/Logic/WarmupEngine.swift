@@ -95,6 +95,6 @@ struct WarmupEngine {
     }
 
     private static func roundToNearest5(_ value: Double) -> Double {
-        (value / 5.0).rounded() * 5
+        Rounding.toNearestMultiple(value, of: 5)
     }
 }

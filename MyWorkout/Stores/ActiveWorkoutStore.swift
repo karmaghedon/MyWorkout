@@ -34,13 +34,16 @@ final class ActiveWorkoutStore: ObservableObject {
     @Published private(set) var lastSaveError: String?
     @Published private(set) var lastLoadError: String?
 
-    private let persistenceKey = "active_workout_session"
+    private let legacyDefaultsKey = "active_workout_session"
+    private let fileURL: URL
+    private let saveQueue = DispatchQueue(label: "com.myworkout.activeworkoutstore.save", qos: .utility)
     private var workoutTimer: Timer?
     private var isRestoring = false
     private var restTimer: Timer?
     private var persistWorkItem: DispatchWorkItem?
 
     init() {
+        fileURL = Self.resolveFileURL()
         restoreActiveWorkout()
     }
 
@@ -259,14 +262,14 @@ final class ActiveWorkoutStore: ObservableObject {
         restSecondsRemaining = 0
 
         isRestoring = false
-        UserDefaults.standard.removeObject(forKey: persistenceKey)
+        deletePersistedFile()
     }
 
     private func persistActiveWorkout() {
         guard !isRestoring else { return }
 
         guard let activeWorkout else {
-            UserDefaults.standard.removeObject(forKey: persistenceKey)
+            deletePersistedFile()
             return
         }
 
@@ -279,18 +282,61 @@ final class ActiveWorkoutStore: ObservableObject {
             restTotalSeconds: restTotalSeconds
         )
 
-        do {
-            let data = try JSONEncoder().encode(snapshot)
-            UserDefaults.standard.set(data, forKey: persistenceKey)
-            lastSaveError = nil
-        } catch {
-            print("Failed to persist active workout: \(error.localizedDescription)")
-            lastSaveError = "Couldn't save your active workout. If the app closes, you may lose progress on this session."
+        let destination = fileURL
+
+        saveQueue.async { [weak self] in
+            do {
+                let data = try JSONEncoder().encode(snapshot)
+                try data.write(to: destination, options: .atomic)
+
+                DispatchQueue.main.async {
+                    self?.lastSaveError = nil
+                }
+            } catch {
+                print("Failed to persist active workout: \(error.localizedDescription)")
+
+                DispatchQueue.main.async {
+                    self?.lastSaveError = "Couldn't save your active workout. If the app closes, you may lose progress on this session."
+                }
+            }
         }
     }
 
+    private func deletePersistedFile() {
+        let destination = fileURL
+
+        saveQueue.async {
+            try? FileManager.default.removeItem(at: destination)
+        }
+    }
+
+    private static func resolveFileURL() -> URL {
+        let fileManager = FileManager.default
+        let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let directory = appSupport.appendingPathComponent("MyWorkout", isDirectory: true)
+
+        if !fileManager.fileExists(atPath: directory.path) {
+            try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+
+        return directory.appendingPathComponent("active_workout_session.json")
+    }
+
     private func restoreActiveWorkout() {
-        guard let data = UserDefaults.standard.data(forKey: persistenceKey) else { return }
+        let data: Data
+        var didMigrateFromLegacyStorage = false
+
+        if !FileManager.default.fileExists(atPath: fileURL.path),
+           let legacyData = UserDefaults.standard.data(forKey: legacyDefaultsKey) {
+            // Migrate from the old UserDefaults-based storage. Write it
+            // through to the new file so future launches skip this path.
+            data = legacyData
+            didMigrateFromLegacyStorage = true
+            UserDefaults.standard.removeObject(forKey: legacyDefaultsKey)
+        } else {
+            guard let fileData = try? Data(contentsOf: fileURL) else { return }
+            data = fileData
+        }
 
         do {
             let snapshot = try JSONDecoder().decode(ActiveWorkoutSnapshot.self, from: data)
@@ -314,9 +360,18 @@ final class ActiveWorkoutStore: ObservableObject {
                 restoreRestTimerIfNeeded()
             }
 
+            // Properties set while isRestoring was true don't trigger
+            // schedulePersist(), so a fresh migration wouldn't otherwise get
+            // written to the new file until the next edit. Persist it now so
+            // the migration can't silently lose data if the app is closed
+            // before anything changes.
+            if didMigrateFromLegacyStorage {
+                persistActiveWorkout()
+            }
+
             lastLoadError = nil
         } catch {
-            UserDefaults.standard.removeObject(forKey: persistenceKey)
+            try? FileManager.default.removeItem(at: fileURL)
             print("Failed to restore active workout: \(error.localizedDescription)")
             lastLoadError = "Couldn't restore your in-progress workout. It may have been lost."
         }
