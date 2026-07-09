@@ -22,13 +22,22 @@ enum WorkoutSessionEngine {
     ) {
         var state = states[exerciseID] ?? ExerciseSessionState()
 
+        // Validate input before logging
+        let validWeight = InputValidation.clampWeight(state.weight)
+        let validReps = InputValidation.clampReps(state.reps)
+        
         let newSet = LoggedSet(
             setNumber: state.loggedSets.count + 1,
-            weight: state.weight,
-            reps: state.reps
+            weight: validWeight,
+            reps: validReps
         )
 
         state.loggedSets.append(newSet)
+        
+        //Update state with validated values
+        state.weight = validWeight
+        state.reps = validReps
+        
         states[exerciseID] = state
     }
 

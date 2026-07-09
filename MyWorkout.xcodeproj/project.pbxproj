@@ -114,6 +114,10 @@
 		F5BF30BF2FFEDD3600AB5AD9 /* CSVDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */; };
 		F5BF30C12FFF19E700AB5AD9 /* Rounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */; };
 		F5BF30C32FFF1A1C00AB5AD9 /* ErrorReportingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */; };
+		F5BF30C530002EBC00AB5AD9 /* InputValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C430002EBC00AB5AD9 /* InputValidation.swift */; };
+		F5BF30C73000401400AB5AD9 /* InputValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C63000401400AB5AD9 /* InputValidationTests.swift */; };
+		F5BF30C93000421D00AB5AD9 /* WorkoutLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */; };
+		F5BF30CB3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -239,6 +243,11 @@
 		F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVDocument.swift; sourceTree = "<group>"; };
 		F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rounding.swift; sourceTree = "<group>"; };
 		F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorReportingStore.swift; sourceTree = "<group>"; };
+		F5BF30C430002EBC00AB5AD9 /* InputValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputValidation.swift; sourceTree = "<group>"; };
+		F5BF30C63000401400AB5AD9 /* InputValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputValidationTests.swift; sourceTree = "<group>"; };
+		F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLogStoreTests.swift; sourceTree = "<group>"; };
+		F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateStoreTests.swift; sourceTree = "<group>"; };
+		F5BF30CC3000490100AB5AD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,6 +271,7 @@
 		F54004A42FF0C6FE0079CC05 = {
 			isa = PBXGroup;
 			children = (
+				F5BF30CC3000490100AB5AD9 /* README.md */,
 				F54004AF2FF0C6FE0079CC05 /* MyWorkout */,
 				F5BF30902FFDFF1600AB5AD9 /* MyWorkoutTests */,
 				F54004AE2FF0C6FE0079CC05 /* Products */,
@@ -498,6 +508,7 @@
 			isa = PBXGroup;
 			children = (
 				F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */,
+				F5BF30C430002EBC00AB5AD9 /* InputValidation.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -511,6 +522,9 @@
 				F5BF309D2FFED28500AB5AD9 /* RestTimerRuleTests.swift */,
 				F5BF309E2FFED28500AB5AD9 /* WarmupEngineTests.swift */,
 				F5BF309C2FFED28500AB5AD9 /* WorkoutSessionEngineTests.swift */,
+				F5BF30C63000401400AB5AD9 /* InputValidationTests.swift */,
+				F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */,
+				F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -660,6 +674,7 @@
 				F54004D72FF0CFBA0079CC05 /* HistoryView.swift in Sources */,
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
+				F5BF30C530002EBC00AB5AD9 /* InputValidation.swift in Sources */,
 				F5BF30632FFA77E700AB5AD9 /* NotesSectionView.swift in Sources */,
 				F5BF307E2FFC74D000AB5AD9 /* ExerciseRegistry.swift in Sources */,
 				F54005102FF5984C0079CC05 /* SettingsView.swift in Sources */,
@@ -745,10 +760,13 @@
 			files = (
 				F5BF30982FFDFF3100AB5AD9 /* ProgressionEngineTests.swift in Sources */,
 				F5BF30A12FFED28600AB5AD9 /* WarmupEngineTests.swift in Sources */,
+				F5BF30C93000421D00AB5AD9 /* WorkoutLogStoreTests.swift in Sources */,
 				F5BF30A02FFED28600AB5AD9 /* RestTimerRuleTests.swift in Sources */,
 				F5BF309B2FFED27700AB5AD9 /* WeightConversionTests.swift in Sources */,
 				F5BF309F2FFED28600AB5AD9 /* WorkoutSessionEngineTests.swift in Sources */,
 				F5BF30992FFDFF3300AB5AD9 /* PlateCalculatorTests.swift in Sources */,
+				F5BF30C73000401400AB5AD9 /* InputValidationTests.swift in Sources */,
+				F5BF30CB3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

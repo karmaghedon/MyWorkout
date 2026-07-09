@@ -77,6 +77,7 @@ final class WorkoutTemplateStore: ObservableObject {
 
                 DispatchQueue.main.async {
                     self?.lastSaveError = nil
+                    ExerciseRegistry.invalidateCache()
                 }
             } catch {
                 print("Failed to save workout templates: \(error)")

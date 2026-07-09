@@ -22,17 +22,9 @@ enum AppTheme {
     static let success = Color(red: 0.20, green: 0.70, blue: 0.45)
 
     /// Adaptive surfaces — these automatically flip for light/dark mode.
-    /// UIKit and AppKit expose different dynamic system colors, so each
-    /// platform gets its closest equivalent.
-    #if os(iOS)
     static let cardBackground = Color(.secondarySystemBackground)
     static let subtleFill = Color(.tertiarySystemFill)
     static let groupedBackground = Color(.systemGroupedBackground)
-//    #elseif os(macOS)
-//    static let cardBackground = Color(nsColor: .controlBackgroundColor)
-//    static let subtleFill = Color(nsColor: .underPageBackgroundColor)
-//    static let groupedBackground = Color(nsColor: .windowBackgroundColor)
-    #endif
 
     // MARK: - Spacing
 

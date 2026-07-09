@@ -49,9 +49,7 @@ struct InventoryAddItemRow: View {
     private func textField(_ title: String, text: Binding<String>) -> some View {
         TextField(title, text: text)
             .textFieldStyle(.roundedBorder)
-            #if os(iOS)
             .keyboardType(.decimalPad)
-            #endif
             .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
     }
 

@@ -7,22 +7,22 @@ import SwiftUI
 struct HistoryView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
 
-//    private var groupedLogs: [(date: Date, logs: [WorkoutLog])] {
-//        let calendar = Calendar.current
-//
-//        let grouped = Dictionary(grouping: logStore.logs) { log in
-//            calendar.startOfDay(for: log.date)
-//        }
-//
-//        return grouped
-//            .map { (date: $0.key, logs: $0.value) }
-//            .sorted { $0.date > $1.date }
-//    }
     @State private var groupedLogs: [(date: Date, logs: [WorkoutLog])] = []
+    @State private var displayedGroupCount = 20
+    
+    private let pageSize = 20
+    
+    private var hasMoreGroups: Bool {
+        displayedGroupCount < groupedLogs.count
+    }
+    
+    private var visibleGroups: [(date: Date, logs: [WorkoutLog])] {
+        Array(groupedLogs.prefix(displayedGroupCount))
+    }
     
     var body: some View {
         List {
-            ForEach(groupedLogs, id: \.date) { group in
+            ForEach(visibleGroups, id: \.date) { group in
                 Section(group.date.formatted(date: .long, time: .omitted)) {
                     ForEach(group.logs) { log in
                         NavigationLink {
@@ -56,6 +56,22 @@ struct HistoryView: View {
                     }
                 }
             }
+            
+            if hasMoreGroups {
+                Section {
+                    Button {
+                        loadMore()
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Load More")
+                                .font(.subheadline)
+                            Spacer()
+                        }
+                        .padding(.vertical,8)
+                    }
+                }
+            }
         }
         .navigationTitle("History")
         .overlay {
@@ -63,8 +79,17 @@ struct HistoryView: View {
                 emptyState
             }
         }
-        .onAppear {regroup() }
-        .onChange(of: logStore.logs.count) {_, _ in regroup() }
+        .onAppear {
+            regroup()
+        }
+        .onChange(of: logStore.logs.count) { _, _ in
+            regroup()
+            displayedGroupCount = pageSize //Reset to first page when logs changed
+        }
+    }
+    
+    private func loadMore(){
+        displayedGroupCount += pageSize
     }
     
     private func regroup() {

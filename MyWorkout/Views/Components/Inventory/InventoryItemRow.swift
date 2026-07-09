@@ -59,9 +59,7 @@ struct InventoryItemRow: View {
     private var weightField: some View {
         TextField("Weight", value: $weight, format: .number)
             .textFieldStyle(.roundedBorder)
-            #if os(iOS)
             .keyboardType(.decimalPad)
-            #endif
             .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
             .accessibilityLabel("\(itemLabel) weight in \(unit)")
     }

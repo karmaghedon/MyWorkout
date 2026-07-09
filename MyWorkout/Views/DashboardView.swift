@@ -8,11 +8,7 @@ struct DashboardView: View {
     @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
 
     private var columns: [GridItem] {
-        #if os(iOS)
         [GridItem(.flexible())]
-        #else
-        [GridItem(.flexible()), GridItem(.flexible())]
-        #endif
     }
 
     var body: some View {

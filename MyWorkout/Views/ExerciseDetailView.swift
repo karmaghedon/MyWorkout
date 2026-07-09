@@ -23,9 +23,7 @@ struct ExerciseDetailView: View {
             
         }
         .navigationTitle(exercise.name)
-        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
-        #endif
         .toolbar {
             if showsDoneButton {
                 ToolbarItem(placement: .topBarTrailing) {

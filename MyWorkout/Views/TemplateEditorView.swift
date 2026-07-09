@@ -66,14 +66,10 @@ struct TemplateEditorView: View {
 
             ToolbarItem(placement: .primaryAction) {
                 Button("Save") {
-                    templateStore.update(editableTemplate)
-                    dismiss()
+                    saveTemplate()
                 }
                 .fontWeight(.semibold)
-                .disabled(
-                    editableTemplate.name.trimmingCharacters(in: .whitespaces).isEmpty ||
-                    editableTemplate.exercises.isEmpty
-                )
+                .disabled(!canSave)
             }
 
             ToolbarItem(placement: .primaryAction) {
@@ -146,5 +142,21 @@ struct TemplateEditorView: View {
         }
 
         return availableExercises.filter { $0.equipment == selectedEquipment }
+    }
+    
+    private var canSave: Bool {
+        InputValidation.isValidName(editableTemplate.name) && !editableTemplate.exercises.isEmpty
+    }
+    
+    private func saveTemplate() {
+        guard let validName = InputValidation.validateName(editableTemplate.name) else {
+            return
+        }
+        
+        var validateTemplate = editableTemplate
+        validateTemplate.name = validName
+        
+        templateStore.update(validateTemplate)
+        dismiss()        
     }
 }

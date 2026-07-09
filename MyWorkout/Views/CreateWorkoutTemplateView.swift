@@ -60,11 +60,15 @@ struct CreateWorkoutTemplateView: View {
             Button("Save Template") {
                 saveTemplate()
             }
-            .disabled(templateName.isEmpty || selectedExerciseIDs.isEmpty)
+            .disabled(!canSave)
         }
         .padding()
         .dismissKeyboardOnTap()
         .navigationTitle("Create Template")
+    }
+    
+    private var canSave: Bool {
+        InputValidation.isValidName(templateName) && !selectedExerciseIDs.isEmpty
     }
 
     private func toggle(_ exercise: Exercise) {
@@ -76,12 +80,15 @@ struct CreateWorkoutTemplateView: View {
     }
 
     private func saveTemplate() {
+        guard let validName = InputValidation.validateName(templateName) else {
+            return
+        }
         let selectedExercises = exercises.filter {
             selectedExerciseIDs.contains($0.id)
         }
 
         let template = WorkoutTemplate(
-            name: templateName,
+            name: validName,
             exercises: selectedExercises
         )
 

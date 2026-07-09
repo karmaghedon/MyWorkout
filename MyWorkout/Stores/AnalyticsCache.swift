@@ -10,14 +10,27 @@ final class AnalyticsCache: ObservableObject {
     @Published private(set) var personalRecord: [(exercise: String, weight: Double, reps: Int)] = []
     
     private var cancellable: AnyCancellable?
+    private var lastProcessedLogIds: Set<UUID> = []
+    private var debouncedTask: Task<Void, Never>?
+    
     func bind(to logStore: WorkoutLogStore) {
         guard cancellable == nil else { return }
         recompute(logs: logStore.logs)
         cancellable = logStore.$logs
-            .removeDuplicates { $0.count == $1.count && $0.first?.id == $1.first?.id }
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .sink { [weak self] logs in
-                self?.recompute(logs: logs)
+                self?.recomputeIfNeeded(logs: logs)
             }
+    }
+    
+    private func recomputeIfNeeded(logs: [WorkoutLog]) {
+        let currentLogIDs = Set(logs.map(\.id))
+        
+        // Only recompute if logs actaully changed (not just recorded)
+        guard currentLogIDs != lastProcessedLogIds else {return}
+        
+        lastProcessedLogIds = currentLogIDs
+        recompute(logs: logs)
     }
     
     private func recompute(logs: [WorkoutLog]) {

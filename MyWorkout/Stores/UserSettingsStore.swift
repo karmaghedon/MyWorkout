@@ -11,7 +11,12 @@ final class UserSettingsStore: ObservableObject {
     init() {
         if let data = UserDefaults.standard.data(forKey: key) {
             do {
-                settings = try JSONDecoder().decode(UserSettings.self, from: data)
+                var loadedSettings = try JSONDecoder().decode(UserSettings.self, from: data)
+                
+                // Validate and clamp loaded settings
+                loadedSettings = Self.validateSettings(loadedSettings)
+                
+                settings = loadedSettings
                 lastLoadError = nil
             } catch {
                 print("Failed to load settings: \(error)")
@@ -24,6 +29,21 @@ final class UserSettingsStore: ObservableObject {
             save()
         }
     }
+    
+    /// Validates and clamp a;; settings values to acceptable ranges.
+    private static func validateSettings(_ settings: UserSettings) -> UserSettings {
+        UserSettings(
+            unitSystem: settings.unitSystem,
+            compoundRestSeconds: InputValidation.clampRestDuration(settings.compoundRestSeconds),
+            isolationRestSeconds: InputValidation.clampRestDuration(settings.isolationRestSeconds),
+            bodyweightRestSeconds: InputValidation.clampRestDuration(settings.bodyweightRestSeconds),
+            oneRepMaxFormula: settings.oneRepMaxFormula,
+            compoundIncrement: max(1, min(settings.compoundIncrement, 25)),
+            isolationIncrement: max(1, min(settings.isolationIncrement, 25))
+        )
+    }
+    
+    
 
     func save() {
         do {

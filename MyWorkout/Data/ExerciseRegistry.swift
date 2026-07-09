@@ -3,8 +3,25 @@ import Foundation
 /// A centralized exercise lookup that searches both built-in SeedData exercises
 /// and exercises found in user templates, ensuring analytics and recovery log 
 /// can find user-created exercises.
-struct ExerciseRegistry 
-{ private init() {}
+struct ExerciseRegistry {
+    private init() {}
+    
+    // MARK: - Cache
+    
+    private static var cachedUserExercises: [Exercise]?
+    private static var cachedTimestamp: Date?
+    private static let cachedLifetime: TimeInterval = 60 // 1 min
+    private static let cacheLock = NSLock()
+    
+    ///  Invalidate the exercise cache. Call this after modifying templates.
+    static func invalidateCache() {
+        cacheLock.lock()
+        defer {cacheLock.unlock() }
+        cachedUserExercises = nil
+        cachedTimestamp = nil
+    }
+    
+    // MARK: - Public API
     
     /// Find the exercise definition matching a completed exercise log entry.
     /// Checks SeedData first, then falls back to searching templates.
@@ -43,19 +60,40 @@ struct ExerciseRegistry
         }
     }
     
+    // MARK: - Private Helpers
+    
     /// Exercises defined only in user templates (not in SeedData).
+    /// Cached for 1 minute to avoid repeated disk read.
     private static var userExercises: [Exercise] {
+        cacheLock.lock()
+        defer {cacheLock.unlock()}
+        
+        // Return cached version if still valid
+        if let cached = cachedUserExercises,
+           let timestamp = cachedTimestamp,
+           Date().timeIntervalSince(timestamp) < cachedLifetime {
+            return cached
+        }
+        
+        // Load form disk
         let seedIDs = Set(SeedData.exercises.map(\.id))
         let seedNames = Set(SeedData.exercises.map(\.name))
         
         guard let url = templateFileURL,
               let data = try? Data(contentsOf: url),
               let templates = try? JSONDecoder().decode([WorkoutTemplate].self, from: data) else {
+            cachedUserExercises = []
+            cachedTimestamp = Date()
             return []
         }
-        return templates
+        
+        let exercise = templates
             .flatMap(\.exercises)
             .filter { !seedIDs.contains($0.id) && !seedNames.contains($0.name) }
+        
+        cachedUserExercises = exercise
+        cachedTimestamp = Date()
+        return exercise
     }
     
     private static var templateFileURL: URL? {

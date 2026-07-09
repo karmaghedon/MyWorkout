@@ -26,9 +26,7 @@ struct WorkoutSessionView: View {
         .background(AppTheme.groupedBackground)
         .dismissKeyboardOnTap()
         .navigationTitle(workout?.name ?? "Workout")
-        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
-        #endif
         .navigationBarBackButtonHidden(activeWorkoutStore.hasLoggedSets)
         .toolbar {
             if activeWorkoutStore.hasLoggedSets {

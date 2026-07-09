@@ -67,9 +67,7 @@ struct BarbellInventorySection: View {
             format: .number
         )
         .textFieldStyle(.roundedBorder)
-        #if os(iOS)
         .keyboardType(.decimalPad)
-        #endif
         .frame(minWidth: 60, idealWidth: 80, maxWidth: 100)
         .accessibilityLabel("Barbell weight in \(unit)")
         .onChange(of: equipmentStore.inventory.barbellWeight) { _ in
