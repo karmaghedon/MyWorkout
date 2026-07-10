@@ -59,7 +59,7 @@ struct ExerciseSessionCardView: View {
 
             CurrentSetCardView(
                 weight: weightDisplayBinding,
-                reps: $state.reps,
+                reps: $state.targetReps,
                 weightRange: 0...500,
                 weightStep: displayWeightStep,
                 weightUnit: weightUnit,

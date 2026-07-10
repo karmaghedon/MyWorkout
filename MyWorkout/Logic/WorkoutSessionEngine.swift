@@ -26,7 +26,7 @@ enum WorkoutSessionEngine {
         let validWeight = InputValidation.clampWeight(
             state.workingWeightPounds
         )
-        let validReps = InputValidation.clampReps(state.reps)
+        let validReps = InputValidation.clampReps(state.targetReps)
 
         let newSet = LoggedSet(
             setNumber: state.loggedSets.count + 1,
@@ -37,7 +37,7 @@ enum WorkoutSessionEngine {
         state.loggedSets.append(newSet)
 
         state.workingWeightPounds = validWeight
-        state.reps = validReps
+        state.targetReps = validReps
 
         states[exerciseID] = state
     }
@@ -124,7 +124,7 @@ enum WorkoutSessionEngine {
             )
 
             return ExerciseSessionState(
-                reps: latestSet.reps,
+                targetReps: latestSet.reps,
                 workingWeightPounds:
                     suggestion?.suggestedWeight ?? latestSet.weight,
                 loggedSets: [],
@@ -134,7 +134,7 @@ enum WorkoutSessionEngine {
         }
 
         return ExerciseSessionState(
-            reps: 10,
+            targetReps: 10,
             workingWeightPounds: defaultStartingWeight(
                 for: exercise,
                 equipmentInventory: equipmentInventory

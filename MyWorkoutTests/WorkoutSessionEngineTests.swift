@@ -69,7 +69,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         var states: [UUID: ExerciseSessionState] = [:]
         let exerciseID = UUID()
         states[exerciseID] = ExerciseSessionState(
-            reps: 10,
+            targetReps: 10,
             workingWeightPounds: 100
         )
 
@@ -84,7 +84,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
     func test_logSet_subsequentSets_incrementSetNumber() {
         var states: [UUID: ExerciseSessionState] = [:]
         let exerciseID = UUID()
-        states[exerciseID] = ExerciseSessionState(reps: 8, workingWeightPounds: 100)
+        states[exerciseID] = ExerciseSessionState(targetReps: 8, workingWeightPounds: 100)
 
         WorkoutSessionEngine.logSet(for: exerciseID, in: &states)
         WorkoutSessionEngine.logSet(for: exerciseID, in: &states)
@@ -109,7 +109,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         var states: [UUID: ExerciseSessionState] = [:]
         let exerciseID = UUID()
         states[exerciseID] = ExerciseSessionState(
-            reps: 10,
+            targetReps: 10,
             workingWeightPounds: 100
         )
 
@@ -142,7 +142,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let workout = Workout(name: "Push Day", exercises: [benched, squats])
 
         var states: [UUID: ExerciseSessionState] = [:]
-        states[benched.id] = ExerciseSessionState(reps: 10, workingWeightPounds: 100, loggedSets: [
+        states[benched.id] = ExerciseSessionState(targetReps: 10, workingWeightPounds: 100, loggedSets: [
             LoggedSet(setNumber: 1, weight: 100, reps: 10)
         ])
         // squats has no logged sets at all
@@ -171,7 +171,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let workout = Workout(name: "Push Day", exercises: [benched])
 
         var states: [UUID: ExerciseSessionState] = [:]
-        states[benched.id] = ExerciseSessionState(reps: 10, workingWeightPounds: 135, loggedSets: [
+        states[benched.id] = ExerciseSessionState(targetReps: 10, workingWeightPounds: 135, loggedSets: [
             LoggedSet(setNumber: 1, weight: 135, reps: 10)
         ])
 
@@ -199,7 +199,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
             equipmentInventory: inventory(barbellWeight: 45)
         )
 
-        XCTAssertEqual(state.reps, 10)
+        XCTAssertEqual(state.targetReps, 10)
         XCTAssertEqual(state.workingWeightPounds, 45)
         XCTAssertEqual(state.suggestionMessage, "No history yet")
         XCTAssertTrue(state.loggedSets.isEmpty)
@@ -227,7 +227,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
 
         // All sets hit max reps (12), so double progression should suggest an increase.
         XCTAssertEqual(state.workingWeightPounds, 105)
-        XCTAssertEqual(state.reps, 12)
+        XCTAssertEqual(state.targetReps, 12)
         XCTAssertEqual(state.suggestionMessage, "Increase next time")
     }
 }

@@ -1,7 +1,9 @@
 import Foundation
 
 struct ExerciseSessionState: Codable {
-    var reps: Int = 10
+
+    /// Number of repetitions currently selected for the next set.
+    var targetReps: Int = 10
 
     /// Canonical working weight stored in pounds.
     ///
@@ -13,7 +15,7 @@ struct ExerciseSessionState: Codable {
     var notes: String = ""
 
     enum CodingKeys: String, CodingKey {
-        case reps
+        case targetReps = "reps"
         case workingWeightPounds = "weight"
         case loggedSets
         case suggestionMessage
@@ -21,13 +23,13 @@ struct ExerciseSessionState: Codable {
     }
 
     init(
-        reps: Int = 10,
+        targetReps: Int = 10,
         workingWeightPounds: Double = 0,
         loggedSets: [LoggedSet] = [],
         suggestionMessage: String? = nil,
         notes: String = ""
     ) {
-        self.reps = reps
+        self.targetReps = targetReps
         self.workingWeightPounds = workingWeightPounds
         self.loggedSets = loggedSets
         self.suggestionMessage = suggestionMessage
@@ -37,22 +39,26 @@ struct ExerciseSessionState: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        reps = try container.decodeIfPresent(Int.self, forKey: .reps) ?? 10
+        targetReps = try container.decodeIfPresent(
+            Int.self,
+            forKey: .targetReps
+        ) ?? 10
+
         loggedSets = try container.decodeIfPresent(
             [LoggedSet].self,
             forKey: .loggedSets
         ) ?? []
+
         suggestionMessage = try container.decodeIfPresent(
             String.self,
             forKey: .suggestionMessage
         )
+
         notes = try container.decodeIfPresent(
             String.self,
             forKey: .notes
         ) ?? ""
 
-        // Migration support: historical active workouts may encode weight
-        // as either Double or Int under the existing "weight" JSON key.
         if let doubleWeight = try? container.decodeIfPresent(
             Double.self,
             forKey: .workingWeightPounds
