@@ -9,6 +9,7 @@ enum WorkoutSessionEngine {
         switch exercise.exerciseType {
         case .bodyweight:
             return 0
+
         case .compound, .isolation:
             return exercise.usesBarbell
                 ? equipmentInventory.barbellWeight
@@ -22,10 +23,11 @@ enum WorkoutSessionEngine {
     ) {
         var state = states[exerciseID] ?? ExerciseSessionState()
 
-        // Validate input before logging
-        let validWeight = InputValidation.clampWeight(state.weight)
+        let validWeight = InputValidation.clampWeight(
+            state.workingWeightPounds
+        )
         let validReps = InputValidation.clampReps(state.reps)
-        
+
         let newSet = LoggedSet(
             setNumber: state.loggedSets.count + 1,
             weight: validWeight,
@@ -33,11 +35,10 @@ enum WorkoutSessionEngine {
         )
 
         state.loggedSets.append(newSet)
-        
-        //Update state with validated values
-        state.weight = validWeight
+
+        state.workingWeightPounds = validWeight
         state.reps = validReps
-        
+
         states[exerciseID] = state
     }
 
@@ -66,7 +67,9 @@ enum WorkoutSessionEngine {
         states: [UUID: ExerciseSessionState],
         formattedElapsedTime: String
     ) -> String {
-        guard let workout else { return "No active workout." }
+        guard let workout else {
+            return "No active workout."
+        }
 
         let completed = workout.exercises.compactMap { exercise -> String? in
             guard let state = states[exercise.id],
@@ -85,7 +88,7 @@ enum WorkoutSessionEngine {
             + "\n\nTotal sets: \(totalSets)"
             + "\nDuration: \(formattedElapsedTime)"
     }
-    
+
     static func completedExercises(
         for workout: Workout,
         states: [UUID: ExerciseSessionState]
@@ -104,7 +107,7 @@ enum WorkoutSessionEngine {
             )
         }
     }
-    
+
     static func initialState(
         for exercise: Exercise,
         latestPerformance: CompletedExercise?,
@@ -122,7 +125,8 @@ enum WorkoutSessionEngine {
 
             return ExerciseSessionState(
                 reps: latestSet.reps,
-                weight: suggestion?.suggestedWeight ?? latestSet.weight,
+                workingWeightPounds:
+                    suggestion?.suggestedWeight ?? latestSet.weight,
                 loggedSets: [],
                 suggestionMessage: suggestion?.message,
                 notes: ""
@@ -131,7 +135,7 @@ enum WorkoutSessionEngine {
 
         return ExerciseSessionState(
             reps: 10,
-            weight: defaultStartingWeight(
+            workingWeightPounds: defaultStartingWeight(
                 for: exercise,
                 equipmentInventory: equipmentInventory
             ),
@@ -140,7 +144,7 @@ enum WorkoutSessionEngine {
             notes: ""
         )
     }
-    
+
     static func workoutLog(
         for workout: Workout,
         states: [UUID: ExerciseSessionState],

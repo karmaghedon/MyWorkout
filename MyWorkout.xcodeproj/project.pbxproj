@@ -248,6 +248,7 @@
 		F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLogStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CC3000490100AB5AD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F5BF30CD300124E700AB5AD9 /* ArchitectureDevelopmentWorkflow.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ArchitectureDevelopmentWorkflow.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -465,6 +466,7 @@
 			children = (
 				F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */,
 				F5BF30522FF9F34600AB5AD9 /* Architecture.md */,
+				F5BF30CD300124E700AB5AD9 /* ArchitectureDevelopmentWorkflow.md */,
 			);
 			path = Docs;
 			sourceTree = "<group>";

@@ -7,7 +7,8 @@ struct DoubleBigStepperControl: View {
     let step: Double
     let suffix: String?
 
-    @State private var textValue = ""
+    @State private var draftText = ""
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
@@ -16,20 +17,28 @@ struct DoubleBigStepperControl: View {
                 .foregroundStyle(.secondary)
 
             HStack(spacing: 4) {
-                TextField(title, text: $textValue)
+                TextField(title, text: $draftText)
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .font(AppTheme.Typography.numeric(30))
                     .minimumScaleFactor(0.75)
                     .lineLimit(1)
-                    .onChange(of: textValue) {
-                        updateValueWhileTyping()
+                    .focused($isFocused)
+                    .onChange(of: draftText) {
+                        updateValueFromDraft()
                     }
                     .onChange(of: value) {
-                        textValue = formatWeight(value)
+                        syncDraftFromValueIfNeeded()
+                    }
+                    .onChange(of: isFocused) { _, focused in
+                        if focused {
+                            draftText = formatWeight(value)
+                        } else {
+                            commitDraft()
+                        }
                     }
                     .onAppear {
-                        textValue = formatWeight(value)
+                        draftText = formatWeight(value)
                     }
 
                 if let suffix {
@@ -48,7 +57,7 @@ struct DoubleBigStepperControl: View {
                 }
                 .buttonStyle(.bordered)
                 .accessibilityLabel("Decrease \(title.lowercased())")
-                .accessibilityValue("\(formatWeight(value))\(suffix.map { " \($0)" } ?? "")")
+                .accessibilityValue(accessibilityValue)
 
                 Button {
                     increase()
@@ -58,7 +67,7 @@ struct DoubleBigStepperControl: View {
                 }
                 .buttonStyle(.bordered)
                 .accessibilityLabel("Increase \(title.lowercased())")
-                .accessibilityValue("\(formatWeight(value))\(suffix.map { " \($0)" } ?? "")")
+                .accessibilityValue(accessibilityValue)
             }
         }
         .padding(AppTheme.Spacing.md)
@@ -68,32 +77,57 @@ struct DoubleBigStepperControl: View {
                 .fill(AppTheme.cardBackground)
         )
         .onDisappear {
-            restoreIfEmpty()
+            commitDraft()
         }
     }
 
-    private func updateValueWhileTyping() {
-        guard !textValue.isEmpty else { return }
+    private var accessibilityValue: String {
+        "\(formatWeight(value))\(suffix.map { " \($0)" } ?? "")"
+    }
 
-        if let enteredValue = Double(textValue) {
+    private func updateValueFromDraft() {
+        guard isFocused else { return }
+        guard !draftText.isEmpty else { return }
+
+        if let enteredValue = Double(normalizedDraftText) {
             value = clamp(roundToOneDecimal(enteredValue))
         }
     }
 
+    private func syncDraftFromValueIfNeeded() {
+        guard !isFocused else { return }
+        draftText = formatWeight(value)
+    }
+
+    private func commitDraft() {
+        guard !draftText.isEmpty else {
+            draftText = formatWeight(value)
+            return
+        }
+
+        guard let enteredValue = Double(normalizedDraftText) else {
+            draftText = formatWeight(value)
+            return
+        }
+
+        value = clamp(roundToOneDecimal(enteredValue))
+        draftText = formatWeight(value)
+    }
+
     private func increase() {
+        isFocused = false
         value = clamp(roundToOneDecimal(value + step))
-        textValue = formatWeight(value)
+        draftText = formatWeight(value)
     }
 
     private func decrease() {
+        isFocused = false
         value = clamp(roundToOneDecimal(value - step))
-        textValue = formatWeight(value)
+        draftText = formatWeight(value)
     }
 
-    private func restoreIfEmpty() {
-        if textValue.isEmpty {
-            textValue = formatWeight(value)
-        }
+    private var normalizedDraftText: String {
+        draftText.replacingOccurrences(of: ",", with: ".")
     }
 
     private func clamp(_ value: Double) -> Double {

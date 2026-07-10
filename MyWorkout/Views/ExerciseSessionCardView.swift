@@ -17,13 +17,17 @@ struct ExerciseSessionCardView: View {
 
     @EnvironmentObject var settingsStore: UserSettingsStore
 
+    private var unitSystem: UnitSystem {
+        settingsStore.settings.unitSystem
+    }
+
     private var weightUnit: String {
-        settingsStore.settings.weightUnitLabel
+        unitSystem.rawValue
     }
 
     private var warmups: [WarmupSet] {
         WarmupEngine.generateWarmups(
-            for: state.weight,
+            for: state.workingWeightPounds,
             exerciseType: exercise.exerciseType,
             usesBarbell: exercise.usesBarbell,
             barbellWeight: equipmentInventory.barbellWeight
@@ -49,14 +53,14 @@ struct ExerciseSessionCardView: View {
 
             PreviousPerformanceView(
                 previousSets: previousSets,
-                displayWeight: settingsStore.settings.displayWeight,
+                displayWeight: displayWeight,
                 weightUnit: weightUnit
             )
 
             CurrentSetCardView(
                 weight: weightDisplayBinding,
                 reps: $state.reps,
-                weightRange: 0...500.0,
+                weightRange: 0...500,
                 weightStep: displayWeightStep,
                 weightUnit: weightUnit,
                 repRange: 1...50,
@@ -75,7 +79,7 @@ struct ExerciseSessionCardView: View {
             if !state.loggedSets.isEmpty {
                 LoggedSetsView(
                     sets: state.loggedSets,
-                    displayWeight: settingsStore.settings.displayWeight,
+                    displayWeight: displayWeight,
                     weightUnit: weightUnit,
                     onDeleteSet: onDeleteSet
                 )
@@ -88,7 +92,7 @@ struct ExerciseSessionCardView: View {
                             warmups: warmups,
                             usesBarbell: exercise.usesBarbell,
                             equipmentInventory: equipmentInventory,
-                            displayWeight: settingsStore.settings.displayWeight,
+                            displayWeight: displayWeight,
                             weightUnit: weightUnit
                         )
                     }
@@ -113,13 +117,19 @@ struct ExerciseSessionCardView: View {
             .padding(AppTheme.Spacing.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
-                    .fill(AppTheme.accentMuted)
+                RoundedRectangle(
+                    cornerRadius: AppTheme.Radius.control,
+                    style: .continuous
+                )
+                .fill(AppTheme.accentMuted)
             )
     }
 
     private var workingLoadRow: some View {
-        let loading = PlateCalculator.loading(for: state.weight, inventory: equipmentInventory)
+        let loading = PlateCalculator.loading(
+            for: state.workingWeightPounds,
+            inventory: equipmentInventory
+        )
 
         return VStack(alignment: .leading, spacing: 2) {
             Label(
@@ -128,7 +138,7 @@ struct ExerciseSessionCardView: View {
             )
             .font(AppTheme.Typography.caption)
             .foregroundStyle(.secondary)
-            
+
             if loading.hasResidue {
                 Text("Plates can't match exactly — closest achievable load shown.")
                     .font(.caption2)
@@ -137,24 +147,39 @@ struct ExerciseSessionCardView: View {
         }
     }
 
+    // MARK: - Weight Boundary
+
+    /// The session state always stores pounds.
+    ///
+    /// This binding converts between canonical stored pounds and the unit
+    /// currently selected by the user.
     private var weightDisplayBinding: Binding<Double> {
         Binding(
             get: {
-                settingsStore.settings.displayWeight(state.weight)
+                displayWeight(state.workingWeightPounds)
             },
-            set: { newDisplayValue in
-                state.weight = settingsStore.settings.storageWeight(fromDisplayed: newDisplayValue)
+            set: { displayedWeight in
+                state.workingWeightPounds = WeightConversion.storedPounds(
+                    fromDisplayedWeight: displayedWeight,
+                    unitSystem: unitSystem
+                )
             }
         )
     }
 
+    /// Converts canonical stored pounds into the selected display unit.
+    private func displayWeight(_ storedPounds: Double) -> Double {
+        WeightConversion.displayWeight(
+            fromStoredPounds: storedPounds,
+            unitSystem: unitSystem
+        )
+    }
+
+    /// The incoming step is expressed in canonical pounds.
     private var displayWeightStep: Double {
-        switch settingsStore.settings.unitSystem {
-        case .pounds:
-            return Double(weightStep)
-        case .kilograms:
-            let raw = WeightConversion.fromPounds(Double(weightStep), to: .kilograms)
-            return max(0.5, (raw * 2).rounded() / 2) // round to nearest 0.5kg
-        }
+        WeightConversion.displayStep(
+            fromStoredPounds: Double(weightStep),
+            unitSystem: unitSystem
+        )
     }
 }

@@ -40,7 +40,10 @@ struct CurrentSetCardView: View {
                 )
             }
 
-            Button(action: onLogSet) {
+            Button {
+                Keyboard.dismiss()
+                onLogSet()
+            } label: {
                 Label("Log Set \(nextSetNumber)", systemImage: "checkmark.circle.fill")
                     .font(.system(.headline, design: .rounded).weight(.bold))
                     .frame(maxWidth: .infinity)

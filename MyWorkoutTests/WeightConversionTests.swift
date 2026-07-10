@@ -3,42 +3,40 @@ import XCTest
 
 final class WeightConversionTests: XCTestCase {
 
-    func test_toPounds_pounds_isIdentity() {
-        XCTAssertEqual(WeightConversion.toPounds(135, from: .pounds), 135)
+    func testPoundsDisplayWeightKeepsPounds() {
+        let value = WeightConversion.displayWeight(fromStoredPounds: 100, unitSystem: .pounds)
+
+        XCTAssertEqual(value, 100)
     }
 
-    func test_toPounds_kilograms_convertsCorrectly() {
-        // 100 kg ≈ 220.46 lb
-        XCTAssertEqual(WeightConversion.toPounds(100, from: .kilograms), 220.46, accuracy: 0.01)
+    func testKilogramsDisplayWeightConvertsFromStoredPounds() {
+        let value = WeightConversion.displayWeight(fromStoredPounds: 100, unitSystem: .kilograms)
+
+        XCTAssertEqual(value, 45.4, accuracy: 0.1)
     }
 
-    func test_fromPounds_pounds_isIdentity() {
-        XCTAssertEqual(WeightConversion.fromPounds(135, to: .pounds), 135)
+    func testPoundsInputStoresAsPounds() {
+        let value = WeightConversion.storedPounds(fromDisplayedWeight: 100, unitSystem: .pounds)
+
+        XCTAssertEqual(value, 100)
     }
 
-    func test_fromPounds_kilograms_convertsCorrectly() {
-        // 220.46 lb ≈ 100 kg
-        XCTAssertEqual(WeightConversion.fromPounds(220.46, to: .kilograms), 100, accuracy: 0.01)
+    func testKilogramsInputStoresAsPounds() {
+        let value = WeightConversion.storedPounds(fromDisplayedWeight: 45.4, unitSystem: .kilograms)
+
+        XCTAssertEqual(value, 100.1, accuracy: 0.2)
     }
 
-    func test_zeroWeight_convertsToZeroInBothDirections() {
-        XCTAssertEqual(WeightConversion.toPounds(0, from: .kilograms), 0)
-        XCTAssertEqual(WeightConversion.fromPounds(0, to: .kilograms), 0)
+    func testRoundTripPoundsToKilogramsBackToPounds() {
+        let displayedKg = WeightConversion.displayWeight(fromStoredPounds: 135, unitSystem: .kilograms)
+        let storedPounds = WeightConversion.storedPounds(fromDisplayedWeight: displayedKg, unitSystem: .kilograms)
+
+        XCTAssertEqual(storedPounds, 135, accuracy: 0.2)
     }
 
-    func test_roundTrip_kilogramsToPoundsAndBack_preservesOriginalValue() {
-        let original = 62.5
-        let pounds = WeightConversion.toPounds(original, from: .kilograms)
-        let roundTripped = WeightConversion.fromPounds(pounds, to: .kilograms)
+    func testDisplayStepConvertsFivePoundsToKilograms() {
+        let step = WeightConversion.displayStep(fromStoredPounds: 5, unitSystem: .kilograms)
 
-        XCTAssertEqual(roundTripped, original, accuracy: 0.0001)
-    }
-
-    func test_roundTrip_poundsToKilogramsAndBack_preservesOriginalValue() {
-        let original = 135.0
-        let kilograms = WeightConversion.fromPounds(original, to: .kilograms)
-        let roundTripped = WeightConversion.toPounds(kilograms, from: .kilograms)
-
-        XCTAssertEqual(roundTripped, original, accuracy: 0.0001)
+        XCTAssertEqual(step, 2.3, accuracy: 0.1)
     }
 }
