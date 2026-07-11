@@ -2,27 +2,29 @@ import SwiftUI
 
 #if canImport(UIKit)
 import UIKit
+#endif
 
 enum Keyboard {
     static func dismiss() {
+        #if canImport(UIKit)
         UIApplication.shared.sendAction(
             #selector(UIResponder.resignFirstResponder),
             to: nil,
             from: nil,
             for: nil
         )
+        #endif
     }
 }
-#endif
 
-struct DismissKeyboardOnTap: ViewModifier {
-
+private struct DismissKeyboardOnTap: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .contentShape(Rectangle())
-            .onTapGesture {
-                Keyboard.dismiss()
-            }
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    Keyboard.dismiss()
+                }
+            )
     }
 }
 

@@ -4,13 +4,15 @@ import Foundation
 final class WorkoutLogStore: ObservableObject {
     @Published var logs: [WorkoutLog] = []
 
-    @Published private(set) var lastSaveError: String?
-    @Published private(set) var lastLoadError: String?
+    @Published private(set) var persistenceError: StoreError?
 
     private let legacyDefaultsKey = "workout_logs"
 
     private let fileURL: URL
-    private let saveQueue = DispatchQueue(label: "com.myworkout.workoutlogstore.save", qos: .utility)
+    private let saveQueue = DispatchQueue(
+        label: "com.myworkout.workoutlogstore.save",
+        qos: .utility
+    )
 
     init() {
         fileURL = Self.resolveFileURL()
@@ -39,7 +41,10 @@ final class WorkoutLogStore: ObservableObject {
         return nil
     }
 
-    func lastPerformances(for exercise: Exercise, limit: Int) -> [CompletedExercise] {
+    func lastPerformances(
+        for exercise: Exercise,
+        limit: Int
+    ) -> [CompletedExercise] {
         var results: [CompletedExercise] = []
 
         for log in logs {
@@ -57,9 +62,14 @@ final class WorkoutLogStore: ObservableObject {
         return results
     }
 
-    func suggestedStartingSet(for exercise: Exercise) -> LoggedSet? {
-        guard let latestExercise = lastPerformances(for: exercise, limit: 1).first,
-              let latestSet = latestExercise.sets.last else {
+    func suggestedStartingSet(
+        for exercise: Exercise
+    ) -> LoggedSet? {
+        guard let latestExercise = lastPerformances(
+            for: exercise,
+            limit: 1
+        ).first,
+        let latestSet = latestExercise.sets.last else {
             return nil
         }
 
@@ -83,27 +93,69 @@ final class WorkoutLogStore: ObservableObject {
         )
     }
 
-    private func matches(_ completedExercise: CompletedExercise, exercise: Exercise) -> Bool {
+    private func matches(
+        _ completedExercise: CompletedExercise,
+        exercise: Exercise
+    ) -> Bool {
         if let exerciseID = completedExercise.exerciseID {
             return exerciseID == exercise.id
         }
 
-        // Backward compatibility for old logs saved before exerciseID existed.
+        // Backward compatibility for logs saved before exerciseID existed.
         return completedExercise.exerciseName == exercise.name
+    }
+
+    // MARK: - Persistence Errors
+
+    func clearPersistenceError() {
+        persistenceError = nil
+    }
+
+    private func setPersistenceError(
+        operation: StoreOperation,
+        message: String
+    ) {
+        persistenceError = StoreError(
+            operation: operation,
+            message: message
+        )
+    }
+
+    private func clearPersistenceError(
+        for operation: StoreOperation
+    ) {
+        guard persistenceError?.operation == operation else {
+            return
+        }
+
+        persistenceError = nil
     }
 
     // MARK: - Persistence
 
     private static func resolveFileURL() -> URL {
         let fileManager = FileManager.default
-        let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let directory = appSupport.appendingPathComponent("MyWorkout", isDirectory: true)
+
+        let appSupport = fileManager.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        )[0]
+
+        let directory = appSupport.appendingPathComponent(
+            "MyWorkout",
+            isDirectory: true
+        )
 
         if !fileManager.fileExists(atPath: directory.path) {
-            try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+            try? fileManager.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true
+            )
         }
 
-        return directory.appendingPathComponent("workout_logs.json")
+        return directory.appendingPathComponent(
+            "workout_logs.json"
+        )
     }
 
     private func save() {
@@ -113,41 +165,96 @@ final class WorkoutLogStore: ObservableObject {
         saveQueue.async { [weak self] in
             do {
                 let data = try JSONEncoder().encode(logsToSave)
-                try data.write(to: destination, options: .atomic)
+
+                try data.write(
+                    to: destination,
+                    options: .atomic
+                )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = nil
+                    self?.clearPersistenceError(
+                        for: .saving
+                    )
                 }
             } catch {
-                print("Failed to save workout logs: \(error)")
+                print(
+                    "Failed to save workout logs: \(error)"
+                )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = "Couldn't save your latest workout. Please try again."
+                    self?.setPersistenceError(
+                        operation: .saving,
+                        message:
+                            "Couldn't save your latest workout. "
+                            + "Please try again."
+                    )
                 }
             }
         }
     }
 
     private func load() {
-        if !FileManager.default.fileExists(atPath: fileURL.path),
-           let legacyData = UserDefaults.standard.data(forKey: legacyDefaultsKey) {
-            if let decoded = try? JSONDecoder().decode([WorkoutLog].self, from: legacyData) {
-                logs = decoded
+        if !FileManager.default.fileExists(
+            atPath: fileURL.path
+        ),
+        let legacyData = UserDefaults.standard.data(
+            forKey: legacyDefaultsKey
+        ) {
+            do {
+                logs = try JSONDecoder().decode(
+                    [WorkoutLog].self,
+                    from: legacyData
+                )
+
+                UserDefaults.standard.removeObject(
+                    forKey: legacyDefaultsKey
+                )
+
+                clearPersistenceError(for: .loading)
                 save()
+            } catch {
+                print(
+                    "Failed to migrate legacy workout logs: \(error)"
+                )
+
+                setPersistenceError(
+                    operation: .loading,
+                    message:
+                        "Couldn't load your saved workouts. "
+                        + "Recent data may be unavailable."
+                )
             }
 
-            UserDefaults.standard.removeObject(forKey: legacyDefaultsKey)
             return
         }
 
-        guard let data = try? Data(contentsOf: fileURL) else { return }
+        guard FileManager.default.fileExists(
+            atPath: fileURL.path
+        ) else {
+            clearPersistenceError(for: .loading)
+            return
+        }
 
         do {
-            logs = try JSONDecoder().decode([WorkoutLog].self, from: data)
-            lastLoadError = nil
+            let data = try Data(contentsOf: fileURL)
+
+            logs = try JSONDecoder().decode(
+                [WorkoutLog].self,
+                from: data
+            )
+
+            clearPersistenceError(for: .loading)
         } catch {
-            print("Failed to load workout logs: \(error)")
-            lastLoadError = "Couldn't load your saved workouts. Recent data may be unavailable."
+            print(
+                "Failed to load workout logs: \(error)"
+            )
+
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't load your saved workouts. "
+                    + "Recent data may be unavailable."
+            )
         }
     }
 }

@@ -4,18 +4,22 @@ import Foundation
 final class WorkoutTemplateStore: ObservableObject {
     @Published var templates: [WorkoutTemplate] = []
 
-    @Published private(set) var lastSaveError: String?
-    @Published private(set) var lastLoadError: String?
+    @Published private(set) var persistenceError: StoreError?
 
     private let legacyDefaultsKey = "workout_templates"
+
     private let fileURL: URL
-    private let saveQueue = DispatchQueue(label: "com.myworkout.workouttemplatestore.save", qos: .utility)
+    private let saveQueue = DispatchQueue(
+        label: "com.myworkout.workouttemplatestore.save",
+        qos: .utility
+    )
 
     init() {
         fileURL = Self.resolveFileURL()
         load()
 
-        if templates.isEmpty {
+        if templates.isEmpty,
+           persistenceError == nil {
             templates = SeedData.defaultTemplates
             save()
         }
@@ -32,17 +36,21 @@ final class WorkoutTemplateStore: ObservableObject {
     }
 
     func update(_ template: WorkoutTemplate) {
-        guard let index = templates.firstIndex(where: { $0.id == template.id }) else { return }
+        guard let index = templates.firstIndex(
+            where: { $0.id == template.id }
+        ) else {
+            return
+        }
+
         templates[index] = refreshed(template)
         save()
     }
 
     func duplicate(_ template: WorkoutTemplate) {
-        let refreshedTemplate = refreshed(template)
-
         let copy = WorkoutTemplate(
-            name: "\(refreshedTemplate.name) Copy",
-            exercises: refreshedTemplate.exercises
+            id: UUID(),
+            name: duplicateName(for: template.name),
+            exercises: template.exercises
         )
 
         templates.append(copy)
@@ -54,16 +62,75 @@ final class WorkoutTemplateStore: ObservableObject {
         save()
     }
 
-    private static func resolveFileURL() -> URL {
-        let fileManager = FileManager.default
-        let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let directory = appSupport.appendingPathComponent("MyWorkout", isDirectory: true)
+    // MARK: - Persistence Errors
 
-        if !fileManager.fileExists(atPath: directory.path) {
-            try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+    func clearPersistenceError() {
+        persistenceError = nil
+    }
+    
+    private func duplicateName(for originalName: String) -> String {
+        let baseName = "\(originalName) Copy"
+
+        guard templates.contains(where: { $0.name == baseName }) else {
+            return baseName
         }
 
-        return directory.appendingPathComponent("workout_templates.json")
+        var copyNumber = 2
+
+        while templates.contains(
+            where: { $0.name == "\(baseName) \(copyNumber)" }
+        ) {
+            copyNumber += 1
+        }
+
+        return "\(baseName) \(copyNumber)"
+    }
+
+    private func setPersistenceError(
+        operation: StoreOperation,
+        message: String
+    ) {
+        persistenceError = StoreError(
+            operation: operation,
+            message: message
+        )
+    }
+
+    private func clearPersistenceError(
+        for operation: StoreOperation
+    ) {
+        guard persistenceError?.operation == operation else {
+            return
+        }
+
+        persistenceError = nil
+    }
+
+    // MARK: - Persistence
+
+    private static func resolveFileURL() -> URL {
+        let fileManager = FileManager.default
+
+        let appSupport = fileManager.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        )[0]
+
+        let directory = appSupport.appendingPathComponent(
+            "MyWorkout",
+            isDirectory: true
+        )
+
+        if !fileManager.fileExists(atPath: directory.path) {
+            try? fileManager.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true
+            )
+        }
+
+        return directory.appendingPathComponent(
+            "workout_templates.json"
+        )
     }
 
     private func save() {
@@ -72,54 +139,121 @@ final class WorkoutTemplateStore: ObservableObject {
 
         saveQueue.async { [weak self] in
             do {
-                let data = try JSONEncoder().encode(templatesToSave)
-                try data.write(to: destination, options: .atomic)
+                let data = try JSONEncoder().encode(
+                    templatesToSave
+                )
+
+                try data.write(
+                    to: destination,
+                    options: .atomic
+                )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = nil
+                    self?.clearPersistenceError(
+                        for: .saving
+                    )
+
                     ExerciseRegistry.invalidateCache()
                 }
             } catch {
-                print("Failed to save workout templates: \(error)")
+                print(
+                    "Failed to save workout templates: \(error)"
+                )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = "Couldn't save workout templates."
+                    self?.setPersistenceError(
+                        operation: .saving,
+                        message:
+                            "Couldn't save workout templates."
+                    )
                 }
             }
         }
     }
 
     private func load() {
-        if !FileManager.default.fileExists(atPath: fileURL.path),
-           let legacyData = UserDefaults.standard.data(forKey: legacyDefaultsKey) {
-            if let decoded = try? JSONDecoder().decode([WorkoutTemplate].self, from: legacyData) {
-                templates = decoded
+        if !FileManager.default.fileExists(
+            atPath: fileURL.path
+        ),
+        let legacyData = UserDefaults.standard.data(
+            forKey: legacyDefaultsKey
+        ) {
+            do {
+                let decoded = try JSONDecoder().decode(
+                    [WorkoutTemplate].self,
+                    from: legacyData
+                )
+
+                templates = decoded.map { refreshed($0) }
+
+                UserDefaults.standard.removeObject(
+                    forKey: legacyDefaultsKey
+                )
+
+                clearPersistenceError(for: .loading)
                 save()
+            } catch {
+                print(
+                    "Failed to migrate legacy workout templates: \(error)"
+                )
+
+                setPersistenceError(
+                    operation: .loading,
+                    message:
+                        "Couldn't load workout templates."
+                )
             }
 
-            UserDefaults.standard.removeObject(forKey: legacyDefaultsKey)
             return
         }
 
-        guard let data = try? Data(contentsOf: fileURL) else { return }
+        guard FileManager.default.fileExists(
+            atPath: fileURL.path
+        ) else {
+            clearPersistenceError(for: .loading)
+            return
+        }
 
         do {
-            let decoded = try JSONDecoder().decode([WorkoutTemplate].self, from: data)
+            let data = try Data(contentsOf: fileURL)
+
+            let decoded = try JSONDecoder().decode(
+                [WorkoutTemplate].self,
+                from: data
+            )
+
             templates = decoded.map { refreshed($0) }
+
+            clearPersistenceError(for: .loading)
+
+            // Save refreshed exercise definitions back to disk.
             save()
-            lastLoadError = nil
         } catch {
-            print("Failed to load workout templates: \(error)")
-            lastLoadError = "Couldn't load workout templates."
+            print(
+                "Failed to load workout templates: \(error)"
+            )
+
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't load workout templates."
+            )
         }
     }
-    
-    private func refreshed(_ template: WorkoutTemplate) -> WorkoutTemplate {
+
+    // MARK: - Exercise Refresh
+
+    private func refreshed(
+        _ template: WorkoutTemplate
+    ) -> WorkoutTemplate {
         WorkoutTemplate(
             id: template.id,
             name: template.name,
             exercises: template.exercises.map { savedExercise in
-                ExerciseRegistry.find(id: savedExercise.id, name: savedExercise.name) ?? savedExercise
+                ExerciseRegistry.find(
+                    id: savedExercise.id,
+                    name: savedExercise.name
+                ) ?? savedExercise
             }
         )
     }

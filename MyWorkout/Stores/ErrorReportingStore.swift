@@ -13,13 +13,13 @@ protocol ErrorReportingStore: AnyObject {
 
 extension WorkoutLogStore: ErrorReportingStore {
     var currentError: String? {
-        lastSaveError ?? lastLoadError
+        persistenceError?.message
     }
 }
 
 extension WorkoutTemplateStore: ErrorReportingStore {
     var currentError: String? {
-        lastSaveError ?? lastLoadError
+        persistenceError?.message
     }
 }
 

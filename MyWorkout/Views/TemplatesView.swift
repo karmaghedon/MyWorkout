@@ -15,6 +15,7 @@ struct TemplatesView: View {
             ForEach(templateStore.templates) { template in
                 NavigationLink {
                     TemplateEditorView(template: template)
+                        .id(template.id)
                 } label: {
                     HStack(spacing: AppTheme.Spacing.md) {
                         ZStack {
