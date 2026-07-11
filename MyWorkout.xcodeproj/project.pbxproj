@@ -54,6 +54,7 @@
 		F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */; };
 		F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005212FF6F7560079CC05 /* DashboardStatsView.swift */; };
 		F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */; };
+		F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */; };
 		F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B32FF83B9D00991F1D /* Haptics.swift */; };
 		F59350B62FF848AD00991F1D /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B52FF848AD00991F1D /* TemplatesView.swift */; };
 		F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */; };
@@ -180,6 +181,7 @@
 		F540051F2FF6E5250079CC05 /* RecoveryAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAnalyzer.swift; sourceTree = "<group>"; };
 		F54005212FF6F7560079CC05 /* DashboardStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsView.swift; sourceTree = "<group>"; };
 		F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionStrategy.swift; sourceTree = "<group>"; };
+		F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
 		F59350B32FF83B9D00991F1D /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		F59350B52FF848AD00991F1D /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatesView.swift; sourceTree = "<group>"; };
 		F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 		F54004AF2FF0C6FE0079CC05 /* MyWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				F5630A1F3001941B000BB3AD /* Persistence */,
 				F5BF304D2FF9F23400AB5AD9 /* Docs */,
 				F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */,
 				F54004C12FF0C7F90079CC05 /* Models */,
@@ -416,6 +419,14 @@
 				F54005092FF58D660079CC05 /* AppTheme.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		F5630A1F3001941B000BB3AD /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		F59350B22FF83B5D00991F1D /* Helper */ = {
@@ -691,6 +702,7 @@
 				F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
 				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
+				F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */,
 				F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */,
 				F5BF30AE2FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift in Sources */,
 				F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */,
