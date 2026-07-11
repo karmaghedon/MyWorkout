@@ -17,22 +17,13 @@ final class ActiveWorkoutStore: ObservableObject {
 
     @Published var elapsedSeconds: Int = 0
 
-    @Published var activeRestExerciseID: UUID? {
+    @Published private(set) var restTimerState: RestTimerState? {
         didSet { schedulePersist() }
     }
 
-    @Published var restStartedAt: Date? {
-        didSet { schedulePersist() }
-    }
+    @Published private(set) var restSecondsRemaining: Int = 0
 
-    @Published var restTotalSeconds: Int = 0 {
-        didSet { schedulePersist() }
-    }
-
-    @Published var restSecondsRemaining: Int = 0
-
-    @Published private(set) var lastSaveError: String?
-    @Published private(set) var lastLoadError: String?
+    @Published private(set) var persistenceError: StoreError?
 
     private let persistence: any ActiveWorkoutPersisting
 
@@ -64,6 +55,23 @@ final class ActiveWorkoutStore: ObservableObject {
 
     var formattedElapsedTime: String {
         Self.formatDuration(elapsedSeconds)
+    }
+
+    // MARK: - Rest Timer Compatibility
+
+    /// Preserves the existing read API used by workout views.
+    var activeRestExerciseID: UUID? {
+        restTimerState?.exerciseID
+    }
+
+    /// Preserves the existing snapshot API until a future snapshot migration.
+    var restStartedAt: Date? {
+        restTimerState?.startedAt
+    }
+
+    /// Preserves the existing snapshot and UI API.
+    var restTotalSeconds: Int {
+        restTimerState?.durationSeconds ?? 0
     }
 
     // MARK: - Workout Lifecycle
@@ -182,12 +190,15 @@ final class ActiveWorkoutStore: ObservableObject {
         for exerciseID: UUID,
         totalSeconds: Int
     ) {
-        stopRestTimer(clearPersistedState: true)
+        stopRestTimer(clearPersistedState: false)
 
-        activeRestExerciseID = exerciseID
-        restStartedAt = Date()
-        restTotalSeconds = totalSeconds
-        restSecondsRemaining = totalSeconds
+        restTimerState = RestTimerState(
+            exerciseID: exerciseID,
+            durationSeconds: totalSeconds
+        )
+
+        restSecondsRemaining =
+            restTimerState?.remainingSeconds() ?? 0
 
         startRestTimerIfNeeded()
         persistActiveWorkout()
@@ -216,9 +227,7 @@ final class ActiveWorkoutStore: ObservableObject {
         restSecondsRemaining = 0
 
         if clearPersistedState {
-            activeRestExerciseID = nil
-            restStartedAt = nil
-            restTotalSeconds = 0
+            restTimerState = nil
             persistActiveWorkout()
         }
     }
@@ -238,11 +247,8 @@ final class ActiveWorkoutStore: ObservableObject {
             return
         }
 
-        guard activeRestExerciseID != nil else {
-            return
-        }
-
-        guard restTotalSeconds > 0 else {
+        guard let restTimerState,
+              restTimerState.isActive() else {
             return
         }
 
@@ -255,19 +261,13 @@ final class ActiveWorkoutStore: ObservableObject {
     }
 
     private func updateRestSecondsRemaining() {
-        guard let restStartedAt else {
+        guard let restTimerState else {
             restSecondsRemaining = 0
             return
         }
 
-        let elapsed = Int(
-            Date().timeIntervalSince(restStartedAt)
-        )
-
-        let remaining = max(
-            0,
-            restTotalSeconds - elapsed
-        )
+        let remaining =
+            restTimerState.remainingSeconds()
 
         restSecondsRemaining = remaining
 
@@ -300,6 +300,22 @@ final class ActiveWorkoutStore: ObservableObject {
         elapsedSeconds = currentDurationSeconds()
     }
 
+    // MARK: - Persistence Errors
+
+    func clearPersistenceError() {
+        persistenceError = nil
+    }
+
+    private func setPersistenceError(
+        operation: StoreOperation,
+        message: String
+    ) {
+        persistenceError = StoreError(
+            operation: operation,
+            message: message
+        )
+    }
+    
     // MARK: - Persistence Coordination
 
     private func schedulePersist() {
@@ -331,9 +347,7 @@ final class ActiveWorkoutStore: ObservableObject {
         startedAt = nil
         elapsedSeconds = 0
 
-        activeRestExerciseID = nil
-        restStartedAt = nil
-        restTotalSeconds = 0
+        restTimerState = nil
         restSecondsRemaining = 0
 
         isRestoring = false
@@ -360,9 +374,12 @@ final class ActiveWorkoutStore: ObservableObject {
                 )
             },
             startedAt: startedAt,
-            activeRestExerciseID: activeRestExerciseID,
-            restStartedAt: restStartedAt,
-            restTotalSeconds: restTotalSeconds
+            activeRestExerciseID:
+                restTimerState?.exerciseID,
+            restStartedAt:
+                restTimerState?.startedAt,
+            restTotalSeconds:
+                restTimerState?.durationSeconds ?? 0
         )
 
         let persistence = persistence
@@ -372,7 +389,11 @@ final class ActiveWorkoutStore: ObservableObject {
                 try persistence.save(snapshot)
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = nil
+                    guard self?.persistenceError?.operation == .saving else {
+                        return
+                    }
+
+                    self?.persistenceError = nil
                 }
             } catch {
                 print(
@@ -381,10 +402,13 @@ final class ActiveWorkoutStore: ObservableObject {
                 )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError =
-                        "Couldn't save your active workout. "
-                        + "If the app closes, you may lose progress "
-                        + "on this session."
+                    self?.setPersistenceError(
+                        operation: .saving,
+                        message:
+                            "Couldn't save your active workout. "
+                            + "If the app closes, you may lose progress "
+                            + "on this session."
+                    )
                 }
             }
         }
@@ -398,7 +422,11 @@ final class ActiveWorkoutStore: ObservableObject {
                 try persistence.delete()
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError = nil
+                    guard self?.persistenceError?.operation == .deleting else {
+                        return
+                    }
+
+                    self?.persistenceError = nil
                 }
             } catch {
                 print(
@@ -407,8 +435,11 @@ final class ActiveWorkoutStore: ObservableObject {
                 )
 
                 DispatchQueue.main.async {
-                    self?.lastSaveError =
-                        "Couldn't clear the saved active workout."
+                    self?.setPersistenceError(
+                        operation: .deleting,
+                        message:
+                            "Couldn't clear the saved active workout."
+                    )
                 }
             }
         }
@@ -417,7 +448,9 @@ final class ActiveWorkoutStore: ObservableObject {
     private func restoreActiveWorkout() {
         do {
             guard let snapshot = try persistence.load() else {
-                lastLoadError = nil
+                if persistenceError?.operation == .loading {
+                    persistenceError = nil
+                }
                 return
             }
 
@@ -433,10 +466,21 @@ final class ActiveWorkoutStore: ObservableObject {
             )
 
             startedAt = snapshot.startedAt
-            activeRestExerciseID =
-                snapshot.activeRestExerciseID
-            restStartedAt = snapshot.restStartedAt
-            restTotalSeconds = snapshot.restTotalSeconds
+
+            if let exerciseID =
+                snapshot.activeRestExerciseID,
+               let restStartedAt =
+                snapshot.restStartedAt,
+               snapshot.restTotalSeconds > 0 {
+                restTimerState = RestTimerState(
+                    exerciseID: exerciseID,
+                    startedAt: restStartedAt,
+                    durationSeconds:
+                        snapshot.restTotalSeconds
+                )
+            } else {
+                restTimerState = nil
+            }
 
             elapsedSeconds = currentDurationSeconds()
 
@@ -445,7 +489,9 @@ final class ActiveWorkoutStore: ObservableObject {
             startTimerIfNeeded()
             restoreRestTimerIfNeeded()
 
-            lastLoadError = nil
+            if persistenceError?.operation == .loading {
+                persistenceError = nil
+            }
         } catch {
             isRestoring = false
 
@@ -464,9 +510,12 @@ final class ActiveWorkoutStore: ObservableObject {
                 + error.localizedDescription
             )
 
-            lastLoadError =
-                "Couldn't restore your in-progress workout. "
-                + "It may have been lost."
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't restore your in-progress workout. "
+                    + "It may have been lost."
+            )
         }
     }
 

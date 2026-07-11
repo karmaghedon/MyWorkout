@@ -1,6 +1,24 @@
 import Foundation
 
 enum WorkoutSessionEngine {
+    
+    static func makeLoggedSet(
+        from state: ExerciseSessionState
+    ) -> LoggedSet {
+        let validatedWeight = InputValidation.clampWeight(
+            state.workingWeightPounds
+        )
+
+        let validatedReps = InputValidation.clampReps(
+            state.targetReps
+        )
+
+        return LoggedSet(
+            setNumber: state.loggedSets.count + 1,
+            weight: validatedWeight,
+            reps: validatedReps
+        )
+    }
 
     static func defaultStartingWeight(
         for exercise: Exercise,
@@ -23,21 +41,14 @@ enum WorkoutSessionEngine {
     ) {
         var state = states[exerciseID] ?? ExerciseSessionState()
 
-        let validWeight = InputValidation.clampWeight(
-            state.workingWeightPounds
-        )
-        let validReps = InputValidation.clampReps(state.targetReps)
-
-        let newSet = LoggedSet(
-            setNumber: state.loggedSets.count + 1,
-            weight: validWeight,
-            reps: validReps
+        let loggedSet = makeLoggedSet(
+            from: state
         )
 
-        state.loggedSets.append(newSet)
+        state.loggedSets.append(loggedSet)
 
-        state.workingWeightPounds = validWeight
-        state.targetReps = validReps
+        state.workingWeightPounds = loggedSet.weight
+        state.targetReps = loggedSet.reps
 
         states[exerciseID] = state
     }
@@ -145,26 +156,44 @@ enum WorkoutSessionEngine {
         )
     }
 
-    static func workoutLog(
+    /// Creates a completed workout log from the current session state.
+    ///
+    /// Returns nil when the session contains no logged sets.
+    static func makeCompletedWorkoutLog(
         for workout: Workout,
         states: [UUID: ExerciseSessionState],
         durationSeconds: Int,
-        date: Date = Date()
+        completedAt date: Date = Date()
     ) -> WorkoutLog? {
-        let completedExercises = completedExercises(
+        let exercises = completedExercises(
             for: workout,
             states: states
         )
 
-        guard !completedExercises.isEmpty else {
+        guard !exercises.isEmpty else {
             return nil
         }
 
         return WorkoutLog(
             workoutName: workout.name,
             date: date,
+            durationSeconds: max(0, durationSeconds),
+            completedExercises: exercises
+        )
+    }
+    
+    /// Compatibility wrapper retained while existing callers are migrated.
+    static func workoutLog(
+        for workout: Workout,
+        states: [UUID: ExerciseSessionState],
+        durationSeconds: Int,
+        date: Date = Date()
+    ) -> WorkoutLog? {
+        makeCompletedWorkoutLog(
+            for: workout,
+            states: states,
             durationSeconds: durationSeconds,
-            completedExercises: completedExercises
+            completedAt: date
         )
     }
 }

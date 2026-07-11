@@ -1,23 +1,44 @@
 import Foundation
 
-/// Conformed to by every store that persists data and surfaces failures to
-/// the UI, so callers (like DashboardView's error banners) can handle all of
-/// them generically instead of repeating the same `lastSaveError ??
-/// lastLoadError` check once per store.
+/// Common error-reporting boundary for persistent stores.
+///
+/// Legacy stores currently expose separate load/save errors.
+/// ActiveWorkoutStore has migrated to the unified StoreError model.
+/// Phase 7.2 will migrate the remaining stores.
 protocol ErrorReportingStore: AnyObject {
-    var lastSaveError: String? { get }
-    var lastLoadError: String? { get }
+    var currentError: String? { get }
 }
 
-extension ErrorReportingStore {
-    /// The most relevant error to show right now, if any.
+// MARK: - Legacy Persistent Stores
+
+extension WorkoutLogStore: ErrorReportingStore {
     var currentError: String? {
         lastSaveError ?? lastLoadError
     }
 }
 
-extension WorkoutLogStore: ErrorReportingStore {}
-extension WorkoutTemplateStore: ErrorReportingStore {}
-extension EquipmentInventoryStore: ErrorReportingStore {}
-extension UserSettingsStore: ErrorReportingStore {}
-extension ActiveWorkoutStore: ErrorReportingStore {}
+extension WorkoutTemplateStore: ErrorReportingStore {
+    var currentError: String? {
+        lastSaveError ?? lastLoadError
+    }
+}
+
+extension EquipmentInventoryStore: ErrorReportingStore {
+    var currentError: String? {
+        lastSaveError ?? lastLoadError
+    }
+}
+
+extension UserSettingsStore: ErrorReportingStore {
+    var currentError: String? {
+        lastSaveError ?? lastLoadError
+    }
+}
+
+// MARK: - Unified Error Model
+
+extension ActiveWorkoutStore: ErrorReportingStore {
+    var currentError: String? {
+        persistenceError?.message
+    }
+}

@@ -6,13 +6,120 @@ import Foundation
 ///
 /// Snapshot versioning and migration belong to Phase 4.
 /// For Phase 3.1, this intentionally preserves the existing JSON structure.
+
+enum ActiveWorkoutPersistenceError: LocalizedError {
+    case unsupportedSchemaVersion(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .unsupportedSchemaVersion(let version):
+            return """
+            Active workout schema version \(version) is newer than \
+            the supported version \
+            \(ActiveWorkoutSnapshot.currentSchemaVersion).
+            """
+        }
+    }
+}
+
 struct ActiveWorkoutSnapshot: Codable {
+
+    // MARK: - Schema
+
+    static let currentSchemaVersion = 1
+
+    let schemaVersion: Int
+
+    // MARK: - Persisted Workout State
+
     let activeWorkout: Workout
     let exerciseStates: [ExerciseStateSnapshot]
     let startedAt: Date?
     let activeRestExerciseID: UUID?
     let restStartedAt: Date?
     let restTotalSeconds: Int
+
+    // MARK: - Initialization
+
+    init(
+        schemaVersion: Int = Self.currentSchemaVersion,
+        activeWorkout: Workout,
+        exerciseStates: [ExerciseStateSnapshot],
+        startedAt: Date?,
+        activeRestExerciseID: UUID?,
+        restStartedAt: Date?,
+        restTotalSeconds: Int
+    ) {
+        self.schemaVersion = schemaVersion
+        self.activeWorkout = activeWorkout
+        self.exerciseStates = exerciseStates
+        self.startedAt = startedAt
+        self.activeRestExerciseID = activeRestExerciseID
+        self.restStartedAt = restStartedAt
+        self.restTotalSeconds = restTotalSeconds
+    }
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion
+        case activeWorkout
+        case exerciseStates
+        case startedAt
+        case activeRestExerciseID
+        case restStartedAt
+        case restTotalSeconds
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(
+            keyedBy: CodingKeys.self
+        )
+
+        // Snapshots created before schema versioning are considered v1.
+        let decodedVersion = try container.decodeIfPresent(
+            Int.self,
+            forKey: .schemaVersion
+        ) ?? 1
+
+        guard decodedVersion <= Self.currentSchemaVersion else {
+            throw ActiveWorkoutPersistenceError.unsupportedSchemaVersion(
+                decodedVersion
+            )
+        }
+
+        schemaVersion = decodedVersion
+
+        activeWorkout = try container.decode(
+            Workout.self,
+            forKey: .activeWorkout
+        )
+
+        exerciseStates = try container.decode(
+            [ExerciseStateSnapshot].self,
+            forKey: .exerciseStates
+        )
+
+        startedAt = try container.decodeIfPresent(
+            Date.self,
+            forKey: .startedAt
+        )
+
+        activeRestExerciseID = try container.decodeIfPresent(
+            UUID.self,
+            forKey: .activeRestExerciseID
+        )
+
+        restStartedAt = try container.decodeIfPresent(
+            Date.self,
+            forKey: .restStartedAt
+        )
+
+        restTotalSeconds = try container.decodeIfPresent(
+            Int.self,
+            forKey: .restTotalSeconds
+        ) ?? 0
+    }
 }
 
 struct ExerciseStateSnapshot: Codable {
