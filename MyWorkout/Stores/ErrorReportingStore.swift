@@ -1,44 +1,28 @@
 import Foundation
 
-/// Common error-reporting boundary for persistent stores.
+/// Shared error-reporting boundary for persistent stores.
 ///
-/// Legacy stores currently expose separate load/save errors.
-/// ActiveWorkoutStore has migrated to the unified StoreError model.
-/// Phase 7.2 will migrate the remaining stores.
+/// Every persistent store exposes the same StoreError model.
+/// DashboardView can aggregate errors without knowing each store's
+/// implementation details.
 protocol ErrorReportingStore: AnyObject {
-    var currentError: String? { get }
+    var persistenceError: StoreError? { get }
 }
 
-// MARK: - Legacy Persistent Stores
-
-extension WorkoutLogStore: ErrorReportingStore {
+extension ErrorReportingStore {
     var currentError: String? {
         persistenceError?.message
     }
 }
 
-extension WorkoutTemplateStore: ErrorReportingStore {
-    var currentError: String? {
-        persistenceError?.message
-    }
-}
+// MARK: - Store Conformance
 
-extension EquipmentInventoryStore: ErrorReportingStore {
-    var currentError: String? {
-        lastSaveError ?? lastLoadError
-    }
-}
+extension WorkoutLogStore: ErrorReportingStore {}
 
-extension UserSettingsStore: ErrorReportingStore {
-    var currentError: String? {
-        lastSaveError ?? lastLoadError
-    }
-}
+extension WorkoutTemplateStore: ErrorReportingStore {}
 
-// MARK: - Unified Error Model
+extension EquipmentInventoryStore: ErrorReportingStore {}
 
-extension ActiveWorkoutStore: ErrorReportingStore {
-    var currentError: String? {
-        persistenceError?.message
-    }
-}
+extension UserSettingsStore: ErrorReportingStore {}
+
+extension ActiveWorkoutStore: ErrorReportingStore {}

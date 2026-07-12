@@ -3,21 +3,36 @@ import Foundation
 @MainActor
 final class EquipmentInventoryStore: ObservableObject {
     @Published var inventory: EquipmentInventory
-    @Published private(set) var lastSaveError: String?
-    @Published private(set) var lastLoadError: String?
+
+    @Published private(set) var persistenceError: StoreError?
 
     private let key = "equipment_inventory"
 
     init() {
         if let data = UserDefaults.standard.data(forKey: key) {
             do {
-                inventory = try JSONDecoder().decode(EquipmentInventory.self, from: data)
-                lastLoadError = nil
+                inventory = try JSONDecoder().decode(
+                    EquipmentInventory.self,
+                    from: data
+                )
+
+                clearPersistenceError(for: .loading)
             } catch {
-                print("Failed to load equipment inventory: \(error)")
+                print(
+                    "Failed to load equipment inventory: \(error)"
+                )
+
                 UserDefaults.standard.removeObject(forKey: key)
+
                 inventory = EquipmentInventory.defaultInventory
-                lastLoadError = "Couldn't load equipment inventory. Defaults were restored."
+
+                setPersistenceError(
+                    operation: .loading,
+                    message:
+                        "Couldn't load equipment inventory. "
+                        + "Defaults were restored."
+                )
+
                 save()
             }
         } else {
@@ -26,32 +41,98 @@ final class EquipmentInventoryStore: ObservableObject {
         }
     }
 
+    // MARK: - Persistence Errors
+
+    func clearPersistenceError() {
+        persistenceError = nil
+    }
+
+    private func setPersistenceError(
+        operation: StoreOperation,
+        message: String
+    ) {
+        persistenceError = StoreError(
+            operation: operation,
+            message: message
+        )
+    }
+
+    private func clearPersistenceError(
+        for operation: StoreOperation
+    ) {
+        guard persistenceError?.operation == operation else {
+            return
+        }
+
+        persistenceError = nil
+    }
+
+    // MARK: - Persistence
+
     func save() {
         do {
             let data = try JSONEncoder().encode(inventory)
-            UserDefaults.standard.set(data, forKey: key)
-            lastSaveError = nil
+
+            UserDefaults.standard.set(
+                data,
+                forKey: key
+            )
+
+            clearPersistenceError(for: .saving)
         } catch {
-            print("Failed to save equipment inventory: \(error)")
-            lastSaveError = "Couldn't save equipment inventory."
+            print(
+                "Failed to save equipment inventory: \(error)"
+            )
+
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Couldn't save equipment inventory."
+            )
         }
     }
+
+    // MARK: - Inventory Management
 
     func resetToDefault(unit: UnitSystem) {
         inventory = EquipmentInventory.defaultInventory
         convertInventory(to: unit, from: .pounds)
     }
 
-    func addPlate(weight: Double, quantity: Int) {
-        guard weight > 0, quantity > 0 else {return}
-        inventory.plates.append(PlateInventory(weight: weight, quantity: quantity))
+    func addPlate(
+        weight: Double,
+        quantity: Int
+    ) {
+        guard weight > 0, quantity > 0 else {
+            return
+        }
+
+        inventory.plates.append(
+            PlateInventory(
+                weight: weight,
+                quantity: quantity
+            )
+        )
+
         sort()
         save()
     }
 
-    func addDumbbell(weight: Double, quantity: Int) {
-        guard weight > 0, quantity > 0 else {return}
-        inventory.dumbbells.append(DumbbellInventory(weight: weight, quantity: quantity))
+    func addDumbbell(
+        weight: Double,
+        quantity: Int
+    ) {
+        guard weight > 0, quantity > 0 else {
+            return
+        }
+
+        inventory.dumbbells.append(
+            DumbbellInventory(
+                weight: weight,
+                quantity: quantity
+            )
+        )
+
         sort()
         save()
     }
@@ -65,22 +146,32 @@ final class EquipmentInventoryStore: ObservableObject {
         inventory.dumbbells.remove(atOffsets: offsets)
         save()
     }
-    
+
     func deletePlate(id: UUID) {
-        inventory.plates.removeAll { $0.id == id }
+        inventory.plates.removeAll {
+            $0.id == id
+        }
+
         save()
     }
 
     func deleteDumbbell(id: UUID) {
-        inventory.dumbbells.removeAll { $0.id == id }
+        inventory.dumbbells.removeAll {
+            $0.id == id
+        }
+
         save()
     }
 
-    func replace(with newInventory: EquipmentInventory) {
+    func replace(
+        with newInventory: EquipmentInventory
+    ) {
         inventory = newInventory
         sort()
         save()
     }
+
+    // MARK: - Loading Increments
 
     func smallestPlateIncrement() -> Int {
         let smallestPlateInCurrentUnit = inventory.plates
@@ -88,29 +179,56 @@ final class EquipmentInventoryStore: ObservableObject {
             .map { $0.weight }
             .min() ?? 2.5
 
-        let smallestPlateInPounds = WeightConversion.toPounds(
-            smallestPlateInCurrentUnit,
-            from: inventory.unitSystem
-        )
+        let smallestPlateInPounds =
+            WeightConversion.toPounds(
+                smallestPlateInCurrentUnit,
+                from: inventory.unitSystem
+            )
 
-        return max(1, Int((smallestPlateInPounds * 2).rounded()))
+        return max(
+            1,
+            Int(
+                (smallestPlateInPounds * 2).rounded()
+            )
+        )
     }
 
-    func convertInventory(to newUnit: UnitSystem, from oldUnit: UnitSystem) {
-        guard newUnit != oldUnit else { return }
+    // MARK: - Unit Conversion
+
+    func convertInventory(
+        to newUnit: UnitSystem,
+        from oldUnit: UnitSystem
+    ) {
+        guard newUnit != oldUnit else {
+            return
+        }
 
         func convert(_ value: Double) -> Double {
             switch (oldUnit, newUnit) {
             case (.pounds, .kilograms):
-                return roundToQuarter(WeightConversion.fromPounds(value, to: .kilograms))
+                return roundToQuarter(
+                    WeightConversion.fromPounds(
+                        value,
+                        to: .kilograms
+                    )
+                )
+
             case (.kilograms, .pounds):
-                return roundToQuarter(WeightConversion.toPounds(value, from: .kilograms))
+                return roundToQuarter(
+                    WeightConversion.toPounds(
+                        value,
+                        from: .kilograms
+                    )
+                )
+
             default:
                 return value
             }
         }
 
-        inventory.barbellWeight = convert(inventory.barbellWeight)
+        inventory.barbellWeight = convert(
+            inventory.barbellWeight
+        )
 
         inventory.plates = inventory.plates.map {
             PlateInventory(
@@ -129,16 +247,29 @@ final class EquipmentInventoryStore: ObservableObject {
         }
 
         inventory.unitSystem = newUnit
+
         sort()
         save()
     }
 
+    // MARK: - Helpers
+
     private func sort() {
-        inventory.plates.sort { $0.weight > $1.weight }
-        inventory.dumbbells.sort { $0.weight < $1.weight }
+        inventory.plates.sort {
+            $0.weight > $1.weight
+        }
+
+        inventory.dumbbells.sort {
+            $0.weight < $1.weight
+        }
     }
 
-    private func roundToQuarter(_ value: Double) -> Double {
-        Rounding.toNearestMultiple(value, of: 0.25)
+    private func roundToQuarter(
+        _ value: Double
+    ) -> Double {
+        Rounding.toNearestMultiple(
+            value,
+            of: 0.25
+        )
     }
 }
