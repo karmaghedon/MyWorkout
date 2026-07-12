@@ -29,9 +29,14 @@ enum WorkoutSessionEngine {
             return 0
 
         case .compound, .isolation:
-            return exercise.usesBarbell
-                ? equipmentInventory.barbellWeight
-                : 0
+            guard exercise.usesBarbell else {
+                return 0
+            }
+
+            return WeightConversion.toPounds(
+                equipmentInventory.barbellWeight,
+                from: equipmentInventory.unitSystem
+            )
         }
     }
 

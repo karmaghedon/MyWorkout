@@ -11,11 +11,11 @@ struct ExerciseRowView: View {
         var parts: [String] = []
 
         if showsMuscleGroup {
-            parts.append(exercise.muscleGroup)
+            parts.append(exercise.muscleGroup.displayName)
         }
 
         if showsEquipment {
-            parts.append(exercise.equipment)
+            parts.append(exercise.equipment.displayName)
         }
 
         if showsExerciseType {

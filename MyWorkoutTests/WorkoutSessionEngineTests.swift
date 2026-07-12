@@ -13,7 +13,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
     ) -> Exercise {
         Exercise(
             name: name,
-            muscleGroup: "Chest",
+            muscleGroup: .chest,
             equipment: equipment,
             instructions: "Push it",
             progressionRule: ProgressionRule(

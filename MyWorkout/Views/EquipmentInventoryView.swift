@@ -27,8 +27,7 @@ struct EquipmentInventoryView: View {
         }
 
         equipmentStore.convertInventory(
-            to: settingsStore.settings.unitSystem,
-            from: equipmentStore.inventory.unitSystem
+            to: settingsStore.settings.unitSystem
         )
     }
 }

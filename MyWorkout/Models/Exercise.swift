@@ -6,8 +6,8 @@ struct Exercise: Identifiable, Codable {
     let name: String
 
     // Existing (keep for compatibility)
-    let muscleGroup: String
-    let equipment: String
+    let muscleGroup: MuscleGroup
+    let equipment: ExerciseEquipment
     let instructions: String
 
     // New metadata
@@ -23,14 +23,14 @@ struct Exercise: Identifiable, Codable {
     let progressionStrategy: ProgressionStrategy
 
     var usesBarbell: Bool {
-        equipment.lowercased().contains("barbell")
+        equipment.usesBarbell
     }
 
     init(
         id: UUID = UUID(),
         name: String,
-        muscleGroup: String,
-        equipment: String,
+        muscleGroup: MuscleGroup,
+        equipment: ExerciseEquipment,
         instructions: String,
 
         primaryMuscles: [String] = [],

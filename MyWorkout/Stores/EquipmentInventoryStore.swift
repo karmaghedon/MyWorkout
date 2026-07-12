@@ -96,7 +96,14 @@ final class EquipmentInventoryStore: ObservableObject {
 
     func resetToDefault(unit: UnitSystem) {
         inventory = EquipmentInventory.defaultInventory
-        convertInventory(to: unit, from: .pounds)
+
+        if unit == .pounds {
+            sort()
+            save()
+            return
+        }
+
+        convertInventory(to: unit)
     }
 
     func addPlate(
@@ -196,9 +203,10 @@ final class EquipmentInventoryStore: ObservableObject {
     // MARK: - Unit Conversion
 
     func convertInventory(
-        to newUnit: UnitSystem,
-        from oldUnit: UnitSystem
+        to newUnit: UnitSystem
     ) {
+        let oldUnit = inventory.unitSystem
+
         guard newUnit != oldUnit else {
             return
         }
@@ -206,20 +214,10 @@ final class EquipmentInventoryStore: ObservableObject {
         func convert(_ value: Double) -> Double {
             switch (oldUnit, newUnit) {
             case (.pounds, .kilograms):
-                return roundToQuarter(
-                    WeightConversion.fromPounds(
-                        value,
-                        to: .kilograms
-                    )
-                )
+                return WeightConversion.poundsToKilograms(value)
 
             case (.kilograms, .pounds):
-                return roundToQuarter(
-                    WeightConversion.toPounds(
-                        value,
-                        from: .kilograms
-                    )
-                )
+                return WeightConversion.kilogramsToPounds(value)
 
             default:
                 return value
@@ -264,12 +262,12 @@ final class EquipmentInventoryStore: ObservableObject {
         }
     }
 
-    private func roundToQuarter(
-        _ value: Double
-    ) -> Double {
-        Rounding.toNearestMultiple(
-            value,
-            of: 0.25
-        )
-    }
+//    private func roundToQuarter(
+//        _ value: Double
+//    ) -> Double {
+//        Rounding.toNearestMultiple(
+//            value,
+//            of: 0.25
+//        )
+//    }
 }

@@ -15,15 +15,20 @@ struct ExerciseHeaderView: View {
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
 
-                Text("\(exercise.muscleGroup) • \(exercise.equipment) • \(exercise.exerciseType.rawValue.capitalized)")
+                Text(
+                    "\(exercise.muscleGroup.displayName) • \(exercise.equipment.displayName) • \(exercise.exerciseType.rawValue.capitalized)"
+                )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
             HStack(spacing: 8) {
-                InfoBadge(text: exercise.muscleGroup)
-                InfoBadge(text: exercise.equipment, systemImage: iconName)
+                InfoBadge(text: exercise.muscleGroup.displayName)
+                InfoBadge(
+                    text: exercise.equipment.displayName,
+                    systemImage: exercise.equipment.systemImage
+                )
                 InfoBadge(text: exercise.difficulty)
             }
         }
@@ -32,19 +37,7 @@ struct ExerciseHeaderView: View {
     }
 
     private var iconName: String {
-        if exercise.exerciseType == .bodyweight {
-            return "figure.strengthtraining.traditional"
-        }
-
-        if exercise.equipment.lowercased().contains("barbell") {
-            return "dumbbell.fill"
-        }
-
-        if exercise.equipment.lowercased().contains("dumbbell") {
-            return "dumbbell"
-        }
-
-        return "figure.strengthtraining.functional"
+        exercise.equipment.systemImage
     }
 }
 

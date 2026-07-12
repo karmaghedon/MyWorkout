@@ -7,6 +7,7 @@ final class WorkoutTemplateStore: ObservableObject {
     @Published private(set) var persistenceError: StoreError?
 
     private let legacyDefaultsKey = "workout_templates"
+    private let builtInRegistry: ExerciseRegistry
 
     private let fileURL: URL
     private let saveQueue = DispatchQueue(
@@ -14,7 +15,15 @@ final class WorkoutTemplateStore: ObservableObject {
         qos: .utility
     )
 
-    init() {
+    init(
+        builtInRegistry: ExerciseRegistry = ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource()
+            ]
+        )
+    ) {
+        self.builtInRegistry = builtInRegistry
+
         fileURL = Self.resolveFileURL()
         load()
 
@@ -152,8 +161,6 @@ final class WorkoutTemplateStore: ObservableObject {
                     self?.clearPersistenceError(
                         for: .saving
                     )
-
-                    ExerciseRegistry.invalidateCache()
                 }
             } catch {
                 print(
@@ -249,8 +256,10 @@ final class WorkoutTemplateStore: ObservableObject {
         WorkoutTemplate(
             id: template.id,
             name: template.name,
-            exercises: template.exercises.map { savedExercise in
-                ExerciseRegistry.find(
+            exercises: template.exercises.map {
+                savedExercise in
+
+                builtInRegistry.exercise(
                     id: savedExercise.id,
                     name: savedExercise.name
                 ) ?? savedExercise

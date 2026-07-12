@@ -2,12 +2,11 @@ import SwiftUI
 
 struct BarbellInventorySection: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
-    @EnvironmentObject var settingsStore: UserSettingsStore
 
     @State private var showResetConfirmation = false
 
     private var unit: String {
-        settingsStore.settings.weightUnitLabel
+        equipmentStore.inventory.unitSystem.rawValue
     }
 
     var body: some View {
@@ -50,7 +49,7 @@ struct BarbellInventorySection: View {
             ) {
                 Button("Reset to Default", role: .destructive) {
                     equipmentStore.resetToDefault(
-                        unit: settingsStore.settings.unitSystem
+                        unit: equipmentStore.inventory.unitSystem
                     )
                 }
                 Button("Cancel", role: .cancel) {}
@@ -64,7 +63,9 @@ struct BarbellInventorySection: View {
         TextField(
             "Weight",
             value: $equipmentStore.inventory.barbellWeight,
-            format: .number
+            format: .number.precision(
+                .fractionLength(0...2)
+            )
         )
         .textFieldStyle(.roundedBorder)
         .keyboardType(.decimalPad)

@@ -6,20 +6,25 @@ struct CreateWorkoutTemplateView: View {
 
     @State private var templateName = ""
     @State private var selectedExerciseIDs: Set<UUID> = []
-    @State private var selectedEquipment = "All"
+    @State private var selectedEquipment: ExerciseEquipment?
 
     private let exercises = SeedData.exercises
 
-    private var equipmentOptions: [String] {
-        ["All"] + Array(Set(exercises.map { $0.equipment })).sorted()
+    private var equipmentOptions: [ExerciseEquipment] {
+        Array(
+            Set(exercises.map(\.equipment))
+        )
+        .sorted()
     }
 
     private var filteredExercises: [Exercise] {
-        if selectedEquipment == "All" {
+        guard let selectedEquipment else {
             return exercises
         }
 
-        return exercises.filter { $0.equipment == selectedEquipment }
+        return exercises.filter {
+            $0.equipment == selectedEquipment
+        }
     }
 
     var body: some View {
@@ -27,9 +32,16 @@ struct CreateWorkoutTemplateView: View {
             TextField("Workout name", text: $templateName)
                 .textFieldStyle(.roundedBorder)
 
-            Picker("Equipment", selection: $selectedEquipment) {
-                ForEach(equipmentOptions, id: \.self) { equipment in
-                    Text(equipment).tag(equipment)
+            Picker(
+                "Equipment",
+                selection: $selectedEquipment
+            ) {
+                Text("All")
+                    .tag(ExerciseEquipment?.none)
+
+                ForEach(equipmentOptions) { equipment in
+                    Text(equipment.displayName)
+                        .tag(Optional(equipment))
                 }
             }
             .pickerStyle(.menu)

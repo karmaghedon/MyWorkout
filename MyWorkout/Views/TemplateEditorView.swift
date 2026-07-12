@@ -5,89 +5,12 @@ struct TemplateEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var editableTemplate: WorkoutTemplate
-    @State private var selectedEquipment = "All"
+    @State private var selectedEquipment: ExerciseEquipment?
     @State private var showingAddExercises = false
 
     init(template: WorkoutTemplate) {
         _editableTemplate = State(initialValue: template)
     }
-
-//    var body: some View {
-//        Form {
-//            Section {
-//                TextField("Template name", text: $editableTemplate.name)
-//                    .font(AppTheme.Typography.label)
-//            }
-//
-//            Section {
-//                Button {
-//                    showingAddExercises.toggle()
-//                } label: {
-//                    Label(
-//                        showingAddExercises ? "Hide Exercises" : "Add Exercises",
-//                        systemImage: showingAddExercises ? "minus.circle" : "plus.circle"
-//                    )
-//                }
-//
-//                if showingAddExercises {
-//                    addExercisesPanel
-//                }
-//            }
-//
-//            Section {
-//                ForEach(Array(editableTemplate.exercises.enumerated()), id: \.element.id) { index, exercise in
-//                    exerciseRow(index: index, exercise: exercise)
-//                }
-//                .onMove(perform: moveExercises)
-//                .onDelete(perform: deleteExercises)
-//            } header: {
-//                Text("Exercises")
-//            } footer: {
-//                Text("Tap Edit to reorder or remove exercises.")
-//            }
-//
-////            Section {
-////                Button {
-////                    templateStore.duplicate(editableTemplate)
-////                    dismiss()
-////                } label: {
-////                    Label("Duplicate Template", systemImage: "doc.on.doc")
-////                }
-////            }
-//        }
-//        .dismissKeyboardOnTap()
-//        .navigationTitle("Edit Template")
-//        .toolbar {
-//            ToolbarItem(placement: .cancellationAction) {
-//                Button("Cancel") {
-//                    dismiss()
-//                }
-//            }
-//
-//            ToolbarItemGroup(placement: .primaryAction) {
-//                EditButton()
-//
-//                Menu {
-//                    Button {
-//                        duplicateTemplate()
-//                    } label: {
-//                        Label(
-//                            "Duplicate Template",
-//                            systemImage: "doc.on.doc"
-//                        )
-//                    }
-//                } label: {
-//                    Image(systemName: "ellipsis.circle")
-//                }
-//
-//                Button("Save") {
-//                    saveTemplate()
-//                }
-//                .fontWeight(.semibold)
-//                .disabled(!canSave)
-//            }
-//        }
-//    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -206,25 +129,18 @@ struct TemplateEditorView: View {
         dismiss()
     }
     
-//    private func duplicateTemplate() {
-//        guard let validName = InputValidation.validateName(
-//            editableTemplate.name
-//        ) else {
-//            return
-//        }
-//
-//        var templateToDuplicate = editableTemplate
-//        templateToDuplicate.name = validName
-//
-//        templateStore.duplicate(templateToDuplicate)
-//        dismiss()
-//    }
-    
     private var addExercisesPanel: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Picker("Equipment", selection: $selectedEquipment) {
-                ForEach(equipmentOptions, id: \.self) { equipment in
-                    Text(equipment).tag(equipment)
+            Picker(
+                "Equipment",
+                selection: $selectedEquipment
+            ) {
+                Text("All")
+                    .tag(ExerciseEquipment?.none)
+
+                ForEach(equipmentOptions) { equipment in
+                    Text(equipment.displayName)
+                        .tag(Optional(equipment))
                 }
             }
             .pickerStyle(.menu)
@@ -274,31 +190,20 @@ struct TemplateEditorView: View {
         }
     }
 
-    private var equipmentOptions: [String] {
-        ["All"] + Array(Set(availableExercises.map { $0.equipment })).sorted()
+    private var equipmentOptions: [ExerciseEquipment] {
+        Array(
+            Set(availableExercises.map(\.equipment))
+        )
+        .sorted()
     }
 
     private var filteredAvailableExercises: [Exercise] {
-        if selectedEquipment == "All" {
+        guard let selectedEquipment else {
             return availableExercises
         }
 
-        return availableExercises.filter { $0.equipment == selectedEquipment }
+        return availableExercises.filter {
+            $0.equipment == selectedEquipment
+        }
     }
-    
-//    private var canSave: Bool {
-//        InputValidation.isValidName(editableTemplate.name) && !editableTemplate.exercises.isEmpty
-//    }
-//    
-//    private func saveTemplate() {
-//        guard let validName = InputValidation.validateName(editableTemplate.name) else {
-//            return
-//        }
-//        
-//        var validateTemplate = editableTemplate
-//        validateTemplate.name = validName
-//        
-//        templateStore.update(validateTemplate)
-//        dismiss()        
-//    }
 }

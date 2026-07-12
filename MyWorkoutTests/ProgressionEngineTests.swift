@@ -15,8 +15,8 @@ final class ProgressionEngineTests: XCTestCase {
     ) -> Exercise {
         Exercise(
             name: "Test Exercise",
-            muscleGroup: "Chest",
-            equipment: "Barbell",
+            muscleGroup: .chest,
+            equipment: .barbell,
             instructions: "Do the thing",
             progressionRule: ProgressionRule(
                 minReps: minReps,

@@ -12,10 +12,9 @@ struct SettingsView: View {
                         Text(unit.rawValue).tag(unit)
                     }
                 }
-                .onChange(of: settingsStore.settings.unitSystem) { oldUnit, newUnit in
+                .onChange(of: settingsStore.settings.unitSystem) { _, newUnit in
                     equipmentStore.convertInventory(
-                        to: newUnit,
-                        from: oldUnit
+                        to: newUnit
                     )
 
                     settingsStore.save()

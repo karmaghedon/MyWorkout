@@ -2,13 +2,12 @@ import SwiftUI
 
 struct PlatesInventorySection: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
-    @EnvironmentObject var settingsStore: UserSettingsStore
 
     @State private var newPlateWeight = ""
     @State private var newPlateQuantity = ""
 
     private var unit: String {
-        settingsStore.settings.weightUnitLabel
+        equipmentStore.inventory.unitSystem.rawValue
     }
 
     var body: some View {

@@ -28,7 +28,7 @@ struct AnalyticsView: View {
             VolumeByMuscleGroupSection(volumeByMuscleGroup: analyticsCache.volumeByMuscleGroup)
 
             PersonalRecordsSection(
-                personalRecords: analyticsCache.personalRecord,
+                personalRecords: analyticsCache.personalRecords,
                 settings: settingsStore.settings
             )
 

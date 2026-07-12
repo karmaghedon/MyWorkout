@@ -19,7 +19,10 @@ struct MyWorkoutApp: App {
                 .environmentObject(settingsStore)
                 .environmentObject(activeWorkoutStore)
                 .environmentObject(analyticsCache)
-                .onAppear {analyticsCache.bind(to: logStore)}
+                .onAppear {analyticsCache.bind(
+                    to: logStore,
+                    templateStore: templateStore
+                )}
         }
     }
 }

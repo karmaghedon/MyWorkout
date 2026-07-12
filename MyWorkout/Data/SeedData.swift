@@ -5,8 +5,8 @@ struct SeedData {
     static let exercises: [Exercise] = [
         exercise(
             "Bench Press",
-            muscleGroup: "Chest",
-            equipment: "Barbell",
+            muscleGroup: .chest,
+            equipment: .barbell,
             instructions: """
             1. Lie on the bench with your eyes under the bar.
             2. Grip slightly wider than shoulder width.
@@ -18,8 +18,8 @@ struct SeedData {
 
         exercise(
             "Front Squat",
-            muscleGroup: "Legs",
-            equipment: "Barbell",
+            muscleGroup: .legs,
+            equipment: .barbell,
             instructions: """
             1. Place the bar across the front shoulders.
             2. Keep elbows high and chest tall.
@@ -31,8 +31,8 @@ struct SeedData {
 
         exercise(
             "Romanian Deadlift",
-            muscleGroup: "Hamstrings/Glutes",
-            equipment: "Barbell",
+            muscleGroup: .hamstrings ,
+            equipment: .barbell,
             instructions: """
             1. Stand tall with the bar in front of thighs.
             2. Keep knees slightly bent.
@@ -44,8 +44,8 @@ struct SeedData {
 
         exercise(
             "Incline Bench Press",
-            muscleGroup: "Chest",
-            equipment: "Dumbbells",
+            muscleGroup: .chest,
+            equipment: .dumbbell,
             instructions: """
             1. Set bench to a low or moderate incline.
             2. Start with dumbbells at chest level.
@@ -57,8 +57,8 @@ struct SeedData {
 
         exercise(
             "Incline Row",
-            muscleGroup: "Back",
-            equipment: "Dumbbells",
+            muscleGroup: .back,
+            equipment: .dumbbell,
             instructions: """
             1. Lie chest-down on an incline bench.
             2. Let dumbbells hang straight down.
@@ -70,8 +70,8 @@ struct SeedData {
 
         exercise(
             "Bent Over Row - Underhand",
-            muscleGroup: "Back",
-            equipment: "Barbell",
+            muscleGroup: .back,
+            equipment: .barbell,
             instructions: """
             1. Hold the bar with palms facing up.
             2. Hinge at hips with a neutral spine.
@@ -83,8 +83,8 @@ struct SeedData {
 
         exercise(
             "Pull Up",
-            muscleGroup: "Back",
-            equipment: "Bodyweight",
+            muscleGroup: .back,
+            equipment: .bodyweight,
             instructions: """
             1. Grip bar with palms facing away.
             2. Start from a controlled hang.
@@ -98,8 +98,8 @@ struct SeedData {
 
         exercise(
             "Chin Up",
-            muscleGroup: "Back/Biceps",
-            equipment: "Bodyweight",
+            muscleGroup: .back,
+            equipment: .bodyweight,
             instructions: """
             1. Grip bar with palms facing you.
             2. Start from a controlled hang.
@@ -113,8 +113,8 @@ struct SeedData {
 
         exercise(
             "Chest Dip",
-            muscleGroup: "Chest/Triceps",
-            equipment: "Bodyweight",
+            muscleGroup: .chest,
+            equipment: .bodyweight,
             instructions: """
             1. Support yourself on parallel bars.
             2. Keep shoulders down.
@@ -128,8 +128,8 @@ struct SeedData {
 
         exercise(
             "Strict Military Press",
-            muscleGroup: "Shoulders",
-            equipment: "Barbell",
+            muscleGroup: .shoulders,
+            equipment: .barbell,
             instructions: """
             1. Start with bar at upper chest.
             2. Brace core and squeeze glutes.
@@ -141,8 +141,8 @@ struct SeedData {
 
         exercise(
             "Glute Bridge",
-            muscleGroup: "Glutes",
-            equipment: "Barbell",
+            muscleGroup: .glutes,
+            equipment: .barbell,
             instructions: """
             1. Lie on back with knees bent.
             2. Place bar across hips if using weight.
@@ -154,8 +154,8 @@ struct SeedData {
 
         exercise(
             "Goblet Squat",
-            muscleGroup: "Legs",
-            equipment: "Kettlebell/Dumbbell",
+            muscleGroup: .legs,
+            equipment: .kettlebellOrDumbbell,
             instructions: """
             1. Hold weight close to chest.
             2. Stand with feet about shoulder width.
@@ -167,8 +167,8 @@ struct SeedData {
 
         exercise(
             "Inverted Row",
-            muscleGroup: "Back",
-            equipment: "Bodyweight",
+            muscleGroup: .back,
+            equipment: .bodyweight,
             instructions: """
             1. Set a bar around waist height.
             2. Lie underneath and grip the bar.
@@ -182,8 +182,8 @@ struct SeedData {
 
         exercise(
             "Face Pull",
-            muscleGroup: "Rear Delts/Upper Back",
-            equipment: "Cable/Band",
+            muscleGroup: .shoulders,
+            equipment: .cableOrBand,
             instructions: """
             1. Set band or cable at face height.
             2. Pull toward your face.
@@ -199,8 +199,8 @@ struct SeedData {
 
         exercise(
             "Skullcrusher",
-            muscleGroup: "Triceps",
-            equipment: "Barbell",
+            muscleGroup: .triceps,
+            equipment: .barbell,
             instructions: """
             1. Lie on bench with bar above chest.
             2. Keep upper arms mostly still.
@@ -216,8 +216,8 @@ struct SeedData {
 
         exercise(
             "Triceps Extension",
-            muscleGroup: "Triceps",
-            equipment: "Barbell",
+            muscleGroup: .triceps,
+            equipment: .barbell,
             instructions: """
             1. Hold bar with comfortable grip.
             2. Keep upper arms steady.
@@ -233,8 +233,8 @@ struct SeedData {
 
         exercise(
             "Bicep Curl",
-            muscleGroup: "Biceps",
-            equipment: "Barbell",
+            muscleGroup: .biceps,
+            equipment: .barbell,
             instructions: """
             1. Stand tall with palms facing up.
             2. Keep elbows close to sides.
@@ -250,8 +250,8 @@ struct SeedData {
 
         exercise(
             "Hammer Curl",
-            muscleGroup: "Biceps/Forearms",
-            equipment: "Dumbbell",
+            muscleGroup: .biceps,
+            equipment: .dumbbell,
             instructions: """
             1. Hold dumbbells with palms facing each other.
             2. Keep elbows close.
@@ -312,8 +312,8 @@ struct SeedData {
 
     private static func exercise(
         _ name: String,
-        muscleGroup: String,
-        equipment: String,
+        muscleGroup: MuscleGroup,
+        equipment: ExerciseEquipment,
         instructions: String,
 
         primaryMuscles: [String] = [],

@@ -30,7 +30,7 @@ struct ExerciseSessionCardView: View {
             for: state.workingWeightPounds,
             exerciseType: exercise.exerciseType,
             usesBarbell: exercise.usesBarbell,
-            barbellWeight: equipmentInventory.barbellWeight
+            barbellWeight: storedBarbellWeightPounds
         )
     }
 
@@ -38,6 +38,13 @@ struct ExerciseSessionCardView: View {
         state.loggedSets.count + 1
     }
 
+    private var storedBarbellWeightPounds: Double {
+        WeightConversion.toPounds(
+            equipmentInventory.barbellWeight,
+            from: equipmentInventory.unitSystem
+        )
+    }
+    
     var body: some View {
         WorkoutSessionCard {
             ExerciseSessionHeaderView(

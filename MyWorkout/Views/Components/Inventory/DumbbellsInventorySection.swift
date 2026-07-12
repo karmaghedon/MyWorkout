@@ -2,13 +2,12 @@ import SwiftUI
 
 struct DumbbellsInventorySection: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
-    @EnvironmentObject var settingsStore: UserSettingsStore
 
     @State private var newDumbbellWeight = ""
     @State private var newDumbbellQuantity = ""
 
     private var unit: String {
-        settingsStore.settings.weightUnitLabel
+        equipmentStore.inventory.unitSystem.rawValue
     }
 
     var body: some View {
