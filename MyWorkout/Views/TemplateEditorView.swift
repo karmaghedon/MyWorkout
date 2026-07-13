@@ -16,11 +16,10 @@ struct TemplateEditorView: View {
         VStack(spacing: 0) {
             Form {
                 Section {
-                    TextField(
-                        "Template name",
+                    ValidatedNameField(
+                        title: "Template name",
                         text: $editableTemplate.name
                     )
-                    .font(AppTheme.Typography.label)
                 }
 
                 Section {
@@ -99,9 +98,7 @@ struct TemplateEditorView: View {
     }
     
     private var canSave: Bool {
-        !editableTemplate.name
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .isEmpty
+        editableTemplate.name.isValidName
             && !editableTemplate.exercises.isEmpty
     }
 
@@ -110,8 +107,8 @@ struct TemplateEditorView: View {
             return
         }
 
-        editableTemplate.name = editableTemplate.name
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        editableTemplate.name =
+            editableTemplate.name.normalizedName
 
         templateStore.update(editableTemplate)
         dismiss()
@@ -122,8 +119,8 @@ struct TemplateEditorView: View {
             return
         }
 
-        editableTemplate.name = editableTemplate.name
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        editableTemplate.name =
+            editableTemplate.name.normalizedName
 
         templateStore.duplicate(editableTemplate)
         dismiss()

@@ -56,6 +56,7 @@
 		F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */; };
 		F54B808A30044C4E00615DA0 /* HistoricalExerciseReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B808930044C4E00615DA0 /* HistoricalExerciseReference.swift */; };
 		F54B808C30044C8900615DA0 /* HistoricalExerciseReferenceSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B808B30044C8900615DA0 /* HistoricalExerciseReferenceSource.swift */; };
+		F54B808F3004717100615DA0 /* ValidatedNameField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B808E3004717100615DA0 /* ValidatedNameField.swift */; };
 		F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */; };
 		F5630A24300260A3000BB3AD /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A23300260A3000BB3AD /* RestTimerState.swift */; };
 		F5630A273002669F000BB3AD /* StoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A263002669F000BB3AD /* StoreError.swift */; };
@@ -194,6 +195,7 @@
 		F54005232FF6F8DD0079CC05 /* ProgressionStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionStrategy.swift; sourceTree = "<group>"; };
 		F54B808930044C4E00615DA0 /* HistoricalExerciseReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalExerciseReference.swift; sourceTree = "<group>"; };
 		F54B808B30044C8900615DA0 /* HistoricalExerciseReferenceSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalExerciseReferenceSource.swift; sourceTree = "<group>"; };
+		F54B808E3004717100615DA0 /* ValidatedNameField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedNameField.swift; sourceTree = "<group>"; };
 		F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
 		F5630A23300260A3000BB3AD /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		F5630A263002669F000BB3AD /* StoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreError.swift; sourceTree = "<group>"; };
@@ -448,6 +450,14 @@
 			path = Theme;
 			sourceTree = "<group>";
 		};
+		F54B808D3004714F00615DA0 /* Forms */ = {
+			isa = PBXGroup;
+			children = (
+				F54B808E3004717100615DA0 /* ValidatedNameField.swift */,
+			);
+			path = Forms;
+			sourceTree = "<group>";
+		};
 		F5630A1F3001941B000BB3AD /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
@@ -529,6 +539,7 @@
 		F5BF303E2FF9DFC600AB5AD9 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F54B808D3004714F00615DA0 /* Forms */,
 				F5630A28300268FE000BB3AD /* FeedBack */,
 				F5BF30B52FFEDA7D00AB5AD9 /* Export */,
 				F5BF30A22FFED42000AB5AD9 /* Analytics */,
@@ -824,6 +835,7 @@
 				F5BF30B22FFED4B300AB5AD9 /* BarbellInventorySection.swift in Sources */,
 				F5BF30AC2FFED42000AB5AD9 /* RecentWorkoutsSection.swift in Sources */,
 				F540050A2FF58D660079CC05 /* AppTheme.swift in Sources */,
+				F54B808F3004717100615DA0 /* ValidatedNameField.swift in Sources */,
 				F5BF30C32FFF1A1C00AB5AD9 /* ErrorReportingStore.swift in Sources */,
 				F5BF306D2FFB131E00AB5AD9 /* NoActiveWorkoutView.swift in Sources */,
 				F54004D92FF0CFD10079CC05 /* WorkoutLogDetailView.swift in Sources */,

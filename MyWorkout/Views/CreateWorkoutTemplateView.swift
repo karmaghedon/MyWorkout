@@ -27,10 +27,24 @@ struct CreateWorkoutTemplateView: View {
         }
     }
 
+    private var selectedExercises: [Exercise] {
+        exercises.filter {
+            selectedExerciseIDs.contains($0.id)
+        }
+    }
+
+    private var canSave: Bool {
+        templateName.isValidName
+            && !selectedExercises.isEmpty
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            TextField("Workout name", text: $templateName)
-                .textFieldStyle(.roundedBorder)
+            ValidatedNameField(
+                title: "Template name",
+                text: $templateName
+            )
+            .textFieldStyle(.roundedBorder)
 
             Picker(
                 "Equipment",
@@ -47,26 +61,36 @@ struct CreateWorkoutTemplateView: View {
             .pickerStyle(.menu)
 
             List(filteredExercises) { exercise in
-                let isSelected = selectedExerciseIDs.contains(exercise.id)
+                let isSelected = selectedExerciseIDs.contains(
+                    exercise.id
+                )
 
                 Button {
                     toggle(exercise)
                 } label: {
                     HStack {
-                        ExerciseRowView(exercise: exercise)
+                        ExerciseRowView(
+                            exercise: exercise
+                        )
 
                         Spacer()
 
                         if isSelected {
-                            Image(systemName: "checkmark.circle.fill")
-                                .accessibilityHidden(true)
+                            Image(
+                                systemName: "checkmark.circle.fill"
+                            )
+                            .accessibilityHidden(true)
                         }
                     }
                     .padding(.vertical, 6)
                 }
                 .buttonStyle(.plain)
-                .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-                .accessibilityValue(isSelected ? "Selected" : "")
+                .accessibilityAddTraits(
+                    isSelected ? [.isSelected] : []
+                )
+                .accessibilityValue(
+                    isSelected ? "Selected" : ""
+                )
             }
 
             Button("Save Template") {
@@ -78,10 +102,6 @@ struct CreateWorkoutTemplateView: View {
         .dismissKeyboardOnTap()
         .navigationTitle("Create Template")
     }
-    
-    private var canSave: Bool {
-        InputValidation.isValidName(templateName) && !selectedExerciseIDs.isEmpty
-    }
 
     private func toggle(_ exercise: Exercise) {
         if selectedExerciseIDs.contains(exercise.id) {
@@ -92,15 +112,12 @@ struct CreateWorkoutTemplateView: View {
     }
 
     private func saveTemplate() {
-        guard let validName = InputValidation.validateName(templateName) else {
+        guard canSave else {
             return
-        }
-        let selectedExercises = exercises.filter {
-            selectedExerciseIDs.contains($0.id)
         }
 
         let template = WorkoutTemplate(
-            name: validName,
+            name: templateName.normalizedName,
             exercises: selectedExercises
         )
 
