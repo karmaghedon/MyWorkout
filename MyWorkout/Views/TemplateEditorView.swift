@@ -59,6 +59,7 @@ struct TemplateEditorView: View {
                     Text("Tap Edit to reorder or remove exercises.")
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
 
             Button {
                 duplicateTemplate()
@@ -76,7 +77,6 @@ struct TemplateEditorView: View {
             .padding(.vertical, AppTheme.Spacing.sm)
             .background(AppTheme.groupedBackground)
         }
-        .dismissKeyboardOnTap()
         .navigationTitle("Edit Template")
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
