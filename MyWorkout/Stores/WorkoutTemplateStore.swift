@@ -6,6 +6,8 @@ final class WorkoutTemplateStore: ObservableObject {
 
     @Published private(set) var persistenceError: StoreError?
 
+    private static let currentSchemaVersion = 1
+
     private let legacyDefaultsKey = "workout_templates"
     private let builtInRegistry: ExerciseRegistry
 
@@ -14,6 +16,9 @@ final class WorkoutTemplateStore: ObservableObject {
         label: "com.myworkout.workouttemplatestore.save",
         qos: .utility
     )
+
+    /// Prevents an unreadable template file from being overwritten.
+    private var isPersistenceWritable = true
 
     init(
         builtInRegistry: ExerciseRegistry = ExerciseRegistry(
@@ -33,6 +38,8 @@ final class WorkoutTemplateStore: ObservableObject {
             save()
         }
     }
+
+    // MARK: - Template Actions
 
     func add(_ template: WorkoutTemplate) {
         templates.append(refreshed(template))
@@ -62,12 +69,17 @@ final class WorkoutTemplateStore: ObservableObject {
             exercises: template.exercises
         )
 
-        templates.append(copy)
+        templates.append(refreshed(copy))
         save()
     }
 
-    func replaceAll(with newTemplates: [WorkoutTemplate]) {
-        templates = newTemplates.map { refreshed($0) }
+    func replaceAll(
+        with newTemplates: [WorkoutTemplate]
+    ) {
+        templates = newTemplates.map {
+            refreshed($0)
+        }
+
         save()
     }
 
@@ -75,24 +87,6 @@ final class WorkoutTemplateStore: ObservableObject {
 
     func clearPersistenceError() {
         persistenceError = nil
-    }
-    
-    private func duplicateName(for originalName: String) -> String {
-        let baseName = "\(originalName) Copy"
-
-        guard templates.contains(where: { $0.name == baseName }) else {
-            return baseName
-        }
-
-        var copyNumber = 2
-
-        while templates.contains(
-            where: { $0.name == "\(baseName) \(copyNumber)" }
-        ) {
-            copyNumber += 1
-        }
-
-        return "\(baseName) \(copyNumber)"
     }
 
     private func setPersistenceError(
@@ -115,6 +109,32 @@ final class WorkoutTemplateStore: ObservableObject {
         persistenceError = nil
     }
 
+    // MARK: - Duplicate Naming
+
+    private func duplicateName(
+        for originalName: String
+    ) -> String {
+        let baseName = "\(originalName) Copy"
+
+        guard templates.contains(
+            where: { $0.name == baseName }
+        ) else {
+            return baseName
+        }
+
+        var copyNumber = 2
+
+        while templates.contains(
+            where: {
+                $0.name == "\(baseName) \(copyNumber)"
+            }
+        ) {
+            copyNumber += 1
+        }
+
+        return "\(baseName) \(copyNumber)"
+    }
+
     // MARK: - Persistence
 
     private static func resolveFileURL() -> URL {
@@ -130,7 +150,9 @@ final class WorkoutTemplateStore: ObservableObject {
             isDirectory: true
         )
 
-        if !fileManager.fileExists(atPath: directory.path) {
+        if !fileManager.fileExists(
+            atPath: directory.path
+        ) {
             try? fileManager.createDirectory(
                 at: directory,
                 withIntermediateDirectories: true
@@ -142,14 +164,33 @@ final class WorkoutTemplateStore: ObservableObject {
         )
     }
 
-    private func save() {
-        let templatesToSave = templates
+    private func save(
+        onSuccess: (() -> Void)? = nil
+    ) {
+        guard isPersistenceWritable else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Your workout templates could not be read, "
+                    + "so the existing file was not overwritten. "
+                    + "Restart the app or restore a valid backup "
+                    + "before saving more templates."
+            )
+
+            return
+        }
+
+        let envelope = PersistedEnvelope(
+            schemaVersion: Self.currentSchemaVersion,
+            payload: templates
+        )
+
         let destination = fileURL
 
         saveQueue.async { [weak self] in
             do {
                 let data = try JSONEncoder().encode(
-                    templatesToSave
+                    envelope
                 )
 
                 try data.write(
@@ -161,6 +202,8 @@ final class WorkoutTemplateStore: ObservableObject {
                     self?.clearPersistenceError(
                         for: .saving
                     )
+
+                    onSuccess?()
                 }
             } catch {
                 print(
@@ -185,31 +228,9 @@ final class WorkoutTemplateStore: ObservableObject {
         let legacyData = UserDefaults.standard.data(
             forKey: legacyDefaultsKey
         ) {
-            do {
-                let decoded = try JSONDecoder().decode(
-                    [WorkoutTemplate].self,
-                    from: legacyData
-                )
-
-                templates = decoded.map { refreshed($0) }
-
-                UserDefaults.standard.removeObject(
-                    forKey: legacyDefaultsKey
-                )
-
-                clearPersistenceError(for: .loading)
-                save()
-            } catch {
-                print(
-                    "Failed to migrate legacy workout templates: \(error)"
-                )
-
-                setPersistenceError(
-                    operation: .loading,
-                    message:
-                        "Couldn't load workout templates."
-                )
-            }
+            migrateLegacyDefaults(
+                from: legacyData
+            )
 
             return
         }
@@ -217,25 +238,37 @@ final class WorkoutTemplateStore: ObservableObject {
         guard FileManager.default.fileExists(
             atPath: fileURL.path
         ) else {
+            isPersistenceWritable = true
             clearPersistenceError(for: .loading)
             return
         }
 
         do {
-            let data = try Data(contentsOf: fileURL)
+            let data = try Data(
+                contentsOf: fileURL
+            )
 
-            let decoded = try JSONDecoder().decode(
-                [WorkoutTemplate].self,
+            let decodedTemplates = try decodeTemplates(
                 from: data
             )
 
-            templates = decoded.map { refreshed($0) }
+            templates = decodedTemplates.map {
+                refreshed($0)
+            }
 
+            isPersistenceWritable = true
             clearPersistenceError(for: .loading)
 
-            // Save refreshed exercise definitions back to disk.
+            /*
+             Re-save after loading because:
+             1. Legacy unwrapped files need migration.
+             2. Stored exercise definitions may have been refreshed
+                from the built-in exercise registry.
+             */
             save()
         } catch {
+            isPersistenceWritable = false
+
             print(
                 "Failed to load workout templates: \(error)"
             )
@@ -243,9 +276,82 @@ final class WorkoutTemplateStore: ObservableObject {
             setPersistenceError(
                 operation: .loading,
                 message:
-                    "Couldn't load workout templates."
+                    "Couldn't load your workout templates. "
+                    + "The existing template file was preserved "
+                    + "and will not be overwritten."
             )
         }
+    }
+
+    private func migrateLegacyDefaults(
+        from data: Data
+    ) {
+        do {
+            let decodedTemplates = try JSONDecoder().decode(
+                [WorkoutTemplate].self,
+                from: data
+            )
+
+            templates = decodedTemplates.map {
+                refreshed($0)
+            }
+
+            isPersistenceWritable = true
+            clearPersistenceError(for: .loading)
+
+            /*
+             Remove the legacy value only after the new file
+             has been written successfully.
+             */
+            save {
+                UserDefaults.standard.removeObject(
+                    forKey: self.legacyDefaultsKey
+                )
+            }
+        } catch {
+            isPersistenceWritable = false
+
+            print(
+                "Failed to migrate legacy workout templates: \(error)"
+            )
+
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't migrate your saved workout templates. "
+                    + "The original data was preserved."
+            )
+        }
+    }
+
+    private func decodeTemplates(
+        from data: Data
+    ) throws -> [WorkoutTemplate] {
+        let decoder = JSONDecoder()
+
+        if let envelope = try? decoder.decode(
+            PersistedEnvelope<[WorkoutTemplate]>.self,
+            from: data
+        ) {
+            guard envelope.schemaVersion
+                    == Self.currentSchemaVersion else {
+                throw WorkoutTemplatePersistenceError
+                    .unsupportedSchemaVersion(
+                        envelope.schemaVersion
+                    )
+            }
+
+            return envelope.payload
+        }
+
+        /*
+         Backward compatibility for workout_templates.json
+         files saved before PersistedEnvelope was introduced.
+         */
+        return try decoder.decode(
+            [WorkoutTemplate].self,
+            from: data
+        )
     }
 
     // MARK: - Exercise Refresh
@@ -265,5 +371,21 @@ final class WorkoutTemplateStore: ObservableObject {
                 ) ?? savedExercise
             }
         )
+    }
+}
+
+// MARK: - WorkoutTemplatePersistenceError
+
+private enum WorkoutTemplatePersistenceError:
+    LocalizedError {
+    case unsupportedSchemaVersion(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case let .unsupportedSchemaVersion(version):
+            return
+                "Unsupported workout template schema "
+                + "version: \(version)."
+        }
     }
 }

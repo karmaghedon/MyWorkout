@@ -93,10 +93,12 @@ struct CreateWorkoutTemplateView: View {
                 )
             }
 
-            Button("Save Template") {
-                saveTemplate()
-            }
-            .disabled(!canSave)
+            PrimaryFormActionButton(
+                title: "Save Template",
+                systemImage: "checkmark",
+                isEnabled: canSave,
+                action: saveTemplate
+            )
         }
         .padding()
         .dismissKeyboardOnTap()

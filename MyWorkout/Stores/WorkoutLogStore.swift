@@ -6,6 +6,9 @@ final class WorkoutLogStore: ObservableObject {
 
     @Published private(set) var persistenceError: StoreError?
 
+    private static let currentSchemaVersion = 1
+    private var isPersistenceWritable = true
+    
     private let legacyDefaultsKey = "workout_logs"
 
     private let fileURL: URL
@@ -158,13 +161,30 @@ final class WorkoutLogStore: ObservableObject {
         )
     }
 
-    private func save() {
-        let logsToSave = logs
+    private func save(
+        onSuccess: (() -> Void)? = nil
+    ) {
+        guard isPersistenceWritable else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Your workout history could not be read, so it "
+                    + "was not overwritten. Restart the app or restore "
+                    + "a valid backup before saving more workouts."
+            )
+            return
+        }
+
+        let envelope = PersistedEnvelope(
+            schemaVersion: Self.currentSchemaVersion,
+            payload: logs
+        )
+
         let destination = fileURL
 
         saveQueue.async { [weak self] in
             do {
-                let data = try JSONEncoder().encode(logsToSave)
+                let data = try JSONEncoder().encode(envelope)
 
                 try data.write(
                     to: destination,
@@ -175,6 +195,8 @@ final class WorkoutLogStore: ObservableObject {
                     self?.clearPersistenceError(
                         for: .saving
                     )
+
+                    onSuccess?()
                 }
             } catch {
                 print(
@@ -200,30 +222,9 @@ final class WorkoutLogStore: ObservableObject {
         let legacyData = UserDefaults.standard.data(
             forKey: legacyDefaultsKey
         ) {
-            do {
-                logs = try JSONDecoder().decode(
-                    [WorkoutLog].self,
-                    from: legacyData
-                )
-
-                UserDefaults.standard.removeObject(
-                    forKey: legacyDefaultsKey
-                )
-
-                clearPersistenceError(for: .loading)
-                save()
-            } catch {
-                print(
-                    "Failed to migrate legacy workout logs: \(error)"
-                )
-
-                setPersistenceError(
-                    operation: .loading,
-                    message:
-                        "Couldn't load your saved workouts. "
-                        + "Recent data may be unavailable."
-                )
-            }
+            migrateLegacyDefaults(
+                from: legacyData
+            )
 
             return
         }
@@ -231,20 +232,30 @@ final class WorkoutLogStore: ObservableObject {
         guard FileManager.default.fileExists(
             atPath: fileURL.path
         ) else {
+            isPersistenceWritable = true
             clearPersistenceError(for: .loading)
             return
         }
 
         do {
-            let data = try Data(contentsOf: fileURL)
+            let data = try Data(
+                contentsOf: fileURL
+            )
 
-            logs = try JSONDecoder().decode(
-                [WorkoutLog].self,
+            let decodedLogs = try decodeLogs(
                 from: data
             )
 
+            logs = decodedLogs
+            isPersistenceWritable = true
             clearPersistenceError(for: .loading)
+
+            if isLegacyUnwrappedPayload(data) {
+                save()
+            }
         } catch {
+            isPersistenceWritable = false
+
             print(
                 "Failed to load workout logs: \(error)"
             )
@@ -253,8 +264,95 @@ final class WorkoutLogStore: ObservableObject {
                 operation: .loading,
                 message:
                     "Couldn't load your saved workouts. "
-                    + "Recent data may be unavailable."
+                    + "The existing history file was preserved "
+                    + "and will not be overwritten."
             )
+        }
+    }
+    
+    private func migrateLegacyDefaults(
+        from data: Data
+    ) {
+        do {
+            let legacyLogs = try JSONDecoder().decode(
+                [WorkoutLog].self,
+                from: data
+            )
+
+            logs = legacyLogs
+            isPersistenceWritable = true
+            clearPersistenceError(for: .loading)
+
+            save {
+                UserDefaults.standard.removeObject(
+                    forKey: self.legacyDefaultsKey
+                )
+            }
+        } catch {
+            isPersistenceWritable = false
+
+            print(
+                "Failed to migrate legacy workout logs: \(error)"
+            )
+
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't migrate your saved workouts. "
+                    + "The original data was preserved."
+            )
+        }
+    }
+
+    private func decodeLogs(
+        from data: Data
+    ) throws -> [WorkoutLog] {
+        let decoder = JSONDecoder()
+
+        if let envelope = try? decoder.decode(
+            PersistedEnvelope<[WorkoutLog]>.self,
+            from: data
+        ) {
+            guard envelope.schemaVersion
+                    == Self.currentSchemaVersion else {
+                throw WorkoutLogPersistenceError
+                    .unsupportedSchemaVersion(
+                        envelope.schemaVersion
+                    )
+            }
+
+            return envelope.payload
+        }
+
+        // Backward compatibility for workout_logs.json files
+        // written before PersistedEnvelope was introduced.
+        return try decoder.decode(
+            [WorkoutLog].self,
+            from: data
+        )
+    }
+
+    private func isLegacyUnwrappedPayload(
+        _ data: Data
+    ) -> Bool {
+        guard let object = try? JSONSerialization.jsonObject(
+            with: data
+        ) else {
+            return false
+        }
+
+        return object is [Any]
+    }
+    
+    private enum WorkoutLogPersistenceError: LocalizedError {
+        case unsupportedSchemaVersion(Int)
+
+        var errorDescription: String? {
+            switch self {
+            case let .unsupportedSchemaVersion(version):
+                return
+                    "Unsupported workout log schema version: \(version)."
+            }
         }
     }
 }

@@ -6,41 +6,56 @@ final class UserSettingsStore: ObservableObject {
 
     @Published private(set) var persistenceError: StoreError?
 
+    private static let currentSchemaVersion = 1
+
     private let key = "user_settings"
 
+    /// Prevents unreadable settings from being overwritten.
+    private var isPersistenceWritable = true
+
     init() {
-        if let data = UserDefaults.standard.data(forKey: key) {
-            do {
-                var loadedSettings = try JSONDecoder().decode(
-                    UserSettings.self,
-                    from: data
-                )
-
-                loadedSettings = Self.validateSettings(
-                    loadedSettings
-                )
-
-                settings = loadedSettings
-                clearPersistenceError(for: .loading)
-            } catch {
-                print(
-                    "Failed to load settings: \(error)"
-                )
-
-                settings = .defaults
-
-                setPersistenceError(
-                    operation: .loading,
-                    message:
-                        "Couldn't load settings. "
-                        + "Defaults were restored."
-                )
-
-                save()
-            }
-        } else {
+        guard let data = UserDefaults.standard.data(
+            forKey: key
+        ) else {
             settings = .defaults
             save()
+            return
+        }
+
+        do {
+            let decodedResult = try Self.decodeSettings(
+                from: data
+            )
+
+            settings = Self.validateSettings(
+                decodedResult.settings
+            )
+
+            isPersistenceWritable = true
+            clearPersistenceError(for: .loading)
+
+            if decodedResult.requiresMigration {
+                save()
+            }
+        } catch {
+            print(
+                "Failed to load settings: \(error)"
+            )
+
+            /*
+             Keep the original UserDefaults value untouched.
+             Do not replace it automatically with defaults.
+             */
+            settings = .defaults
+            isPersistenceWritable = false
+
+            setPersistenceError(
+                operation: .loading,
+                message:
+                    "Couldn't load your saved settings. "
+                    + "Defaults are being used temporarily, "
+                    + "and the existing data was preserved."
+            )
         }
     }
 
@@ -72,7 +87,6 @@ final class UserSettingsStore: ObservableObject {
 
     // MARK: - Validation
 
-    /// Validates and clamps all settings values to acceptable ranges.
     private static func validateSettings(
         _ settings: UserSettings
     ) -> UserSettings {
@@ -108,14 +122,36 @@ final class UserSettingsStore: ObservableObject {
     // MARK: - Persistence
 
     func save() {
+        guard isPersistenceWritable else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Settings could not be saved because "
+                    + "the existing saved data could not be read."
+            )
+            return
+        }
+
         do {
-            let data = try JSONEncoder().encode(settings)
+            let validatedSettings = Self.validateSettings(
+                settings
+            )
+
+            let envelope = PersistedEnvelope(
+                schemaVersion: Self.currentSchemaVersion,
+                payload: validatedSettings
+            )
+
+            let data = try JSONEncoder().encode(
+                envelope
+            )
 
             UserDefaults.standard.set(
                 data,
                 forKey: key
             )
 
+            settings = validatedSettings
             clearPersistenceError(for: .saving)
         } catch {
             print(
@@ -133,7 +169,84 @@ final class UserSettingsStore: ObservableObject {
     func replace(
         with newSettings: UserSettings
     ) {
-        settings = newSettings
+        guard isPersistenceWritable else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Settings could not be replaced because "
+                    + "the existing saved data could not be read."
+            )
+            return
+        }
+
+        settings = Self.validateSettings(
+            newSettings
+        )
+
         save()
+    }
+
+    // MARK: - Decoding
+
+    private static func decodeSettings(
+        from data: Data
+    ) throws -> DecodedSettings {
+        let decoder = JSONDecoder()
+
+        if let envelope = try? decoder.decode(
+            PersistedEnvelope<UserSettings>.self,
+            from: data
+        ) {
+            guard envelope.schemaVersion
+                    == currentSchemaVersion else {
+                throw UserSettingsPersistenceError
+                    .unsupportedSchemaVersion(
+                        envelope.schemaVersion
+                    )
+            }
+
+            return DecodedSettings(
+                settings: envelope.payload,
+                requiresMigration: false
+            )
+        }
+
+        /*
+         Backward compatibility for the original unwrapped
+         UserSettings value stored in UserDefaults.
+         */
+        let legacySettings = try decoder.decode(
+            UserSettings.self,
+            from: data
+        )
+
+        return DecodedSettings(
+            settings: legacySettings,
+            requiresMigration: true
+        )
+    }
+}
+
+// MARK: - DecodedSettings
+
+private struct DecodedSettings {
+    let settings: UserSettings
+    let requiresMigration: Bool
+}
+
+// MARK: - UserSettingsPersistenceError
+
+private enum UserSettingsPersistenceError:
+    LocalizedError {
+
+    case unsupportedSchemaVersion(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case let .unsupportedSchemaVersion(version):
+            return
+                "Unsupported user-settings schema version: "
+                + "\(version)."
+        }
     }
 }

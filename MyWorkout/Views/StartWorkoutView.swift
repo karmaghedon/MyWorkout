@@ -6,7 +6,7 @@ struct StartWorkoutView: View {
     @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
 
     @State private var showWorkoutSession = false
-    @State private var templatePendingStart: WorkoutTemplate?
+    @State private var workoutPendingStart: Workout?
     @State private var showActiveWorkoutWarning = false
     @State private var showCancelActiveWorkoutConfirmation = false
 
@@ -62,20 +62,28 @@ struct StartWorkoutView: View {
             titleVisibility: .visible
         ) {
             Button("Resume Active Workout") {
-                templatePendingStart = nil
+                workoutPendingStart = nil
                 showWorkoutSession = true
             }
 
-            Button("Cancel Active Workout and Start New", role: .destructive) {
-                guard let template = templatePendingStart else { return }
+            Button(
+                "Cancel Active Workout and Start New",
+                role: .destructive
+            ) {
+                guard let workout = workoutPendingStart else {
+                    return
+                }
 
-                activeWorkoutStore.cancel()
-                startWorkout(from: template)
-                templatePendingStart = nil
+                activeWorkoutStore.replaceActiveWorkout(
+                    with: workout
+                )
+
+                workoutPendingStart = nil
+                showWorkoutSession = true
             }
 
-            Button("Do Nothing", role: .cancel) {
-                templatePendingStart = nil
+            Button("Keep Current Workout", role: .cancel) {
+                workoutPendingStart = nil
             }
         } message: {
             Text("You already have a workout running. Starting a new one will discard the active session.")
@@ -95,23 +103,22 @@ struct StartWorkoutView: View {
         }
     }
 
-    private func handleTemplateTap(_ template: WorkoutTemplate) {
-        if activeWorkoutStore.hasActiveWorkout {
-            templatePendingStart = template
-            showActiveWorkoutWarning = true
-        } else {
-            startWorkout(from: template)
-        }
-    }
-
-    private func startWorkout(from template: WorkoutTemplate) {
+    private func handleTemplateTap(
+        _ template: WorkoutTemplate
+    ) {
         let workout = Workout(
             name: template.name,
             exercises: template.exercises
         )
 
-        activeWorkoutStore.start(workout)
-        showWorkoutSession = true
+        switch activeWorkoutStore.start(workout) {
+        case .started:
+            showWorkoutSession = true
+
+        case .activeWorkoutAlreadyExists:
+            workoutPendingStart = workout
+            showActiveWorkoutWarning = true
+        }
     }
 
     private func row(for template: WorkoutTemplate) -> some View {

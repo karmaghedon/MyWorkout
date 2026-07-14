@@ -76,16 +76,17 @@ final class ActiveWorkoutStore: ObservableObject {
 
     // MARK: - Workout Lifecycle
 
-    func start(_ workout: Workout) {
-        persistWorkItem?.cancel()
+    @discardableResult
+    func start(
+        _ workout: Workout
+    ) -> WorkoutStartResult {
+        guard !hasActiveWorkout else {
+            return .activeWorkoutAlreadyExists
+        }
 
-        activeWorkout = workout
-        exerciseStates = [:]
-        startedAt = Date()
-        elapsedSeconds = 0
+        beginWorkout(workout)
 
-        startTimerIfNeeded()
-        persistActiveWorkout()
+        return .started
     }
 
     func resumeTimer() {
@@ -241,6 +242,13 @@ final class ActiveWorkoutStore: ObservableObject {
             stopRestTimer(clearPersistedState: true)
         }
     }
+    
+    func replaceActiveWorkout(
+        with workout: Workout
+    ) {
+        cancel()
+        beginWorkout(workout)
+    }
 
     private func startRestTimerIfNeeded() {
         guard restTimer == nil else {
@@ -258,6 +266,20 @@ final class ActiveWorkoutStore: ObservableObject {
         ) { [weak self] _ in
             self?.updateRestSecondsRemaining()
         }
+    }
+    
+    private func beginWorkout(
+        _ workout: Workout
+    ) {
+        persistWorkItem?.cancel()
+
+        activeWorkout = workout
+        exerciseStates = [:]
+        startedAt = Date()
+        elapsedSeconds = 0
+
+        startTimerIfNeeded()
+        persistActiveWorkout()
     }
 
     private func updateRestSecondsRemaining() {

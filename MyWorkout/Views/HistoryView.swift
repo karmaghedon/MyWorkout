@@ -76,7 +76,11 @@ struct HistoryView: View {
         .navigationTitle("History")
         .overlay {
             if logStore.logs.isEmpty {
-                emptyState
+                AppEmptyStateView(
+                    title: "No Workouts Yet",
+                    message: "Finish a workout and it'll show up here.",
+                    systemImage: "clock.arrow.circlepath"
+                )
             }
         }
         .onAppear {
@@ -102,23 +106,6 @@ struct HistoryView: View {
         groupedLogs = grouped
             .map { (date: $0.key, logs: $0.value) }
             .sorted { $0.date > $1.date }
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-
-            Text("No Workouts Yet")
-                .font(.headline)
-
-            Text("Finish a workout and it'll show up here.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .multilineTextAlignment(.center)
-        .padding()
     }
 
     private func setCount(for log: WorkoutLog) -> Int {
