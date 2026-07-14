@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PersonalRecordsSection: View {
-    let personalRecords: [(exercise: String, weight: Double, reps: Int)]
+    let personalRecords: [PersonalRecord]
     let settings: UserSettings
 
     var body: some View {
@@ -10,35 +10,80 @@ struct PersonalRecordsSection: View {
                 Text("No PRs yet")
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(personalRecords, id: \.exercise) { pr in
-                    HStack(spacing: AppTheme.Spacing.sm) {
+                ForEach(personalRecords) { record in
+                    HStack(
+                        spacing: AppTheme.Spacing.sm
+                    ) {
                         Image(systemName: "trophy.fill")
                             .foregroundStyle(.yellow)
                             .accessibilityHidden(true)
 
-                        Text(pr.exercise)
+                        Text(record.exerciseName)
 
                         Spacer()
 
-                        Text("\(formatWeight(settings.displayWeight(pr.weight))) \(settings.weightUnitLabel) × \(pr.reps)")
-                            .bold()
+                        Text(
+                            formattedRecord(record)
+                        )
+                        .bold()
                     }
-                    .accessibilityElement(children: .ignore)
+                    .accessibilityElement(
+                        children: .ignore
+                    )
                     .accessibilityLabel(
-                        "\(pr.exercise), personal record: \(formatWeight(settings.displayWeight(pr.weight))) \(settings.weightUnitLabel), \(pr.reps) reps"
+                        accessibilityDescription(
+                            for: record
+                        )
                     )
                 }
             }
         } header: {
-            Label("Personal Records", systemImage: "trophy.fill")
+            Label(
+                "Personal Records",
+                systemImage: "trophy.fill"
+            )
         }
+    }
+
+    private func formattedRecord(
+        _ record: PersonalRecord
+    ) -> String {
+        let displayedWeight = settings.displayWeight(
+            record.weightPounds
+        )
+
+        return
+            "\(formatWeight(displayedWeight)) "
+            + "\(settings.weightUnitLabel) "
+            + "× \(record.reps)"
+    }
+
+    private func accessibilityDescription(
+        for record: PersonalRecord
+    ) -> String {
+        let displayedWeight = settings.displayWeight(
+            record.weightPounds
+        )
+
+        return
+            "\(record.exerciseName), personal record: "
+            + "\(formatWeight(displayedWeight)) "
+            + "\(settings.weightUnitLabel), "
+            + "\(record.reps) reps"
     }
 }
 
 #Preview {
     List {
         PersonalRecordsSection(
-            personalRecords: [(exercise: "Bench Press", weight: 225, reps: 5)],
+            personalRecords: [
+                PersonalRecord(
+                    exerciseID: nil,
+                    exerciseName: "Bench Press",
+                    weightPounds: 225,
+                    reps: 5
+                )
+            ],
             settings: .defaults
         )
     }

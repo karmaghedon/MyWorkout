@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct VolumeByMuscleGroupSection: View {
-    let volumeByMuscleGroup: [(muscle: String, sets: Int)]
+    let volumeByMuscleGroup: [MuscleGroupVolume]
 
     var body: some View {
         Section {
@@ -9,27 +9,42 @@ struct VolumeByMuscleGroupSection: View {
                 Text("No volume data yet")
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(volumeByMuscleGroup, id: \.muscle) { item in
+                ForEach(volumeByMuscleGroup) { item in
                     HStack {
-                        Text(item.muscle)
+                        Text(item.muscleGroup.displayName)
+
                         Spacer()
-                        Text("\(item.sets) sets")
+
+                        Text("\(item.setCount) sets")
                             .bold()
                     }
-                    .accessibilityElement(children: .combine)
+                    .accessibilityElement(
+                        children: .combine
+                    )
                 }
             }
         } header: {
-            Label("Volume by Muscle Group", systemImage: "chart.pie.fill")
+            Label(
+                "Volume by Muscle Group",
+                systemImage: "chart.pie.fill"
+            )
         }
     }
 }
 
 #Preview {
     List {
-        VolumeByMuscleGroupSection(volumeByMuscleGroup: [
-            (muscle: "Chest", sets: 24),
-            (muscle: "Back", sets: 20)
-        ])
+        VolumeByMuscleGroupSection(
+            volumeByMuscleGroup: [
+                MuscleGroupVolume(
+                    muscleGroup: .chest,
+                    setCount: 24
+                ),
+                MuscleGroupVolume(
+                    muscleGroup: .back,
+                    setCount: 20
+                )
+            ]
+        )
     }
 }
