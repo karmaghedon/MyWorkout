@@ -5,6 +5,7 @@ struct ExportActionsSection: View {
     @EnvironmentObject var settingsStore: UserSettingsStore
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
+    @EnvironmentObject var customExerciseStore: CustomExerciseStore
 
     @State private var showJSONExporter = false
     @State private var backupDocument = BackupDocument(backup: nil)
@@ -38,19 +39,20 @@ struct ExportActionsSection: View {
             Button {
                 backupDocument = BackupDocument(
                     backup: AppBackup(
-                        version: 1,
+                        version: AppBackup.currentVersion,
                         exportedAt: Date(),
                         logs: logStore.logs,
                         templates: templateStore.templates,
                         equipment: equipmentStore.inventory,
-                        settings: settingsStore.settings
+                        settings: settingsStore.settings,
+                        customExercises: customExerciseStore.storedExercises
                     )
                 )
                 showJSONExporter = true
             } label: {
                 Label("Export Full Backup JSON", systemImage: "arrow.down.doc.fill")
             }
-            .accessibilityHint("Creates a JSON file containing all your workouts, templates, equipment, and settings.")
+            .accessibilityHint("Creates a JSON file containing all your workouts, templates, custom exercises, equipment, and settings.")
             .fileExporter(
                 isPresented: $showJSONExporter,
                 document: backupDocument,

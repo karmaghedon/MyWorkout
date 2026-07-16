@@ -26,6 +26,7 @@ struct BackupImportHandler {
     let templateStore: WorkoutTemplateStore
     let equipmentStore: EquipmentInventoryStore
     let settingsStore: UserSettingsStore
+    let customExerciseStore: CustomExerciseStore
 
     func importBackup(from url: URL) -> BackupImportResult {
         // Files handed back by .fileImporter may require security-scoped
@@ -54,6 +55,9 @@ struct BackupImportHandler {
             templateStore.replaceAll(with: backup.templates)
             equipmentStore.replace(with: backup.equipment)
             settingsStore.replace(with: backup.settings)
+            customExerciseStore.replaceAll(
+                with: backup.customExercises
+            )
 
             return .success
         } catch {

@@ -5,6 +5,7 @@ struct ImportActionsSection: View {
     @EnvironmentObject var settingsStore: UserSettingsStore
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
+    @EnvironmentObject var customExerciseStore: CustomExerciseStore
 
     @State private var showJSONImporter = false
 
@@ -21,7 +22,8 @@ struct ImportActionsSection: View {
             logStore: logStore,
             templateStore: templateStore,
             equipmentStore: equipmentStore,
-            settingsStore: settingsStore
+            settingsStore: settingsStore,
+            customExerciseStore: customExerciseStore
         )
     }
 
@@ -32,7 +34,7 @@ struct ImportActionsSection: View {
             } label: {
                 Label("Import Full Backup JSON", systemImage: "arrow.up.doc.fill")
             }
-            .accessibilityHint("Replaces all current workouts, templates, equipment, and settings. You'll be asked to confirm before anything changes.")
+            .accessibilityHint("Replaces all current workouts, templates, custom exercises, equipment, and settings. You'll be asked to confirm before anything changes.")
             .fileImporter(
                 isPresented: $showJSONImporter,
                 allowedContentTypes: [.json],
@@ -51,7 +53,7 @@ struct ImportActionsSection: View {
         } header: {
             Label("Import", systemImage: "square.and.arrow.down")
         } footer: {
-            Text("Importing replaces all current workouts, templates, equipment, and settings with the contents of the backup file. This can't be undone.")
+            Text("Importing replaces all current workouts, templates, custom exercises, equipment, and settings with the contents of the backup file. This can't be undone.")
         }
         .confirmationDialog(
             "Replace All Data?",
@@ -68,7 +70,7 @@ struct ImportActionsSection: View {
                 pendingImportURL = nil
             }
         } message: { _ in
-            Text("This will permanently replace all your current workouts, templates, equipment, and settings with the contents of this backup file.")
+            Text("This will permanently replace all your current workouts, templates, custom exercises, equipment, and settings with the contents of this backup file.")
         }
         .alert(
             "Import Backup",

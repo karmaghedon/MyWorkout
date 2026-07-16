@@ -52,24 +52,27 @@ final class AnalyticsCache: ObservableObject {
 
     func bind(
         to logStore: WorkoutLogStore,
-        templateStore: WorkoutTemplateStore
+        templateStore: WorkoutTemplateStore,
+        customExerciseStore: CustomExerciseStore
     ) {
         guard storeCancellable == nil else {
             return
         }
 
-        storeCancellable = Publishers.CombineLatest(
+        storeCancellable = Publishers.CombineLatest3(
             logStore.$logs,
-            templateStore.$templates
+            templateStore.$templates,
+            customExerciseStore.$storedExercises
         )
         .debounce(
             for: .milliseconds(300),
             scheduler: DispatchQueue.main
         )
-        .sink { [weak self] logs, templates in
+        .sink { [weak self] logs, templates, storedCustomExercises in
             self?.requestRecomputation(
                 logs: logs,
-                templates: templates
+                templates: templates,
+                customExercises: storedCustomExercises.map(\.exercise)
             )
         }
     }
@@ -78,7 +81,8 @@ final class AnalyticsCache: ObservableObject {
 
     private func requestRecomputation(
         logs: [WorkoutLog],
-        templates: [WorkoutTemplate]
+        templates: [WorkoutTemplate],
+        customExercises: [Exercise]
     ) {
         recomputationGeneration += 1
         let generation = recomputationGeneration
@@ -104,7 +108,8 @@ final class AnalyticsCache: ObservableObject {
 
             let registry = ExerciseRegistryFactory.make(
                 templates: templates,
-                logs: logs
+                logs: logs,
+                customExercises: customExercises
             )
 
             guard !Task.isCancelled else {

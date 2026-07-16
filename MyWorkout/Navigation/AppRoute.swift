@@ -9,6 +9,7 @@ enum AppRoute: Hashable {
     case strengthTrends
     case templates
     case equipmentInventory
+    case customExercises
     case settings
     case export
 
@@ -18,4 +19,6 @@ enum AppRoute: Hashable {
     case workoutLogDetail(UUID)
     case editTemplate(UUID)
     case activeWorkout
+    case createCustomExercise
+    case editCustomExercise(UUID)
 }

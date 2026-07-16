@@ -2,13 +2,23 @@ import SwiftUI
 
 struct CreateWorkoutTemplateView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
+    @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var templateName = ""
     @State private var selectedExerciseIDs: Set<UUID> = []
     @State private var selectedEquipment: ExerciseEquipment?
 
-    private let exercises = SeedData.exercises
+    private var exercises: [Exercise] {
+        ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource(),
+                CustomExerciseSource(
+                    exercises: customExerciseStore.activeExercises
+                )
+            ]
+        ).exercises
+    }
 
     private var equipmentOptions: [ExerciseEquipment] {
         Array(

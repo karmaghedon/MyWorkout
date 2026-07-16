@@ -26,3 +26,5 @@ extension EquipmentInventoryStore: ErrorReportingStore {}
 extension UserSettingsStore: ErrorReportingStore {}
 
 extension ActiveWorkoutStore: ErrorReportingStore {}
+
+extension CustomExerciseStore: ErrorReportingStore {}

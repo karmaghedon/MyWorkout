@@ -6,6 +6,7 @@ struct DashboardView: View {
     @EnvironmentObject private var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject private var settingsStore: UserSettingsStore
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
+    @EnvironmentObject private var customExerciseStore: CustomExerciseStore
 
     @State private var navigationPath: [AppRoute] = []
 
@@ -68,6 +69,12 @@ struct DashboardView: View {
                             title: "Equipment",
                             subtitle: "Inventory & plates",
                             route: .equipmentInventory
+                        )
+                        
+                        dashboardLink(
+                            title: "Custom Exercises",
+                            subtitle: "Create and manage your own exercises",
+                            route: .customExercises
                         )
                     }
 
@@ -163,13 +170,51 @@ struct DashboardView: View {
                     message: "This exercise is no longer available."
                 )
             }
+            
+        case .customExercises:
+            CustomExercisesView(
+                onCreateExercise: {
+                    navigationPath.append(
+                        .createCustomExercise
+                    )
+                },
+                onEditExercise: { exercise in
+                    navigationPath.append(
+                        .editCustomExercise(
+                            exercise.id
+                        )
+                    )
+                }
+            )
+
+        case .createCustomExercise:
+            CustomExerciseFormView(
+                mode: .create
+            )
+
+        case let .editCustomExercise(exerciseID):
+            if let exercise = customExerciseStore.exercise(
+                id: exerciseID
+            ) {
+                CustomExerciseFormView(
+                    mode: .edit(exercise)
+                )
+            } else {
+                missingDestinationView(
+                    title: "Exercise Not Found",
+                    message:
+                        "This custom exercise may have been archived "
+                        + "or removed."
+                )
+            }
         }
     }
 
     private var exerciseRegistry: ExerciseRegistry {
         ExerciseRegistryFactory.make(
             templates: templateStore.templates,
-            logs: logStore.logs
+            logs: logStore.logs,
+            customExercises: customExerciseStore.allExercises
         )
     }
 
@@ -234,7 +279,8 @@ struct DashboardView: View {
             templateStore,
             equipmentStore,
             settingsStore,
-            activeWorkoutStore
+            activeWorkoutStore,
+            customExerciseStore
         ]
     }
 

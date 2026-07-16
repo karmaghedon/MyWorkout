@@ -8,6 +8,7 @@ struct MyWorkoutApp: App {
     @StateObject private var equipmentStore = EquipmentInventoryStore()
     @StateObject private var settingsStore = UserSettingsStore()
     @StateObject private var activeWorkoutStore = ActiveWorkoutStore()
+    @StateObject private var customExerciseStore = CustomExerciseStore()
     @StateObject private var analyticsCache = AnalyticsCache()
     
     var body: some Scene {
@@ -19,10 +20,14 @@ struct MyWorkoutApp: App {
                 .environmentObject(settingsStore)
                 .environmentObject(activeWorkoutStore)
                 .environmentObject(analyticsCache)
-                .onAppear {analyticsCache.bind(
-                    to: logStore,
-                    templateStore: templateStore
-                )}
+                .environmentObject(customExerciseStore)
+                .onAppear {
+                    analyticsCache.bind(
+                        to: logStore,
+                        templateStore: templateStore,
+                        customExerciseStore: customExerciseStore
+                    )
+                }
         }
     }
 }

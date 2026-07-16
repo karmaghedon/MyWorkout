@@ -1,7 +1,19 @@
 import SwiftUI
 
 struct ExerciseLibraryView: View {
-    let exercises = SeedData.exercises
+    @EnvironmentObject private var customExerciseStore:
+        CustomExerciseStore
+
+    private var exercises: [Exercise] {
+        ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource(),
+                CustomExerciseSource(
+                    exercises: customExerciseStore.activeExercises
+                )
+            ]
+        ).exercises
+    }
 
     @State private var expandedGroups: Set<MuscleGroup> = []
 

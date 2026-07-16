@@ -29,14 +29,19 @@ struct ExerciseRegistry {
             }
         )
 
-        exercisesByNormalizedName = Dictionary(
-            uniqueKeysWithValues: mergedExercises.map {
-                (
-                    Self.normalizedName($0.name),
-                    $0
-                )
+        var exercisesByName: [String: Exercise] = [:]
+
+        for exercise in mergedExercises {
+            let key = Self.normalizedName(exercise.name)
+
+            // Preserve the first source's exercise when names collide.
+            // UUID lookup remains the primary identity path.
+            if exercisesByName[key] == nil {
+                exercisesByName[key] = exercise
             }
-        )
+        }
+
+        exercisesByNormalizedName = exercisesByName
 
         historicalReferencesByID = Dictionary(
             uniqueKeysWithValues: historicalReferences.map {
@@ -101,7 +106,11 @@ struct ExerciseRegistry {
         var result: [UUID: Exercise] = [:]
 
         for exercise in exercises {
-            result[exercise.id] = exercise
+            // Sources are ordered by precedence. Keep the first value so
+            // a later source cannot silently replace an existing identity.
+            if result[exercise.id] == nil {
+                result[exercise.id] = exercise
+            }
         }
 
         return Array(result.values)

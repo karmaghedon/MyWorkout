@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TemplateEditorView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
+    @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var editableTemplate: WorkoutTemplate
@@ -182,8 +183,19 @@ struct TemplateEditorView: View {
     }
 
     private var availableExercises: [Exercise] {
-        SeedData.exercises.filter { exercise in
-            !editableTemplate.exercises.contains(where: { $0.id == exercise.id })
+        let selectableExercises = ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource(),
+                CustomExerciseSource(
+                    exercises: customExerciseStore.activeExercises
+                )
+            ]
+        ).exercises
+
+        return selectableExercises.filter { exercise in
+            !editableTemplate.exercises.contains {
+                $0.id == exercise.id
+            }
         }
     }
 
