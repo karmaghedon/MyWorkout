@@ -5,6 +5,7 @@ struct CustomExerciseIdentitySection: View {
 
     let muscleGroups: [MuscleGroup]
     let equipmentOptions: [ExerciseEquipment]
+    let nameValidationMessage: String?
 
     var body: some View {
         Section {
@@ -12,7 +13,14 @@ struct CustomExerciseIdentitySection: View {
                 title: "Exercise name",
                 text: $draft.name
             )
-
+            if let nameValidationMessage {
+                Text(nameValidationMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .accessibilityLabel(
+                        "Exercise name error: \(nameValidationMessage)"
+                    )
+            }
             Picker(
                 "Muscle Group",
                 selection: $draft.muscleGroup
@@ -101,4 +109,6 @@ struct CustomExerciseIdentitySection: View {
             "Advanced"
         ]
     }
+    
+    
 }

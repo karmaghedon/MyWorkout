@@ -88,6 +88,12 @@
 		F54B80CE3008540A00615DA0 /* CustomExerciseFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80CD3008540A00615DA0 /* CustomExerciseFormView.swift */; };
 		F54B80D0300855E200615DA0 /* CustomExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80CF300855E200615DA0 /* CustomExercisesView.swift */; };
 		F54B80D230085A6C00615DA0 /* CustomExerciseSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80D130085A6C00615DA0 /* CustomExerciseSource.swift */; };
+		F54B80D430090FFD00615DA0 /* ExerciseReferenceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80D330090FFD00615DA0 /* ExerciseReferenceChecker.swift */; };
+		F54B80D730091DB500615DA0 /* ExerciseNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80D630091DB500615DA0 /* ExerciseNameValidator.swift */; };
+		F54B80D930091DF300615DA0 /* ExerciseNameValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80D830091DF300615DA0 /* ExerciseNameValidatorTests.swift */; };
+		F54B80DB300BC13400615DA0 /* CustomExerciseStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */; };
+		F54B80DE300BCA9300615DA0 /* CustomExerciseImportValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DD300BCA9300615DA0 /* CustomExerciseImportValidator.swift */; };
+		F54B80E0300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */; };
 		F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */; };
 		F5630A24300260A3000BB3AD /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A23300260A3000BB3AD /* RestTimerState.swift */; };
 		F5630A273002669F000BB3AD /* StoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A263002669F000BB3AD /* StoreError.swift */; };
@@ -258,6 +264,12 @@
 		F54B80CD3008540A00615DA0 /* CustomExerciseFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseFormView.swift; sourceTree = "<group>"; };
 		F54B80CF300855E200615DA0 /* CustomExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExercisesView.swift; sourceTree = "<group>"; };
 		F54B80D130085A6C00615DA0 /* CustomExerciseSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseSource.swift; sourceTree = "<group>"; };
+		F54B80D330090FFD00615DA0 /* ExerciseReferenceChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseReferenceChecker.swift; sourceTree = "<group>"; };
+		F54B80D630091DB500615DA0 /* ExerciseNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseNameValidator.swift; sourceTree = "<group>"; };
+		F54B80D830091DF300615DA0 /* ExerciseNameValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseNameValidatorTests.swift; sourceTree = "<group>"; };
+		F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseStoreTests.swift; sourceTree = "<group>"; };
+		F54B80DD300BCA9300615DA0 /* CustomExerciseImportValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseImportValidator.swift; sourceTree = "<group>"; };
+		F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseImportValidatorTests.swift; sourceTree = "<group>"; };
 		F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
 		F5630A23300260A3000BB3AD /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		F5630A263002669F000BB3AD /* StoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreError.swift; sourceTree = "<group>"; };
@@ -495,6 +507,7 @@
 		F54004E12FF169210079CC05 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				F54B80D530091D9700615DA0 /* Validation */,
 				F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */,
 				F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */,
 				F54004E42FF16A750079CC05 /* ProgressionEngine.swift */,
@@ -508,6 +521,7 @@
 				F5BF30642FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift */,
 				F54B80A43006D8C500615DA0 /* AnalyticsEngine.swift */,
 				F54B80AA3006DE3600615DA0 /* AnalyticsInputFactory.swift */,
+				F54B80D330090FFD00615DA0 /* ExerciseReferenceChecker.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -564,6 +578,16 @@
 				F54B80BD3008289A00615DA0 /* FileCustomExerciseRepository.swift */,
 			);
 			path = Repositories;
+			sourceTree = "<group>";
+		};
+		F54B80D530091D9700615DA0 /* Validation */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF30C430002EBC00AB5AD9 /* InputValidation.swift */,
+				F54B80DD300BCA9300615DA0 /* CustomExerciseImportValidator.swift */,
+				F54B80D630091DB500615DA0 /* ExerciseNameValidator.swift */,
+			);
+			path = Validation;
 			sourceTree = "<group>";
 		};
 		F5630A1F3001941B000BB3AD /* Persistence */ = {
@@ -736,7 +760,6 @@
 			isa = PBXGroup;
 			children = (
 				F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */,
-				F5BF30C430002EBC00AB5AD9 /* InputValidation.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -755,6 +778,9 @@
 				F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */,
 				F54B809B3006A7E900615DA0 /* PersistedEnvelopeTests.swift */,
 				F54B80A63006DCDB00615DA0 /* AnalyticsEngineTests.swift */,
+				F54B80D830091DF300615DA0 /* ExerciseNameValidatorTests.swift */,
+				F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */,
+				F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -959,10 +985,12 @@
 				F5BF30692FFAA4C500AB5AD9 /* WorkoutSessionActionsView.swift in Sources */,
 				F54B808A30044C4E00615DA0 /* HistoricalExerciseReference.swift in Sources */,
 				F5BF304C2FF9E70900AB5AD9 /* ExerciseWarningsView.swift in Sources */,
+				F54B80D430090FFD00615DA0 /* ExerciseReferenceChecker.swift in Sources */,
 				F54B80CE3008540A00615DA0 /* CustomExerciseFormView.swift in Sources */,
 				F5630A2A3002691F000BB3AD /* StoreErrorBanner.swift in Sources */,
 				F5BF30AD2FFED42000AB5AD9 /* RecoveryWarningsSection.swift in Sources */,
 				F5BF30462FF9E28700AB5AD9 /* FlowLayout.swift in Sources */,
+				F54B80DE300BCA9300615DA0 /* CustomExerciseImportValidator.swift in Sources */,
 				F54B8093300690A400615DA0 /* AppEmptyStateView.swift in Sources */,
 				F5BF30BF2FFEDD3600AB5AD9 /* CSVDocument.swift in Sources */,
 				F54005222FF6F7560079CC05 /* DashboardStatsView.swift in Sources */,
@@ -980,6 +1008,7 @@
 				F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift in Sources */,
+				F54B80D730091DB500615DA0 /* ExerciseNameValidator.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
 				F54B80C8300850C600615DA0 /* CustomExerciseEducationSections.swift in Sources */,
@@ -1036,7 +1065,10 @@
 				F54B809C3006A7E900615DA0 /* PersistedEnvelopeTests.swift in Sources */,
 				F5BF30A02FFED28600AB5AD9 /* RestTimerRuleTests.swift in Sources */,
 				F5BF309B2FFED27700AB5AD9 /* WeightConversionTests.swift in Sources */,
+				F54B80E0300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift in Sources */,
+				F54B80D930091DF300615DA0 /* ExerciseNameValidatorTests.swift in Sources */,
 				F5BF309F2FFED28600AB5AD9 /* WorkoutSessionEngineTests.swift in Sources */,
+				F54B80DB300BC13400615DA0 /* CustomExerciseStoreTests.swift in Sources */,
 				F5BF30992FFDFF3300AB5AD9 /* PlateCalculatorTests.swift in Sources */,
 				F5BF30C73000401400AB5AD9 /* InputValidationTests.swift in Sources */,
 				F5BF30CB3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift in Sources */,

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CustomExerciseFormView: View {
     @Environment(\.dismiss) private var dismiss
+
     @EnvironmentObject private var customExerciseStore:
         CustomExerciseStore
 
@@ -39,7 +40,9 @@ struct CustomExerciseFormView: View {
             CustomExerciseIdentitySection(
                 draft: $draft,
                 muscleGroups: muscleGroups,
-                equipmentOptions: equipmentOptions
+                equipmentOptions: equipmentOptions,
+                nameValidationMessage:
+                    nameValidationResult.message
             )
 
             CustomExerciseMusclesSection(
@@ -58,7 +61,7 @@ struct CustomExerciseFormView: View {
                 PrimaryFormActionButton(
                     title: actionTitle,
                     systemImage: actionSystemImage,
-                    isEnabled: draft.canSave,
+                    isEnabled: canSave,
                     action: save
                 )
             }
@@ -141,11 +144,46 @@ struct CustomExerciseFormView: View {
         }
     }
 
+    // MARK: - Validation
+
+    private var exercisesReservedForNaming: [Exercise] {
+        SeedData.exercises
+            + customExerciseStore.allExercises
+    }
+
+    private var editedExerciseID: UUID? {
+        switch mode {
+        case .create:
+            return nil
+
+        case let .edit(exercise):
+            return exercise.id
+        }
+    }
+
+    private var nameValidationResult:
+        ExerciseNameValidationResult {
+        ExerciseNameValidator.validate(
+            draft.name,
+            existingExercises:
+                exercisesReservedForNaming,
+            excluding: editedExerciseID
+        )
+    }
+
+    private var canSave: Bool {
+        draft.canSave
+            && nameValidationResult == .valid
+    }
+
     // MARK: - Save
 
     private func save() {
-        let exercise = draft.makeExercise()
+        guard canSave else {
+            return
+        }
 
+        let exercise = draft.makeExercise()
         let didSave: Bool
 
         switch mode {

@@ -7,19 +7,11 @@ enum BackupImportResult {
     case failure(String)
 }
 
-/// Decodes a backup JSON file and applies it to the app's stores.
+/// Decodes a backup JSON file, validates it, and applies it to the app's stores.
 ///
-/// Note on error handling: `replaceAll`/`replace` on the stores below are
-/// synchronous, non-throwing calls — they update in-memory state immediately
-/// and each store kicks off its own async save to disk afterward. That means
-/// there's no way to roll back "if the replace fails," because it can't fail.
-/// If the later on-disk save fails, that's surfaced separately through each
-/// store's own `lastSaveError`, not through this import flow. A previous
-/// version of this code wrapped the replace calls in a do/catch "rollback on
-/// partial failure" block that could never actually run, which was more
-/// misleading than helpful, so it's been removed. If synchronous,
-/// all-or-nothing import persistence is needed later, that would mean giving
-/// the stores a throwing, synchronous save path to call into here.
+/// Backup validation happens before any store is modified. Store replacement is
+/// still synchronous and non-throwing, so a later persistence failure is
+/// surfaced by the affected store rather than rolled back here.
 @MainActor
 struct BackupImportHandler {
     let logStore: WorkoutLogStore
@@ -29,10 +21,9 @@ struct BackupImportHandler {
     let customExerciseStore: CustomExerciseStore
 
     func importBackup(from url: URL) -> BackupImportResult {
-        // Files handed back by .fileImporter may require security-scoped
-        // access (e.g. files picked from iCloud Drive/Files); without this,
-        // reading can silently fail for files outside the app's sandbox.
-        let didStartAccessing = url.startAccessingSecurityScopedResource()
+        let didStartAccessing =
+            url.startAccessingSecurityScopedResource()
+
         defer {
             if didStartAccessing {
                 url.stopAccessingSecurityScopedResource()
@@ -45,23 +36,57 @@ struct BackupImportHandler {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
 
-            let backup = try decoder.decode(AppBackup.self, from: data)
+            let backup = try decoder.decode(
+                AppBackup.self,
+                from: data
+            )
 
             guard backup.version <= AppBackup.currentVersion else {
-                return .unsupportedVersion(backup.version)
+                return .unsupportedVersion(
+                    backup.version
+                )
             }
 
-            logStore.replaceAll(with: backup.logs)
-            templateStore.replaceAll(with: backup.templates)
-            equipmentStore.replace(with: backup.equipment)
-            settingsStore.replace(with: backup.settings)
-            customExerciseStore.replaceAll(
-                with: backup.customExercises
+            let customExerciseValidation =
+                CustomExerciseImportValidator.validate(
+                    backup.customExercises,
+                    reservedExercises: SeedData.exercises
+                )
+
+            guard customExerciseValidation == .valid else {
+                return .failure(
+                    customExerciseValidation.message
+                    ?? "The backup contains invalid custom exercises."
+                )
+            }
+
+            logStore.replaceAll(
+                with: backup.logs
             )
+            templateStore.replaceAll(
+                with: backup.templates
+            )
+            equipmentStore.replace(
+                with: backup.equipment
+            )
+            settingsStore.replace(
+                with: backup.settings
+            )
+
+            guard customExerciseStore.replaceAll(
+                with: backup.customExercises
+            ) else {
+                return .failure(
+                    customExerciseStore.persistenceError?.message
+                    ?? "Custom exercises could not be imported."
+                )
+            }
 
             return .success
         } catch {
-            return .failure(error.localizedDescription)
+            return .failure(
+                error.localizedDescription
+            )
         }
     }
 }

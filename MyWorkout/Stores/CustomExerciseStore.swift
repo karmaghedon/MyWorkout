@@ -9,15 +9,19 @@ final class CustomExerciseStore: ObservableObject {
     var persistenceError: StoreError?
 
     private let repository: any CustomExerciseRepository
+    private let reservedExercises: [Exercise]
 
     /// Prevents unreadable persisted data from being overwritten.
     private var isPersistenceWritable = true
 
     init(
         repository: any CustomExerciseRepository =
-            FileCustomExerciseRepository()
+            FileCustomExerciseRepository(),
+        reservedExercises: [Exercise] =
+            SeedData.exercises
     ) {
         self.repository = repository
+        self.reservedExercises = reservedExercises
         load()
     }
 
@@ -75,22 +79,16 @@ final class CustomExerciseStore: ObservableObject {
         }
     }
 
-    func containsActiveExercise(
+    func containsExercise(
         named name: String,
         excluding exerciseID: UUID? = nil
     ) -> Bool {
-        let normalizedName = normalized(name)
-
-        return storedExercises.contains { storedExercise in
-            guard !storedExercise.isArchived,
-                  storedExercise.id != exerciseID else {
-                return false
-            }
-
-            return normalized(
-                storedExercise.exercise.name
-            ) == normalizedName
-        }
+        ExerciseNameValidator.validate(
+            name,
+            existingExercises:
+                exercisesReservedForNaming,
+            excluding: exerciseID
+        ) == .duplicate
     }
 
     // MARK: - Create
@@ -115,14 +113,14 @@ final class CustomExerciseStore: ObservableObject {
             return false
         }
 
-        guard !containsActiveExercise(
+        guard !containsExercise(
             named: exercise.name
         ) else {
             setPersistenceError(
                 operation: .saving,
                 message:
-                    "An active custom exercise with this name "
-                    + "already exists."
+                    "A custom exercise with this name already "
+                    + "exists, including archived exercises."
             )
 
             return false
@@ -168,15 +166,15 @@ final class CustomExerciseStore: ObservableObject {
             return false
         }
 
-        guard !containsActiveExercise(
+        guard !containsExercise(
             named: exercise.name,
             excluding: exercise.id
         ) else {
             setPersistenceError(
                 operation: .saving,
                 message:
-                    "Another active custom exercise already "
-                    + "uses this name."
+                    "Another custom exercise already uses this "
+                    + "name, including archived exercises."
             )
 
             return false
@@ -192,6 +190,40 @@ final class CustomExerciseStore: ObservableObject {
         )
 
         sortStoredExercises()
+        save()
+
+        return true
+    }
+
+    // MARK: - Permanent Deletion
+
+    @discardableResult
+    func permanentlyDelete(
+        exerciseID: UUID
+    ) -> Bool {
+        guard isPersistenceWritable else {
+            reportBlockedSave()
+            return false
+        }
+
+        guard let index = storedExercises.firstIndex(
+            where: { $0.id == exerciseID }
+        ) else {
+            return false
+        }
+
+        guard storedExercises[index].isArchived else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    "Only archived custom exercises "
+                    + "can be permanently deleted."
+            )
+
+            return false
+        }
+
+        storedExercises.remove(at: index)
         save()
 
         return true
@@ -256,7 +288,7 @@ final class CustomExerciseStore: ObservableObject {
             return true
         }
 
-        guard !containsActiveExercise(
+        guard !containsExercise(
             named: existing.exercise.name,
             excluding: exerciseID
         ) else {
@@ -264,7 +296,7 @@ final class CustomExerciseStore: ObservableObject {
                 operation: .saving,
                 message:
                     "This exercise cannot be restored because "
-                    + "another active exercise uses the same name."
+                    + "another custom exercise uses the same name."
             )
 
             return false
@@ -285,17 +317,37 @@ final class CustomExerciseStore: ObservableObject {
 
     // MARK: - Backup Replacement
 
+    @discardableResult
     func replaceAll(
         with exercises: [StoredCustomExercise]
-    ) {
+    ) -> Bool {
         guard isPersistenceWritable else {
             reportBlockedSave()
-            return
+            return false
+        }
+
+        let validationResult =
+            CustomExerciseImportValidator.validate(
+                exercises,
+                reservedExercises: reservedExercises
+            )
+
+        guard validationResult == .valid else {
+            setPersistenceError(
+                operation: .saving,
+                message:
+                    validationResult.message
+                    ?? "The imported custom exercises are invalid."
+            )
+
+            return false
         }
 
         storedExercises = exercises
         sortStoredExercises()
         save()
+
+        return true
     }
 
     // MARK: - Persistence Errors
@@ -395,19 +447,7 @@ final class CustomExerciseStore: ObservableObject {
         }
     }
 
-    private func normalized(
-        _ value: String
-    ) -> String {
-        value
-            .trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
-            .folding(
-                options: [
-                    .caseInsensitive,
-                    .diacriticInsensitive
-                ],
-                locale: .current
-            )
+    private var exercisesReservedForNaming: [Exercise] {
+        reservedExercises + allExercises
     }
 }
