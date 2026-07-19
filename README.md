@@ -24,21 +24,24 @@ The project follows a clean, scalable architecture built around reusable SwiftUI
 
 ## Core Functionality
 
-- ✅ Workout session management with live timer
-- ✅ Exercise library with detailed exercise information
-- ✅ Workout template creation and editing
-- ✅ Intelligent progression engine
-- ✅ Automatic warm-up recommendations
-- ✅ Plate loading calculator
-- ✅ Workout history
-- ✅ Performance analytics
-- ✅ Personal records
-- ✅ Recovery analysis
-- ✅ Equipment inventory management
+- ✅ workout templates
+- ✅ active workout sessions
+- ✅ resumable workout persistence
+- ✅ set logging and workout history
+- ✅ previous-performance lookup
+- ✅ automatic warm-up generation
+- ✅ double-progression recommendations
+- ✅ rest timers
+- ✅ plate loading calculations
+- ✅ equipment inventory
+- ✅ custom exercises
+- ✅ exercise education content
+- ✅ personal records
+- ✅ training-volume analytics
+- ✅ recovery and fatigue warnings
 - ✅ CSV export
-- ✅ Metric (kg) and Imperial (lb) support
-- ✅ Active workout persistence
-- ✅ Rest timers with haptic feedback
+- ✅ JSON backup and restore
+- ✅ pound and kilogram display support
 
 ---
 
@@ -63,6 +66,7 @@ The project follows a clean, scalable architecture built around reusable SwiftUI
 - iOS 17.0+
 - Xcode 15+
 - Swift 5.9+
+- iPhone target
 
 ---
 
@@ -89,239 +93,46 @@ open MyWorkout.xcodeproj
 
 ---
 
-# Project Structure
+## Architecture at a glance
 
+```text
+SwiftUI Views
+      |
+Reusable Components
+      |
+Observable Stores
+      |
+Domain Models and Logic Engines
+      |
+Repositories and Persistence
 ```
-MyWorkout
-│
-├── Models/
-│   ├── Exercise
-│   ├── Workout
-│   ├── WorkoutLog
-│   └── ...
-│
-├── Stores/
-│   ├── WorkoutLogStore
-│   ├── ActiveWorkoutStore
-│   ├── WorkoutTemplateStore
-│   ├── EquipmentInventoryStore
-│   └── UserSettingsStore
-│
-├── Logic/
-│   ├── ProgressionEngine
-│   ├── WarmupEngine
-│   ├── PlateCalculator
-│   ├── RecoveryAnalyzer
-│   ├── ExercisePerformanceAnalyzer
-│   └── ...
-│
-├── Views/
-│   ├── Components/
-│   └── Screens
-│
-├── Theme/
-│
-├── Utilities/
-│
-├── Data/
-│
-└── Docs/
+
+The application root creates shared stores and injects them through SwiftUI environment objects.
+
+```text
+MyWorkoutApp
+ ├── WorkoutLogStore
+ ├── WorkoutTemplateStore
+ ├── EquipmentInventoryStore
+ ├── UserSettingsStore
+ ├── ActiveWorkoutStore
+ ├── CustomExerciseStore
+ └── AnalyticsCache
 ```
 
 ---
 
-# Architecture
+## Documentation
 
-MyWorkout follows a clean layered architecture.
+Start with:
 
-```
-Views
-   ↓
-Stores
-   ↓
-Models
-   ↓
-Logic
-```
+- `Docs/README.md`
+- `Docs/Architecture/Architecture.md`
+- `Docs/Architecture/Persistence.md`
+- `Docs/Architecture/TestingStrategy.md`
+- `Docs/Development/DevelopmentRoadmap.md`
+- `Docs/Development/ReleaseChecklist.md`
 
-## Views
-
-Pure presentation layer built from reusable SwiftUI components.
-
-Responsibilities:
-
-- UI composition
-- User interaction
-- Navigation
-
-No business logic.
-
----
-
-## Stores
-
-ObservableObjects responsible for:
-
-- State management
-- Persistence
-- Coordination between Views and Logic
-
-Current stores:
-
-- WorkoutLogStore
-- ActiveWorkoutStore
-- WorkoutTemplateStore
-- EquipmentInventoryStore
-- UserSettingsStore
-- AnalyticsCache
-
----
-
-## Models
-
-Codable data structures representing the application domain.
-
-Examples:
-
-- Exercise
-- Workout
-- WorkoutLog
-- ProgressionRule
-- ExerciseSessionState
-
----
-
-## Logic
-
-Pure functions with no UI dependencies.
-
-Current engines include:
-
-- ProgressionEngine
-- WarmupEngine
-- PlateCalculator
-- RecoveryAnalyzer
-- ExercisePerformanceAnalyzer
-
-These components are deterministic and designed for unit testing.
-
----
-
-# Current Features
-
-## Workout Tracking
-
-- Live workout timer
-- Active workout resume
-- Set logging
-- Rest timers
-- Previous performance
-- Warm-up recommendations
-
----
-
-## Exercise Library
-
-Each exercise includes:
-
-- Name
-- Equipment
-- Difficulty
-- Primary muscles
-- Secondary muscles
-- Instructions
-- Tips
-- Common mistakes
-- Safety warnings
-- Progression strategy
-
----
-
-## Progression
-
-Supports:
-
-- Double Progression
-- Slow Progression
-- Reps then Weight
-- Bodyweight Progression
-
-Automatic:
-
-- Weight increases
-- Deloads
-- Stall detection
-
----
-
-## Equipment Inventory
-
-Configure:
-
-- Barbell weight
-- Plate inventory
-- Dumbbells
-
-Used for:
-
-- Plate calculations
-- Workout starting weights
-
----
-
-## Analytics
-
-Current analytics include:
-
-- Volume tracking
-- Personal records
-- Recovery analysis
-- Performance trends
-- Muscle group volume
-
----
-
-# Weight System
-
-Internally, **all weights are stored in pounds**.
-
-The UI automatically converts between:
-
-- Pounds (lb)
-- Kilograms (kg)
-
-This ensures progression, calculations, and historical data remain consistent regardless of the selected display unit.
-
----
-
-# Data Storage
-
-Application data is stored using file-based persistence.
-
-Examples:
-
-```
-Application Support/
-├── workout_logs.json
-├── workout_templates.json
-├── equipment_inventory.json
-└── settings (UserDefaults)
-```
-
----
-
-# Testing
-
-The architecture is designed for unit testing.
-
-Primary test targets:
-
-- ProgressionEngine
-- WarmupEngine
-- PlateCalculator
-- RecoveryAnalyzer
-- Weight conversion
-- Store persistence
 
 ---
 
@@ -340,67 +151,22 @@ This project follows several core principles:
 
 ---
 
-# Planned Features
+## Project status
 
-- Exercise images
-- Exercise videos
-- Muscle diagrams
-- Favorites
-- Search improvements
-- Apple Health integration
-- CloudKit sync
-- Advanced progression recommendations
-- Recovery dashboard
-- Training readiness
-- Custom exercise creation
-- Backup & Restore
+Phases 1–17.6 are complete.
 
----
+The current work is:
 
-# Performance Goals
+```text
+Phase 18 — Documentation
+```
 
-Designed to comfortably scale to:
+Upcoming work:
 
-- 500+ exercises
-- 20,000+ workouts
-- Multiple years of user history
-
-Optimizations include:
-
-- Cached analytics
-- Cached exercise registry
-- Debounced recalculations
-- Async persistence
-- Incremental updates
-
----
-
-# Contributing
-
-This is currently a personal project.
-
-Suggestions and constructive feedback are always welcome.
-
----
-
-# Code Style
-
-- Swift API Design Guidelines
-- Native SwiftUI
-- Views under ~200 lines
-- Reusable components
-- Pure business logic
-- Centralized styling through `AppTheme`
-
----
-
-# Documentation
-
-Additional documentation:
-
-- `Docs/Architecture.md`
-- `Docs/DevelopmentRoadmap.md`
-
+```text
+Phase 19 — Architecture and folder cleanup
+Phase 20 — Stabilization and release readiness
+```
 ---
 
 # License

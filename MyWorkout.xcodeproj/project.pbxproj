@@ -117,6 +117,27 @@
 		F54B8117300CF6B700615DA0 /* EquipmentReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */; };
 		F54B8119300CF6C300615DA0 /* WorkoutTemplateReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */; };
 		F54B811B300CF6CA00615DA0 /* WorkoutLogReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */; };
+		F54B813A300D018D00615DA0 /* Architecture.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8122300D018D00615DA0 /* Architecture.md */; };
+		F54B813B300D018D00615DA0 /* BackupSystem.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8123300D018D00615DA0 /* BackupSystem.md */; };
+		F54B813C300D018D00615DA0 /* DataFlow.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8124300D018D00615DA0 /* DataFlow.md */; };
+		F54B813D300D018D00615DA0 /* FolderStructure.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8125300D018D00615DA0 /* FolderStructure.md */; };
+		F54B813E300D018D00615DA0 /* Persistence.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8126300D018D00615DA0 /* Persistence.md */; };
+		F54B813F300D018D00615DA0 /* TestingStrategy.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8127300D018D00615DA0 /* TestingStrategy.md */; };
+		F54B8140300D018D00615DA0 /* CodingStandards.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8129300D018D00615DA0 /* CodingStandards.md */; };
+		F54B8141300D018D00615DA0 /* DevelopmentRoadmap.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B812A300D018D00615DA0 /* DevelopmentRoadmap.md */; };
+		F54B8142300D018D00615DA0 /* DevelopmentWorkflow.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B812B300D018D00615DA0 /* DevelopmentWorkflow.md */; };
+		F54B8143300D018D00615DA0 /* ReleaseChecklist.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B812C300D018D00615DA0 /* ReleaseChecklist.md */; };
+		F54B8144300D018D00615DA0 /* Analytics.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B812E300D018D00615DA0 /* Analytics.md */; };
+		F54B8145300D018D00615DA0 /* CustomExercises.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B812F300D018D00615DA0 /* CustomExercises.md */; };
+		F54B8146300D018D00615DA0 /* EquipmentInventory.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8130300D018D00615DA0 /* EquipmentInventory.md */; };
+		F54B8147300D018D00615DA0 /* ExerciseLibrary.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8131300D018D00615DA0 /* ExerciseLibrary.md */; };
+		F54B8148300D018D00615DA0 /* Progression.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8132300D018D00615DA0 /* Progression.md */; };
+		F54B8149300D018D00615DA0 /* Recovery.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8133300D018D00615DA0 /* Recovery.md */; };
+		F54B814A300D018D00615DA0 /* Templates.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8134300D018D00615DA0 /* Templates.md */; };
+		F54B814B300D018D00615DA0 /* WorkoutSessions.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8135300D018D00615DA0 /* WorkoutSessions.md */; };
+		F54B814C300D018D00615DA0 /* GettingStarted.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8136300D018D00615DA0 /* GettingStarted.md */; };
+		F54B814D300D018D00615DA0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8138300D018D00615DA0 /* README.md */; };
+		F54B814E300D018D00615DA0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F54B8139300D018D00615DA0 /* README.md */; };
 		F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */; };
 		F5630A24300260A3000BB3AD /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A23300260A3000BB3AD /* RestTimerState.swift */; };
 		F5630A273002669F000BB3AD /* StoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A263002669F000BB3AD /* StoreError.swift */; };
@@ -316,6 +337,27 @@
 		F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquipmentReplacing.swift; sourceTree = "<group>"; };
 		F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateReplacing.swift; sourceTree = "<group>"; };
 		F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutLogReplacing.swift; sourceTree = "<group>"; };
+		F54B8122300D018D00615DA0 /* Architecture.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Architecture.md; sourceTree = "<group>"; };
+		F54B8123300D018D00615DA0 /* BackupSystem.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = BackupSystem.md; sourceTree = "<group>"; };
+		F54B8124300D018D00615DA0 /* DataFlow.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DataFlow.md; sourceTree = "<group>"; };
+		F54B8125300D018D00615DA0 /* FolderStructure.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = FolderStructure.md; sourceTree = "<group>"; };
+		F54B8126300D018D00615DA0 /* Persistence.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Persistence.md; sourceTree = "<group>"; };
+		F54B8127300D018D00615DA0 /* TestingStrategy.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = TestingStrategy.md; sourceTree = "<group>"; };
+		F54B8129300D018D00615DA0 /* CodingStandards.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CodingStandards.md; sourceTree = "<group>"; };
+		F54B812A300D018D00615DA0 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
+		F54B812B300D018D00615DA0 /* DevelopmentWorkflow.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentWorkflow.md; sourceTree = "<group>"; };
+		F54B812C300D018D00615DA0 /* ReleaseChecklist.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = ReleaseChecklist.md; sourceTree = "<group>"; };
+		F54B812E300D018D00615DA0 /* Analytics.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Analytics.md; sourceTree = "<group>"; };
+		F54B812F300D018D00615DA0 /* CustomExercises.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CustomExercises.md; sourceTree = "<group>"; };
+		F54B8130300D018D00615DA0 /* EquipmentInventory.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = EquipmentInventory.md; sourceTree = "<group>"; };
+		F54B8131300D018D00615DA0 /* ExerciseLibrary.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = ExerciseLibrary.md; sourceTree = "<group>"; };
+		F54B8132300D018D00615DA0 /* Progression.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Progression.md; sourceTree = "<group>"; };
+		F54B8133300D018D00615DA0 /* Recovery.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Recovery.md; sourceTree = "<group>"; };
+		F54B8134300D018D00615DA0 /* Templates.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Templates.md; sourceTree = "<group>"; };
+		F54B8135300D018D00615DA0 /* WorkoutSessions.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = WorkoutSessions.md; sourceTree = "<group>"; };
+		F54B8136300D018D00615DA0 /* GettingStarted.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = GettingStarted.md; sourceTree = "<group>"; };
+		F54B8138300D018D00615DA0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F54B8139300D018D00615DA0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
 		F5630A23300260A3000BB3AD /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		F5630A263002669F000BB3AD /* StoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreError.swift; sourceTree = "<group>"; };
@@ -340,8 +382,6 @@
 		F5BF30472FF9E6B800AB5AD9 /* ExerciseInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInstructionsView.swift; sourceTree = "<group>"; };
 		F5BF30492FF9E6E800AB5AD9 /* ExerciseTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTipsView.swift; sourceTree = "<group>"; };
 		F5BF304B2FF9E70900AB5AD9 /* ExerciseWarningsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseWarningsView.swift; sourceTree = "<group>"; };
-		F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
-		F5BF30522FF9F34600AB5AD9 /* Architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Architecture.md; sourceTree = "<group>"; };
 		F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigStepperControl.swift; sourceTree = "<group>"; };
 		F5BF30562FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSessionHeaderView.swift; sourceTree = "<group>"; };
 		F5BF30582FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousPerformanceView.swift; sourceTree = "<group>"; };
@@ -394,7 +434,6 @@
 		F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLogStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CC3000490100AB5AD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		F5BF30CD300124E700AB5AD9 /* ArchitectureDevelopmentWorkflow.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ArchitectureDevelopmentWorkflow.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -437,11 +476,11 @@
 		F54004AF2FF0C6FE0079CC05 /* MyWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				F54B8120300D018D00615DA0 /* Documentation */,
 				F54B8111300CF67000615DA0 /* Protocols */,
 				F54B80AE3006E1F100615DA0 /* Repositories */,
 				F54B80943006916600615DA0 /* Navigation */,
 				F5630A303003EA21000BB3AD /* Domain */,
-				F5BF304D2FF9F23400AB5AD9 /* Docs */,
 				F5630A1F3001941B000BB3AD /* Persistence */,
 				F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */,
 				F54004C12FF0C7F90079CC05 /* Models */,
@@ -652,6 +691,66 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
+		F54B8120300D018D00615DA0 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				F54B8121300D018D00615DA0 /* Architecture */,
+				F54B8128300D018D00615DA0 /* Development */,
+				F54B812D300D018D00615DA0 /* Features */,
+				F54B8136300D018D00615DA0 /* GettingStarted.md */,
+				F54B8137300D018D00615DA0 /* Images */,
+				F54B8139300D018D00615DA0 /* README.md */,
+			);
+			path = Documentation;
+			sourceTree = "<group>";
+		};
+		F54B8121300D018D00615DA0 /* Architecture */ = {
+			isa = PBXGroup;
+			children = (
+				F54B8122300D018D00615DA0 /* Architecture.md */,
+				F54B8123300D018D00615DA0 /* BackupSystem.md */,
+				F54B8124300D018D00615DA0 /* DataFlow.md */,
+				F54B8125300D018D00615DA0 /* FolderStructure.md */,
+				F54B8126300D018D00615DA0 /* Persistence.md */,
+				F54B8127300D018D00615DA0 /* TestingStrategy.md */,
+			);
+			path = Architecture;
+			sourceTree = "<group>";
+		};
+		F54B8128300D018D00615DA0 /* Development */ = {
+			isa = PBXGroup;
+			children = (
+				F54B8129300D018D00615DA0 /* CodingStandards.md */,
+				F54B812A300D018D00615DA0 /* DevelopmentRoadmap.md */,
+				F54B812B300D018D00615DA0 /* DevelopmentWorkflow.md */,
+				F54B812C300D018D00615DA0 /* ReleaseChecklist.md */,
+			);
+			path = Development;
+			sourceTree = "<group>";
+		};
+		F54B812D300D018D00615DA0 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				F54B812E300D018D00615DA0 /* Analytics.md */,
+				F54B812F300D018D00615DA0 /* CustomExercises.md */,
+				F54B8130300D018D00615DA0 /* EquipmentInventory.md */,
+				F54B8131300D018D00615DA0 /* ExerciseLibrary.md */,
+				F54B8132300D018D00615DA0 /* Progression.md */,
+				F54B8133300D018D00615DA0 /* Recovery.md */,
+				F54B8134300D018D00615DA0 /* Templates.md */,
+				F54B8135300D018D00615DA0 /* WorkoutSessions.md */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		F54B8137300D018D00615DA0 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				F54B8138300D018D00615DA0 /* README.md */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
 		F5630A1F3001941B000BB3AD /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
@@ -771,16 +870,6 @@
 				F5BF30452FF9E28700AB5AD9 /* FlowLayout.swift */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		F5BF304D2FF9F23400AB5AD9 /* Docs */ = {
-			isa = PBXGroup;
-			children = (
-				F5BF30512FF9F31100AB5AD9 /* DevelopmentRoadmap.md */,
-				F5BF30522FF9F34600AB5AD9 /* Architecture.md */,
-				F5BF30CD300124E700AB5AD9 /* ArchitectureDevelopmentWorkflow.md */,
-			);
-			path = Docs;
 			sourceTree = "<group>";
 		};
 		F5BF30532FF9FA3500AB5AD9 /* WorkoutSession */ = {
@@ -965,9 +1054,30 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F54B814B300D018D00615DA0 /* WorkoutSessions.md in Resources */,
+				F54B813F300D018D00615DA0 /* TestingStrategy.md in Resources */,
+				F54B8140300D018D00615DA0 /* CodingStandards.md in Resources */,
+				F54B813D300D018D00615DA0 /* FolderStructure.md in Resources */,
+				F54B8141300D018D00615DA0 /* DevelopmentRoadmap.md in Resources */,
 				F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */,
+				F54B814E300D018D00615DA0 /* README.md in Resources */,
+				F54B8144300D018D00615DA0 /* Analytics.md in Resources */,
+				F54B8147300D018D00615DA0 /* ExerciseLibrary.md in Resources */,
+				F54B814D300D018D00615DA0 /* README.md in Resources */,
+				F54B813E300D018D00615DA0 /* Persistence.md in Resources */,
+				F54B813A300D018D00615DA0 /* Architecture.md in Resources */,
+				F54B813C300D018D00615DA0 /* DataFlow.md in Resources */,
 				F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */,
+				F54B8146300D018D00615DA0 /* EquipmentInventory.md in Resources */,
+				F54B813B300D018D00615DA0 /* BackupSystem.md in Resources */,
 				F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */,
+				F54B814C300D018D00615DA0 /* GettingStarted.md in Resources */,
+				F54B814A300D018D00615DA0 /* Templates.md in Resources */,
+				F54B8149300D018D00615DA0 /* Recovery.md in Resources */,
+				F54B8145300D018D00615DA0 /* CustomExercises.md in Resources */,
+				F54B8142300D018D00615DA0 /* DevelopmentWorkflow.md in Resources */,
+				F54B8148300D018D00615DA0 /* Progression.md in Resources */,
+				F54B8143300D018D00615DA0 /* ReleaseChecklist.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
