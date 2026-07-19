@@ -121,9 +121,12 @@ final class MockActiveWorkoutPersistence:
             ) = state.mutate {
                 $0.savedSnapshots.append(snapshot)
 
+                let onSave = $0.onSave
+                $0.onSave = nil
+
                 return (
                     $0.saveResult,
-                    $0.onSave
+                    onSave
                 )
             }
 
@@ -146,9 +149,12 @@ final class MockActiveWorkoutPersistence:
             ) = state.mutate {
                 $0.deleteCallCount += 1
 
+                let onDelete = $0.onDelete
+                $0.onDelete = nil
+
                 return (
                     $0.deleteResult,
-                    $0.onDelete
+                    onDelete
                 )
             }
 
@@ -157,3 +163,4 @@ final class MockActiveWorkoutPersistence:
         try captured.result.get()
     }
 }
+

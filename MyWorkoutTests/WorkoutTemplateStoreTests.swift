@@ -142,10 +142,10 @@ final class WorkoutTemplateStoreTests: XCTestCase {
     private func createSampleExercise(name: String) -> Exercise {
         Exercise(
             name: name,
-            muscleGroup: "Chest",
-            equipment: "Barbell",
+            muscleGroup: .chest,
+            equipment: .barbell,
             instructions: "Test",
-            progressionRule: ProgressionRule(minReps: 5, maxReps: 10, increaseAmount: 5, stallLimit: 3),
+            progressionRule: ProgressionRule(minReps: 5, maxReps: 10, increaseAmount: 5, deloadAmount: 5, stallLimit: 3),
             exerciseType: .compound,
             progressionStrategy: .doubleProgression
         )

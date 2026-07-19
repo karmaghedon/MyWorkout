@@ -7,7 +7,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
 
     private func exercise(
         name: String = "Bench Press",
-        equipment: String = "Barbell",
+        equipment: ExerciseEquipment = .barbell,
         exerciseType: ExerciseType = .compound,
         strategy: ProgressionStrategy = .doubleProgression
     ) -> Exercise {
@@ -40,25 +40,25 @@ final class WorkoutSessionEngineTests: XCTestCase {
     // MARK: - defaultStartingWeight
 
     func test_defaultStartingWeight_bodyweight_isAlwaysZero() {
-        let ex = exercise(equipment: "Barbell", exerciseType: .bodyweight)
+        let ex = exercise(equipment: .barbell, exerciseType: .bodyweight)
         let weight = WorkoutSessionEngine.defaultStartingWeight(for: ex, equipmentInventory: inventory(barbellWeight: 45))
         XCTAssertEqual(weight, 0)
     }
 
     func test_defaultStartingWeight_barbellCompound_usesInventoryBarbellWeight() {
-        let ex = exercise(equipment: "Barbell", exerciseType: .compound)
+        let ex = exercise(equipment: .barbell, exerciseType: .compound)
         let weight = WorkoutSessionEngine.defaultStartingWeight(for: ex, equipmentInventory: inventory(barbellWeight: 45))
         XCTAssertEqual(weight, 45)
     }
 
     func test_defaultStartingWeight_nonBarbellCompound_isZero() {
-        let ex = exercise(equipment: "Cable Machine", exerciseType: .compound)
+        let ex = exercise(equipment: .cableOrBand, exerciseType: .compound)
         let weight = WorkoutSessionEngine.defaultStartingWeight(for: ex, equipmentInventory: inventory(barbellWeight: 45))
         XCTAssertEqual(weight, 0)
     }
 
     func test_defaultStartingWeight_isolation_followsSameBarbellRule() {
-        let ex = exercise(equipment: "Barbell", exerciseType: .isolation)
+        let ex = exercise(equipment: .barbell, exerciseType: .isolation)
         let weight = WorkoutSessionEngine.defaultStartingWeight(for: ex, equipmentInventory: inventory(barbellWeight: 45))
         XCTAssertEqual(weight, 45)
     }
@@ -190,7 +190,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
     // MARK: - initialState
 
     func test_initialState_noHistory_usesDefaultStartingWeightAndMessage() {
-        let ex = exercise(equipment: "Barbell", exerciseType: .compound)
+        let ex = exercise(equipment: .barbell, exerciseType: .compound)
 
         let state = WorkoutSessionEngine.initialState(
             for: ex,
@@ -206,7 +206,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
     }
 
     func test_initialState_withHistory_usesProgressionSuggestion() {
-        let ex = exercise(equipment: "Barbell", exerciseType: .compound, strategy: .doubleProgression)
+        let ex = exercise(equipment: .barbell, exerciseType: .compound, strategy: .doubleProgression)
 
         let latest = CompletedExercise(
             exerciseName: "Bench Press",
