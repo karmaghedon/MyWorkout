@@ -14,13 +14,15 @@ enum BackupImportResult {
 /// surfaced by the affected store rather than rolled back here.
 @MainActor
 struct BackupImportHandler {
-    let logStore: WorkoutLogStore
-    let templateStore: WorkoutTemplateStore
-    let equipmentStore: EquipmentInventoryStore
-    let settingsStore: UserSettingsStore
-    let customExerciseStore: CustomExerciseStore
+    let logStore: any WorkoutLogReplacing
+    let templateStore: any WorkoutTemplateReplacing
+    let equipmentStore: any EquipmentReplacing
+    let settingsStore: any SettingsReplacing
+    let customExerciseStore: any CustomExerciseReplacing
 
-    func importBackup(from url: URL) -> BackupImportResult {
+    func importBackup(
+        from url: URL
+    ) -> BackupImportResult {
         let didStartAccessing =
             url.startAccessingSecurityScopedResource()
 
@@ -31,7 +33,9 @@ struct BackupImportHandler {
         }
 
         do {
-            let data = try Data(contentsOf: url)
+            let data = try Data(
+                contentsOf: url
+            )
 
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
@@ -41,7 +45,8 @@ struct BackupImportHandler {
                 from: data
             )
 
-            guard backup.version <= AppBackup.currentVersion else {
+            guard backup.version
+                    <= AppBackup.currentVersion else {
                 return .unsupportedVersion(
                     backup.version
                 )
@@ -50,10 +55,12 @@ struct BackupImportHandler {
             let customExerciseValidation =
                 CustomExerciseImportValidator.validate(
                     backup.customExercises,
-                    reservedExercises: SeedData.exercises
+                    reservedExercises:
+                        SeedData.exercises
                 )
 
-            guard customExerciseValidation == .valid else {
+            guard customExerciseValidation
+                    == .valid else {
                 return .failure(
                     customExerciseValidation.message
                     ?? "The backup contains invalid custom exercises."
@@ -63,12 +70,15 @@ struct BackupImportHandler {
             logStore.replaceAll(
                 with: backup.logs
             )
+
             templateStore.replaceAll(
                 with: backup.templates
             )
+
             equipmentStore.replace(
                 with: backup.equipment
             )
+
             settingsStore.replace(
                 with: backup.settings
             )
@@ -77,7 +87,9 @@ struct BackupImportHandler {
                 with: backup.customExercises
             ) else {
                 return .failure(
-                    customExerciseStore.persistenceError?.message
+                    customExerciseStore
+                        .persistenceError?
+                        .message
                     ?? "Custom exercises could not be imported."
                 )
             }

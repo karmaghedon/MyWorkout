@@ -94,6 +94,29 @@
 		F54B80DB300BC13400615DA0 /* CustomExerciseStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */; };
 		F54B80DE300BCA9300615DA0 /* CustomExerciseImportValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DD300BCA9300615DA0 /* CustomExerciseImportValidator.swift */; };
 		F54B80E0300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */; };
+		F54B80E2300C234100615DA0 /* VolumeSpikeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80E1300C234100615DA0 /* VolumeSpikeAnalyzer.swift */; };
+		F54B80E4300C238200615DA0 /* PerformanceDeclineAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80E3300C238200615DA0 /* PerformanceDeclineAnalyzer.swift */; };
+		F54B80E6300C23B700615DA0 /* IntraWorkoutFatigueAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80E5300C23B600615DA0 /* IntraWorkoutFatigueAnalyzer.swift */; };
+		F54B80E8300C3EDB00615DA0 /* VolumeSpikeAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80E7300C3EDB00615DA0 /* VolumeSpikeAnalyzerTests.swift */; };
+		F54B80EA300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80E9300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift */; };
+		F54B80EC300C428E00615DA0 /* IntraWorkoutFatigueAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80EB300C428E00615DA0 /* IntraWorkoutFatigueAnalyzerTests.swift */; };
+		F54B80EE300C459400615DA0 /* RecoveryAnalyzerIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80ED300C459400615DA0 /* RecoveryAnalyzerIntegrationTests.swift */; };
+		F54B80F0300C498100615DA0 /* MockWorkoutLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80EF300C498100615DA0 /* MockWorkoutLogRepository.swift */; };
+		F54B80F2300C599600615DA0 /* ThreadSafeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80F1300C599500615DA0 /* ThreadSafeBox.swift */; };
+		F54B80F6300C59AA00615DA0 /* WorkoutLogTestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80F5300C59AA00615DA0 /* WorkoutLogTestFactory.swift */; };
+		F54B80FA300C674100615DA0 /* MockWorkoutTemplateRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80F9300C674100615DA0 /* MockWorkoutTemplateRepository.swift */; };
+		F54B80FC300C675400615DA0 /* WorkoutTemplateTestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80FB300C675300615DA0 /* WorkoutTemplateTestFactory.swift */; };
+		F54B8102300C6CA600615DA0 /* WorkoutTemplateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8101300C6CA500615DA0 /* WorkoutTemplateStoreTests.swift */; };
+		F54B8104300C6CC200615DA0 /* MockActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8103300C6CC200615DA0 /* MockActiveWorkoutPersistence.swift */; };
+		F54B8106300C6CD000615DA0 /* ActiveWorkoutTestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8105300C6CD000615DA0 /* ActiveWorkoutTestFactory.swift */; };
+		F54B8108300C6CD700615DA0 /* ActiveWorkoutStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8107300C6CD700615DA0 /* ActiveWorkoutStoreTests.swift */; };
+		F54B810A300C707000615DA0 /* EquipmentInventoryTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8109300C707000615DA0 /* EquipmentInventoryTestSupport.swift */; };
+		F54B810C300C707800615DA0 /* EquipmentInventoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B810B300C707800615DA0 /* EquipmentInventoryStoreTests.swift */; };
+		F54B8113300CF6A400615DA0 /* CustomExerciseReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */; };
+		F54B8115300CF6AF00615DA0 /* SettingsReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */; };
+		F54B8117300CF6B700615DA0 /* EquipmentReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */; };
+		F54B8119300CF6C300615DA0 /* WorkoutTemplateReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */; };
+		F54B811B300CF6CA00615DA0 /* WorkoutLogReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */; };
 		F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */; };
 		F5630A24300260A3000BB3AD /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A23300260A3000BB3AD /* RestTimerState.swift */; };
 		F5630A273002669F000BB3AD /* StoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A263002669F000BB3AD /* StoreError.swift */; };
@@ -270,6 +293,29 @@
 		F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseStoreTests.swift; sourceTree = "<group>"; };
 		F54B80DD300BCA9300615DA0 /* CustomExerciseImportValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseImportValidator.swift; sourceTree = "<group>"; };
 		F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseImportValidatorTests.swift; sourceTree = "<group>"; };
+		F54B80E1300C234100615DA0 /* VolumeSpikeAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeSpikeAnalyzer.swift; sourceTree = "<group>"; };
+		F54B80E3300C238200615DA0 /* PerformanceDeclineAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceDeclineAnalyzer.swift; sourceTree = "<group>"; };
+		F54B80E5300C23B600615DA0 /* IntraWorkoutFatigueAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntraWorkoutFatigueAnalyzer.swift; sourceTree = "<group>"; };
+		F54B80E7300C3EDB00615DA0 /* VolumeSpikeAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeSpikeAnalyzerTests.swift; sourceTree = "<group>"; };
+		F54B80E9300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceDeclineAnalyzerTests.swift; sourceTree = "<group>"; };
+		F54B80EB300C428E00615DA0 /* IntraWorkoutFatigueAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntraWorkoutFatigueAnalyzerTests.swift; sourceTree = "<group>"; };
+		F54B80ED300C459400615DA0 /* RecoveryAnalyzerIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAnalyzerIntegrationTests.swift; sourceTree = "<group>"; };
+		F54B80EF300C498100615DA0 /* MockWorkoutLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWorkoutLogRepository.swift; sourceTree = "<group>"; };
+		F54B80F1300C599500615DA0 /* ThreadSafeBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeBox.swift; sourceTree = "<group>"; };
+		F54B80F5300C59AA00615DA0 /* WorkoutLogTestFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutLogTestFactory.swift; sourceTree = "<group>"; };
+		F54B80F9300C674100615DA0 /* MockWorkoutTemplateRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWorkoutTemplateRepository.swift; sourceTree = "<group>"; };
+		F54B80FB300C675300615DA0 /* WorkoutTemplateTestFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateTestFactory.swift; sourceTree = "<group>"; };
+		F54B8101300C6CA500615DA0 /* WorkoutTemplateStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WorkoutTemplateStoreTests.swift; path = ../../../../../Users/nicolaenastas/.Trash/WorkoutTemplateStoreTests.swift; sourceTree = "<group>"; };
+		F54B8103300C6CC200615DA0 /* MockActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
+		F54B8105300C6CD000615DA0 /* ActiveWorkoutTestFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutTestFactory.swift; sourceTree = "<group>"; };
+		F54B8107300C6CD700615DA0 /* ActiveWorkoutStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutStoreTests.swift; sourceTree = "<group>"; };
+		F54B8109300C707000615DA0 /* EquipmentInventoryTestSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquipmentInventoryTestSupport.swift; sourceTree = "<group>"; };
+		F54B810B300C707800615DA0 /* EquipmentInventoryStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquipmentInventoryStoreTests.swift; sourceTree = "<group>"; };
+		F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomExerciseReplacing.swift; sourceTree = "<group>"; };
+		F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsReplacing.swift; sourceTree = "<group>"; };
+		F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquipmentReplacing.swift; sourceTree = "<group>"; };
+		F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateReplacing.swift; sourceTree = "<group>"; };
+		F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutLogReplacing.swift; sourceTree = "<group>"; };
 		F5630A203001946F000BB3AD /* ActiveWorkoutPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistence.swift; sourceTree = "<group>"; };
 		F5630A23300260A3000BB3AD /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		F5630A263002669F000BB3AD /* StoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreError.swift; sourceTree = "<group>"; };
@@ -391,6 +437,7 @@
 		F54004AF2FF0C6FE0079CC05 /* MyWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				F54B8111300CF67000615DA0 /* Protocols */,
 				F54B80AE3006E1F100615DA0 /* Repositories */,
 				F54B80943006916600615DA0 /* Navigation */,
 				F5630A303003EA21000BB3AD /* Domain */,
@@ -522,6 +569,9 @@
 				F54B80A43006D8C500615DA0 /* AnalyticsEngine.swift */,
 				F54B80AA3006DE3600615DA0 /* AnalyticsInputFactory.swift */,
 				F54B80D330090FFD00615DA0 /* ExerciseReferenceChecker.swift */,
+				F54B80E1300C234100615DA0 /* VolumeSpikeAnalyzer.swift */,
+				F54B80E3300C238200615DA0 /* PerformanceDeclineAnalyzer.swift */,
+				F54B80E5300C23B600615DA0 /* IntraWorkoutFatigueAnalyzer.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -588,6 +638,18 @@
 				F54B80D630091DB500615DA0 /* ExerciseNameValidator.swift */,
 			);
 			path = Validation;
+			sourceTree = "<group>";
+		};
+		F54B8111300CF67000615DA0 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */,
+				F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */,
+				F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */,
+				F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */,
+				F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 		F5630A1F3001941B000BB3AD /* Persistence */ = {
@@ -767,6 +829,8 @@
 		F5BF30902FFDFF1600AB5AD9 /* MyWorkoutTests */ = {
 			isa = PBXGroup;
 			children = (
+				F54B80F5300C59AA00615DA0 /* WorkoutLogTestFactory.swift */,
+				F54B80F1300C599500615DA0 /* ThreadSafeBox.swift */,
 				F5BF30892FFDFE1200AB5AD9 /* PlateCalculatorTests.swift */,
 				F5BF30872FFDFDFA00AB5AD9 /* ProgressionEngineTests.swift */,
 				F5BF309A2FFED27700AB5AD9 /* WeightConversionTests.swift */,
@@ -776,11 +840,24 @@
 				F5BF30C63000401400AB5AD9 /* InputValidationTests.swift */,
 				F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */,
 				F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */,
+				F54B810B300C707800615DA0 /* EquipmentInventoryStoreTests.swift */,
+				F54B8109300C707000615DA0 /* EquipmentInventoryTestSupport.swift */,
+				F54B8107300C6CD700615DA0 /* ActiveWorkoutStoreTests.swift */,
+				F54B8105300C6CD000615DA0 /* ActiveWorkoutTestFactory.swift */,
+				F54B8103300C6CC200615DA0 /* MockActiveWorkoutPersistence.swift */,
 				F54B809B3006A7E900615DA0 /* PersistedEnvelopeTests.swift */,
 				F54B80A63006DCDB00615DA0 /* AnalyticsEngineTests.swift */,
 				F54B80D830091DF300615DA0 /* ExerciseNameValidatorTests.swift */,
 				F54B80DA300BC13400615DA0 /* CustomExerciseStoreTests.swift */,
 				F54B80DF300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift */,
+				F54B80E7300C3EDB00615DA0 /* VolumeSpikeAnalyzerTests.swift */,
+				F54B80E9300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift */,
+				F54B80EB300C428E00615DA0 /* IntraWorkoutFatigueAnalyzerTests.swift */,
+				F54B80ED300C459400615DA0 /* RecoveryAnalyzerIntegrationTests.swift */,
+				F54B80EF300C498100615DA0 /* MockWorkoutLogRepository.swift */,
+				F54B80F9300C674100615DA0 /* MockWorkoutTemplateRepository.swift */,
+				F54B80FB300C675300615DA0 /* WorkoutTemplateTestFactory.swift */,
+				F54B8101300C6CA500615DA0 /* WorkoutTemplateStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -908,6 +985,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F54B8113300CF6A400615DA0 /* CustomExerciseReplacing.swift in Sources */,
 				F54B80B43006E49800615DA0 /* WorkoutTemplateRepository.swift in Sources */,
 				F5BF30B92FFEDA7D00AB5AD9 /* ImportActionsSection.swift in Sources */,
 				F54B80C43008309E00615DA0 /* CustomExerciseIdentitySection.swift in Sources */,
@@ -928,6 +1006,8 @@
 				F540050C2FF597CB0079CC05 /* UserSettings.swift in Sources */,
 				F5630A353003EA87000BB3AD /* BuiltInExerciseSource.swift in Sources */,
 				F54004F72FF439FB0079CC05 /* RestTimerRule.swift in Sources */,
+				F54B8119300CF6C300615DA0 /* WorkoutTemplateReplacing.swift in Sources */,
+				F54B811B300CF6CA00615DA0 /* WorkoutLogReplacing.swift in Sources */,
 				F54005122FF5C0990079CC05 /* WeightConversion.swift in Sources */,
 				F5BF303B2FF9DC4E00AB5AD9 /* DetailRow.swift in Sources */,
 				F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */,
@@ -949,6 +1029,7 @@
 				F54B80A13006D46200615DA0 /* MuscleGroupVolume.swift in Sources */,
 				F5BF30732FFB227200AB5AD9 /* ExerciseSessionState.swift in Sources */,
 				F540051A2FF69CC60079CC05 /* AppBackup.swift in Sources */,
+				F54B8115300CF6AF00615DA0 /* SettingsReplacing.swift in Sources */,
 				F54005032FF47B0C0079CC05 /* DashboardCard.swift in Sources */,
 				F54B80D230085A6C00615DA0 /* CustomExerciseSource.swift in Sources */,
 				F54004CF2FF0C87E0079CC05 /* ExerciseLibraryView.swift in Sources */,
@@ -960,6 +1041,7 @@
 				F5BF30802FFC75AD00AB5AD9 /* WeightFormatter.swift in Sources */,
 				F54004DC2FF1632B0079CC05 /* WorkoutTemplate.swift in Sources */,
 				F54005182FF5CFA50079CC05 /* ExportView.swift in Sources */,
+				F54B8117300CF6B700615DA0 /* EquipmentReplacing.swift in Sources */,
 				F5630A213001946F000BB3AD /* ActiveWorkoutPersistence.swift in Sources */,
 				F54B80B03006E20800615DA0 /* WorkoutLogRepository.swift in Sources */,
 				F54B80CC3008517800615DA0 /* CustomExerciseProgressionSection.swift in Sources */,
@@ -977,6 +1059,7 @@
 				F5BF30782FFB25C600AB5AD9 /* InventoryItemRow.swift in Sources */,
 				F54004CB2FF0C8640079CC05 /* SeedData.swift in Sources */,
 				F5BF305F2FFA734200AB5AD9 /* WarmupSectionView.swift in Sources */,
+				F54B80E6300C23B700615DA0 /* IntraWorkoutFatigueAnalyzer.swift in Sources */,
 				F5630A2D3003363A000BB3AD /* ExerciseEquipment.swift in Sources */,
 				F54004E72FF338CE0079CC05 /* ExerciseType.swift in Sources */,
 				F54005012FF4783D0079CC05 /* TemplateEditorView.swift in Sources */,
@@ -1016,6 +1099,7 @@
 				F5BF307C2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift in Sources */,
 				F54004D32FF0C8970079CC05 /* WorkoutSessionView.swift in Sources */,
 				F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */,
+				F54B80E4300C238200615DA0 /* PerformanceDeclineAnalyzer.swift in Sources */,
 				F5BF30612FFA74D300AB5AD9 /* WorkoutSessionCard.swift in Sources */,
 				F5BF30B82FFEDA7D00AB5AD9 /* ExportActionsSection.swift in Sources */,
 				F5BF30402FF9DFE100AB5AD9 /* InfoBadge.swift in Sources */,
@@ -1043,6 +1127,7 @@
 				F54B80BC300827FE00615DA0 /* CustomExerciseRepository.swift in Sources */,
 				F5BF305D2FFA70FA00AB5AD9 /* LoggedSetsView.swift in Sources */,
 				F5BF30572FF9FA6000AB5AD9 /* ExerciseSessionHeaderView.swift in Sources */,
+				F54B80E2300C234100615DA0 /* VolumeSpikeAnalyzer.swift in Sources */,
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
 				F54B809130068F7000615DA0 /* PrimaryFormActionButton.swift in Sources */,
 				F5630A24300260A3000BB3AD /* RestTimerState.swift in Sources */,
@@ -1063,16 +1148,31 @@
 				F5BF30A12FFED28600AB5AD9 /* WarmupEngineTests.swift in Sources */,
 				F5BF30C93000421D00AB5AD9 /* WorkoutLogStoreTests.swift in Sources */,
 				F54B809C3006A7E900615DA0 /* PersistedEnvelopeTests.swift in Sources */,
+				F54B80EC300C428E00615DA0 /* IntraWorkoutFatigueAnalyzerTests.swift in Sources */,
 				F5BF30A02FFED28600AB5AD9 /* RestTimerRuleTests.swift in Sources */,
+				F54B80F0300C498100615DA0 /* MockWorkoutLogRepository.swift in Sources */,
+				F54B80FA300C674100615DA0 /* MockWorkoutTemplateRepository.swift in Sources */,
 				F5BF309B2FFED27700AB5AD9 /* WeightConversionTests.swift in Sources */,
+				F54B810A300C707000615DA0 /* EquipmentInventoryTestSupport.swift in Sources */,
 				F54B80E0300BCC4B00615DA0 /* CustomExerciseImportValidatorTests.swift in Sources */,
+				F54B80F6300C59AA00615DA0 /* WorkoutLogTestFactory.swift in Sources */,
 				F54B80D930091DF300615DA0 /* ExerciseNameValidatorTests.swift in Sources */,
+				F54B8106300C6CD000615DA0 /* ActiveWorkoutTestFactory.swift in Sources */,
 				F5BF309F2FFED28600AB5AD9 /* WorkoutSessionEngineTests.swift in Sources */,
 				F54B80DB300BC13400615DA0 /* CustomExerciseStoreTests.swift in Sources */,
+				F54B810C300C707800615DA0 /* EquipmentInventoryStoreTests.swift in Sources */,
+				F54B80E8300C3EDB00615DA0 /* VolumeSpikeAnalyzerTests.swift in Sources */,
 				F5BF30992FFDFF3300AB5AD9 /* PlateCalculatorTests.swift in Sources */,
+				F54B8104300C6CC200615DA0 /* MockActiveWorkoutPersistence.swift in Sources */,
+				F54B80FC300C675400615DA0 /* WorkoutTemplateTestFactory.swift in Sources */,
+				F54B8102300C6CA600615DA0 /* WorkoutTemplateStoreTests.swift in Sources */,
+				F54B80EE300C459400615DA0 /* RecoveryAnalyzerIntegrationTests.swift in Sources */,
 				F5BF30C73000401400AB5AD9 /* InputValidationTests.swift in Sources */,
+				F54B8108300C6CD700615DA0 /* ActiveWorkoutStoreTests.swift in Sources */,
 				F5BF30CB3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift in Sources */,
 				F54B80A73006DCDB00615DA0 /* AnalyticsEngineTests.swift in Sources */,
+				F54B80F2300C599600615DA0 /* ThreadSafeBox.swift in Sources */,
+				F54B80EA300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

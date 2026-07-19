@@ -20,6 +20,9 @@ enum ExerciseNameValidationResult: Equatable {
 }
 
 enum ExerciseNameValidator {
+    private static let normalizationLocale =
+        Locale(identifier: "en_US_POSIX")
+
     static func validate(
         _ name: String,
         existingExercises: [Exercise],
@@ -56,7 +59,7 @@ enum ExerciseNameValidator {
                     .caseInsensitive,
                     .diacriticInsensitive
                 ],
-                locale: .current
+                locale: normalizationLocale
             )
             .replacingOccurrences(
                 of: "\\s+",

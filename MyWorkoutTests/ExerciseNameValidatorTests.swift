@@ -17,12 +17,40 @@ final class ExerciseNameValidatorTests: XCTestCase {
         )
     }
 
+    func testNewlineOnlyNameIsRejected() {
+        let result = ExerciseNameValidator.validate(
+            "\n\t",
+            existingExercises: []
+        )
+
+        XCTAssertEqual(
+            result,
+            .empty
+        )
+    }
+
     // MARK: - Unique Name
 
     func testUniqueNameIsValid() {
         let result = ExerciseNameValidator.validate(
             "Incline Cable Press",
             existingExercises: []
+        )
+
+        XCTAssertEqual(
+            result,
+            .valid
+        )
+    }
+
+    func testNameWithoutWhitespaceRemainsDistinct() {
+        let exercise = makeExercise(
+            name: "Bench Press"
+        )
+
+        let result = ExerciseNameValidator.validate(
+            "BenchPress",
+            existingExercises: [exercise]
         )
 
         XCTAssertEqual(
@@ -40,6 +68,22 @@ final class ExerciseNameValidatorTests: XCTestCase {
 
         let result = ExerciseNameValidator.validate(
             "bench press",
+            existingExercises: [exercise]
+        )
+
+        XCTAssertEqual(
+            result,
+            .duplicate
+        )
+    }
+
+    func testDuplicateNameIgnoringUppercaseIsRejected() {
+        let exercise = makeExercise(
+            name: "Bench Press"
+        )
+
+        let result = ExerciseNameValidator.validate(
+            "BENCH PRESS",
             existingExercises: [exercise]
         )
 
@@ -97,6 +141,51 @@ final class ExerciseNameValidatorTests: XCTestCase {
         )
     }
 
+    func testDuplicateNameIgnoringCombinedFormattingDifferencesIsRejected() {
+        let exercise = makeExercise(
+            name: "Bench Press"
+        )
+
+        let result = ExerciseNameValidator.validate(
+            "  BÉNCH    PRESS  ",
+            existingExercises: [exercise]
+        )
+
+        XCTAssertEqual(
+            result,
+            .duplicate
+        )
+    }
+
+    // MARK: - Normalization
+
+    func testNormalizeUsesStableCanonicalRepresentation() {
+        XCTAssertEqual(
+            ExerciseNameValidator.normalize(
+                "  BÉNCH    PRESS  "
+            ),
+            "bench press"
+        )
+    }
+
+    func testNormalizeDoesNotInsertMissingWhitespace() {
+        XCTAssertEqual(
+            ExerciseNameValidator.normalize(
+                "BenchPress"
+            ),
+            "benchpress"
+        )
+
+        XCTAssertNotEqual(
+            ExerciseNameValidator.normalize(
+                "BenchPress"
+            ),
+            ExerciseNameValidator.normalize(
+                "Bench Press"
+            )
+        )
+    }
+
     // MARK: - Editing
 
     func testEditedExerciseCanKeepItsCurrentName() {
@@ -106,6 +195,23 @@ final class ExerciseNameValidatorTests: XCTestCase {
 
         let result = ExerciseNameValidator.validate(
             "Bench Press",
+            existingExercises: [exercise],
+            excluding: exercise.id
+        )
+
+        XCTAssertEqual(
+            result,
+            .valid
+        )
+    }
+
+    func testEditedExerciseCanKeepNormalizedVersionOfItsName() {
+        let exercise = makeExercise(
+            name: "Bench Press"
+        )
+
+        let result = ExerciseNameValidator.validate(
+            "  BENCH   PRESS  ",
             existingExercises: [exercise],
             excluding: exercise.id
         )
@@ -182,7 +288,8 @@ final class ExerciseNameValidatorTests: XCTestCase {
                 stallLimit: 3
             ),
             exerciseType: .compound,
-            progressionStrategy: .doubleProgression
+            progressionStrategy:
+                .doubleProgression
         )
     }
 }

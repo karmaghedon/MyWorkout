@@ -109,6 +109,30 @@ final class CustomExerciseStoreTests: XCTestCase {
         )
     }
 
+    func testCreateDoesNotPublishWhenSaveFails() {
+        let repository = InMemoryCustomExerciseRepository(
+            shouldFailSave: true
+        )
+        let store = makeStore(
+            repository: repository
+        )
+
+        let result = store.create(
+            makeExercise(
+                name: "Custom Press"
+            )
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertTrue(store.storedExercises.isEmpty)
+        XCTAssertTrue(repository.savedExercises.isEmpty)
+        XCTAssertEqual(repository.saveCallCount, 1)
+        XCTAssertEqual(
+            store.persistenceError?.operation,
+            .saving
+        )
+    }
+
     // MARK: - Update
 
     func testUpdateChangesExercise() {
@@ -213,6 +237,42 @@ final class CustomExerciseStoreTests: XCTestCase {
         )
     }
 
+    func testUpdateDoesNotPublishWhenSaveFails() {
+        let original = makeExercise(
+            name: "Original Name"
+        )
+
+        let repository = InMemoryCustomExerciseRepository(
+            storedExercises: [
+                makeStoredExercise(
+                    exercise: original
+                )
+            ],
+            shouldFailSave: true
+        )
+
+        let store = makeStore(
+            repository: repository
+        )
+
+        let result = store.update(
+            makeExercise(
+                id: original.id,
+                name: "Updated Name"
+            )
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(
+            store.exercise(id: original.id)?.name,
+            "Original Name"
+        )
+        XCTAssertEqual(
+            repository.savedExercises.first?.exercise.name,
+            "Original Name"
+        )
+    }
+
     // MARK: - Archive and Restore
 
     func testArchiveMovesExerciseToArchivedCollection() {
@@ -246,6 +306,36 @@ final class CustomExerciseStoreTests: XCTestCase {
         )
     }
 
+    func testArchiveDoesNotPublishWhenSaveFails() {
+        let exercise = makeExercise(
+            name: "Custom Press"
+        )
+
+        let repository = InMemoryCustomExerciseRepository(
+            storedExercises: [
+                makeStoredExercise(
+                    exercise: exercise
+                )
+            ],
+            shouldFailSave: true
+        )
+
+        let store = makeStore(
+            repository: repository
+        )
+
+        let result = store.archive(
+            exerciseID: exercise.id
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(
+            store.activeExercises.map { $0.id },
+            [exercise.id]
+        )
+        XCTAssertTrue(store.archivedExercises.isEmpty)
+    }
+
     func testRestoreMovesExerciseToActiveCollection() {
         let exercise = makeExercise(
             name: "Custom Press"
@@ -275,6 +365,37 @@ final class CustomExerciseStoreTests: XCTestCase {
         )
         XCTAssertTrue(
             store.archivedExercises.isEmpty
+        )
+    }
+
+    func testRestoreDoesNotPublishWhenSaveFails() {
+        let exercise = makeExercise(
+            name: "Custom Press"
+        )
+
+        let repository = InMemoryCustomExerciseRepository(
+            storedExercises: [
+                makeStoredExercise(
+                    exercise: exercise,
+                    isArchived: true
+                )
+            ],
+            shouldFailSave: true
+        )
+
+        let store = makeStore(
+            repository: repository
+        )
+
+        let result = store.restore(
+            exerciseID: exercise.id
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertTrue(store.activeExercises.isEmpty)
+        XCTAssertEqual(
+            store.archivedExercises.map { $0.id },
+            [exercise.id]
         )
     }
 
@@ -332,6 +453,36 @@ final class CustomExerciseStoreTests: XCTestCase {
         XCTAssertFalse(result)
         XCTAssertEqual(
             store.activeExercises.map { $0.id },
+            [exercise.id]
+        )
+    }
+
+    func testPermanentDeleteDoesNotPublishWhenSaveFails() {
+        let exercise = makeExercise(
+            name: "Custom Press"
+        )
+
+        let repository = InMemoryCustomExerciseRepository(
+            storedExercises: [
+                makeStoredExercise(
+                    exercise: exercise,
+                    isArchived: true
+                )
+            ],
+            shouldFailSave: true
+        )
+
+        let store = makeStore(
+            repository: repository
+        )
+
+        let result = store.permanentlyDelete(
+            exerciseID: exercise.id
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(
+            store.archivedExercises.map { $0.id },
             [exercise.id]
         )
     }
@@ -586,6 +737,48 @@ final class CustomExerciseStoreTests: XCTestCase {
         )
     }
 
+    func testReplaceAllDoesNotPublishWhenSaveFails() {
+        let existing = makeStoredExercise(
+            exercise: makeExercise(
+                name: "Existing Exercise"
+            )
+        )
+
+        let repository = InMemoryCustomExerciseRepository(
+            storedExercises: [
+                existing
+            ],
+            shouldFailSave: true
+        )
+
+        let store = makeStore(
+            repository: repository
+        )
+
+        let replacement = makeStoredExercise(
+            exercise: makeExercise(
+                name: "Replacement Exercise"
+            )
+        )
+
+        let result = store.replaceAll(
+            with: [
+                replacement
+            ]
+        )
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(
+            store.storedExercises.map { $0.id },
+            [existing.id]
+        )
+        XCTAssertEqual(
+            repository.savedExercises.map { $0.id },
+            [existing.id]
+        )
+        XCTAssertEqual(repository.saveCallCount, 1)
+    }
+
     // MARK: - Fixtures
 
     private func makeStore(
@@ -655,11 +848,15 @@ private final class InMemoryCustomExerciseRepository:
     private(set)
     var saveCallCount = 0
 
+    var shouldFailSave: Bool
+
     init(
         storedExercises:
-            [StoredCustomExercise] = []
+            [StoredCustomExercise] = [],
+        shouldFailSave: Bool = false
     ) {
         savedExercises = storedExercises
+        self.shouldFailSave = shouldFailSave
     }
 
     func load() throws
@@ -672,6 +869,15 @@ private final class InMemoryCustomExerciseRepository:
             [StoredCustomExercise]
     ) throws {
         saveCallCount += 1
+
+        guard !shouldFailSave else {
+            throw TestRepositoryError.saveFailed
+        }
+
         savedExercises = exercises
     }
+}
+
+private enum TestRepositoryError: Error {
+    case saveFailed
 }

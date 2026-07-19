@@ -97,8 +97,7 @@ final class CustomExerciseStore: ObservableObject {
     func create(
         _ exercise: Exercise
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -127,8 +126,9 @@ final class CustomExerciseStore: ObservableObject {
         }
 
         let now = Date()
+        var candidate = storedExercises
 
-        storedExercises.append(
+        candidate.append(
             StoredCustomExercise(
                 exercise: exercise,
                 isArchived: false,
@@ -137,10 +137,9 @@ final class CustomExerciseStore: ObservableObject {
             )
         )
 
-        sortStoredExercises()
-        save()
-
-        return true
+        return persistAndPublish(
+            candidate
+        )
     }
 
     // MARK: - Update
@@ -149,8 +148,7 @@ final class CustomExerciseStore: ObservableObject {
     func update(
         _ exercise: Exercise
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -181,18 +179,18 @@ final class CustomExerciseStore: ObservableObject {
         }
 
         let existing = storedExercises[index]
+        var candidate = storedExercises
 
-        storedExercises[index] = StoredCustomExercise(
+        candidate[index] = StoredCustomExercise(
             exercise: exercise,
             isArchived: existing.isArchived,
             createdAt: existing.createdAt,
             updatedAt: Date()
         )
 
-        sortStoredExercises()
-        save()
-
-        return true
+        return persistAndPublish(
+            candidate
+        )
     }
 
     // MARK: - Permanent Deletion
@@ -201,8 +199,7 @@ final class CustomExerciseStore: ObservableObject {
     func permanentlyDelete(
         exerciseID: UUID
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -223,10 +220,12 @@ final class CustomExerciseStore: ObservableObject {
             return false
         }
 
-        storedExercises.remove(at: index)
-        save()
+        var candidate = storedExercises
+        candidate.remove(at: index)
 
-        return true
+        return persistAndPublish(
+            candidate
+        )
     }
 
     // MARK: - Archive
@@ -235,8 +234,7 @@ final class CustomExerciseStore: ObservableObject {
     func archive(
         exerciseID: UUID
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -251,18 +249,18 @@ final class CustomExerciseStore: ObservableObject {
         }
 
         let existing = storedExercises[index]
+        var candidate = storedExercises
 
-        storedExercises[index] = StoredCustomExercise(
+        candidate[index] = StoredCustomExercise(
             exercise: existing.exercise,
             isArchived: true,
             createdAt: existing.createdAt,
             updatedAt: Date()
         )
 
-        sortStoredExercises()
-        save()
-
-        return true
+        return persistAndPublish(
+            candidate
+        )
     }
 
     // MARK: - Restore
@@ -271,8 +269,7 @@ final class CustomExerciseStore: ObservableObject {
     func restore(
         exerciseID: UUID
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -302,17 +299,18 @@ final class CustomExerciseStore: ObservableObject {
             return false
         }
 
-        storedExercises[index] = StoredCustomExercise(
+        var candidate = storedExercises
+
+        candidate[index] = StoredCustomExercise(
             exercise: existing.exercise,
             isArchived: false,
             createdAt: existing.createdAt,
             updatedAt: Date()
         )
 
-        sortStoredExercises()
-        save()
-
-        return true
+        return persistAndPublish(
+            candidate
+        )
     }
 
     // MARK: - Backup Replacement
@@ -321,8 +319,7 @@ final class CustomExerciseStore: ObservableObject {
     func replaceAll(
         with exercises: [StoredCustomExercise]
     ) -> Bool {
-        guard isPersistenceWritable else {
-            reportBlockedSave()
+        guard canAttemptSave() else {
             return false
         }
 
@@ -343,11 +340,9 @@ final class CustomExerciseStore: ObservableObject {
             return false
         }
 
-        storedExercises = exercises
-        sortStoredExercises()
-        save()
-
-        return true
+        return persistAndPublish(
+            exercises
+        )
     }
 
     // MARK: - Persistence Errors
@@ -389,8 +384,9 @@ final class CustomExerciseStore: ObservableObject {
 
     private func load() {
         do {
-            storedExercises = try repository.load()
-            sortStoredExercises()
+            storedExercises = sorted(
+                try repository.load()
+            )
 
             isPersistenceWritable = true
             clearPersistenceError(for: .loading)
@@ -411,18 +407,31 @@ final class CustomExerciseStore: ObservableObject {
         }
     }
 
-    private func save() {
+    private func canAttemptSave() -> Bool {
         guard isPersistenceWritable else {
             reportBlockedSave()
-            return
+            return false
         }
+
+        return true
+    }
+
+    private func persistAndPublish(
+        _ exercises: [StoredCustomExercise]
+    ) -> Bool {
+        let candidate = sorted(
+            exercises
+        )
 
         do {
             try repository.save(
-                storedExercises
+                candidate
             )
 
+            storedExercises = candidate
             clearPersistenceError(for: .saving)
+
+            return true
         } catch {
             print(
                 "Failed to save custom exercises: \(error)"
@@ -433,13 +442,17 @@ final class CustomExerciseStore: ObservableObject {
                 message:
                     "Couldn't save custom exercises."
             )
+
+            return false
         }
     }
 
     // MARK: - Helpers
 
-    private func sortStoredExercises() {
-        storedExercises.sort {
+    private func sorted(
+        _ exercises: [StoredCustomExercise]
+    ) -> [StoredCustomExercise] {
+        exercises.sorted {
             $0.exercise.name
                 .localizedCaseInsensitiveCompare(
                     $1.exercise.name

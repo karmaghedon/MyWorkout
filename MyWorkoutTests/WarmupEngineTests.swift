@@ -3,9 +3,9 @@ import XCTest
 
 final class WarmupEngineTests: XCTestCase {
 
-    // MARK: - Barbell compound
+    // MARK: - Barbell Compound
 
-    func test_barbellCompound_workingWeightEqualsBarWeight_returnsNoWarmups() {
+    func testBarbellCompoundWorkingWeightEqualsBarWeightReturnsNoWarmups() {
         let warmups = WarmupEngine.generateWarmups(
             for: 45,
             exerciseType: .compound,
@@ -16,7 +16,18 @@ final class WarmupEngineTests: XCTestCase {
         XCTAssertTrue(warmups.isEmpty)
     }
 
-    func test_barbellCompound_belowFirstBracket_onlyBarWarmups() {
+    func testBarbellCompoundWorkingWeightBelowBarWeightReturnsNoWarmups() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 40,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertTrue(warmups.isEmpty)
+    }
+
+    func testBarbellCompoundBelowFirstBracketReturnsOnlyBarWarmups() {
         let warmups = WarmupEngine.generateWarmups(
             for: 70,
             exerciseType: .compound,
@@ -24,51 +35,106 @@ final class WarmupEngineTests: XCTestCase {
             barbellWeight: 45
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(45, 10), Pair(45, 8)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8)
+            ]
+        )
     }
 
-    func test_barbellCompound_bracket95to120_addsOneRampSet() {
+    func testBarbellCompoundAt95AddsOneRampSet() {
         let warmups = WarmupEngine.generateWarmups(
-            for: 100,
+            for: 95,
             exerciseType: .compound,
             usesBarbell: true,
             barbellWeight: 45
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(45, 10), Pair(45, 8), Pair(70, 5)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8),
+                Pair(65, 5)
+            ]
+        )
     }
 
-    func test_barbellCompound_bracket120to160_addsTwoRampSets() {
+    func testBarbellCompoundBelow120UsesOneRampSet() {
         let warmups = WarmupEngine.generateWarmups(
-            for: 140,
+            for: 119,
             exerciseType: .compound,
             usesBarbell: true,
             barbellWeight: 45
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(45, 10), Pair(45, 8), Pair(85, 5), Pair(110, 3)
-        ])
+        XCTAssertEqual(warmups.count, 3)
+        XCTAssertEqual(warmups.last?.reps, 5)
     }
 
-    func test_barbellCompound_bracket160to210_addsThreeRampSets() {
+    func testBarbellCompoundAt120AddsTwoRampSets() {
         let warmups = WarmupEngine.generateWarmups(
-            for: 180,
+            for: 120,
             exerciseType: .compound,
             usesBarbell: true,
             barbellWeight: 45
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(45, 10), Pair(45, 8), Pair(90, 5), Pair(125, 3), Pair(155, 2)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8),
+                Pair(70, 5),
+                Pair(95, 3)
+            ]
+        )
     }
 
-    func test_barbellCompound_bracket210Plus_addsFourRampSets() {
+    func testBarbellCompoundAt160AddsThreeRampSets() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 160,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8),
+                Pair(80, 5),
+                Pair(110, 3),
+                Pair(135, 2)
+            ]
+        )
+    }
+
+    func testBarbellCompoundAt210AddsFourRampSets() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 210,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8),
+                Pair(105, 5),
+                Pair(145, 3),
+                Pair(180, 2),
+                Pair(195, 1)
+            ]
+        )
+    }
+
+    func testBarbellCompoundHighRangeMatchesExpectedRamp() {
         let warmups = WarmupEngine.generateWarmups(
             for: 250,
             exerciseType: .compound,
@@ -76,14 +142,79 @@ final class WarmupEngineTests: XCTestCase {
             barbellWeight: 45
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(45, 10), Pair(45, 8), Pair(125, 5), Pair(175, 3), Pair(215, 2), Pair(230, 1)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(45, 10),
+                Pair(45, 8),
+                Pair(125, 5),
+                Pair(175, 3),
+                Pair(215, 2),
+                Pair(230, 1)
+            ]
+        )
     }
 
-    // MARK: - Dumbbell compound
+    func testBarbellCompoundNeverProducesWeightAboveOrEqualToWorkingWeight() {
+        let workingWeights: [Double] = [
+            46, 70, 95, 120, 160, 210, 250
+        ]
 
-    func test_dumbbellCompound_belowMinimum_returnsNoWarmups() {
+        for workingWeight in workingWeights {
+            let warmups = WarmupEngine.generateWarmups(
+                for: workingWeight,
+                exerciseType: .compound,
+                usesBarbell: true,
+                barbellWeight: 45
+            )
+
+            XCTAssertTrue(
+                warmups.allSatisfy {
+                    $0.weight < workingWeight
+                },
+                "Warmups must remain below \(workingWeight)"
+            )
+        }
+    }
+
+    func testBarbellCompoundRampWeightsIncreaseAfterEmptyBarSets() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 250,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        let rampWeights = warmups
+            .dropFirst(2)
+            .map(\.weight)
+
+        XCTAssertTrue(
+            isStrictlyIncreasing(rampWeights)
+        )
+    }
+
+    func testBarbellCompoundDoesNotDuplicateRampWeights() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 250,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        let rampWeights = warmups
+            .dropFirst(2)
+            .map(\.weight)
+
+        XCTAssertEqual(
+            Set(rampWeights).count,
+            rampWeights.count
+        )
+    }
+
+    // MARK: - Dumbbell Compound
+
+    func testDumbbellCompoundBelowMinimumReturnsNoWarmups() {
         let warmups = WarmupEngine.generateWarmups(
             for: 25,
             exerciseType: .compound,
@@ -93,86 +224,314 @@ final class WarmupEngineTests: XCTestCase {
         XCTAssertTrue(warmups.isEmpty)
     }
 
-    func test_dumbbellCompound_belowSecondThreshold_onlyBaseWarmup() {
+    func testDumbbellCompoundAt30ReturnsBaseWarmup() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 30,
+            exerciseType: .compound,
+            usesBarbell: false
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(10, 10)
+            ]
+        )
+    }
+
+    func testDumbbellCompoundBelowSecondThresholdReturnsBaseWarmup() {
         let warmups = WarmupEngine.generateWarmups(
             for: 40,
             exerciseType: .compound,
             usesBarbell: false
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(15, 10)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(15, 10)
+            ]
+        )
     }
 
-    func test_dumbbellCompound_midRange_addsSecondWarmup() {
+    func testDumbbellCompoundAt50AddsSecondWarmup() {
         let warmups = WarmupEngine.generateWarmups(
-            for: 60,
+            for: 50,
             exerciseType: .compound,
             usesBarbell: false
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(25, 10), Pair(35, 6)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(20, 10),
+                Pair(30, 6)
+            ]
+        )
     }
 
-    func test_dumbbellCompound_highRange_addsThirdWarmup() {
+    func testDumbbellCompoundAt80AddsThirdWarmup() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 80,
+            exerciseType: .compound,
+            usesBarbell: false
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(30, 10),
+                Pair(50, 6),
+                Pair(60, 4)
+            ]
+        )
+    }
+
+    func testDumbbellCompoundHighRangeMatchesExpectedRamp() {
         let warmups = WarmupEngine.generateWarmups(
             for: 100,
             exerciseType: .compound,
             usesBarbell: false
         )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(40, 10), Pair(60, 6), Pair(75, 4)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(40, 10),
+                Pair(60, 6),
+                Pair(75, 4)
+            ]
+        )
+    }
+
+    func testDumbbellCompoundWarmupsIncreaseAndStayBelowWorkingWeight() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 100,
+            exerciseType: .compound,
+            usesBarbell: false
+        )
+
+        XCTAssertTrue(
+            isStrictlyIncreasing(
+                warmups.map(\.weight)
+            )
+        )
+        XCTAssertTrue(
+            warmups.allSatisfy {
+                $0.weight < 100
+            }
+        )
     }
 
     // MARK: - Isolation
 
-    func test_isolation_belowMinimum_returnsNoWarmups() {
-        let warmups = WarmupEngine.generateWarmups(for: 20, exerciseType: .isolation)
+    func testIsolationBelowMinimumReturnsNoWarmups() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 20,
+            exerciseType: .isolation
+        )
+
         XCTAssertTrue(warmups.isEmpty)
     }
 
-    func test_isolation_belowSecondThreshold_returnsOneWarmup() {
-        let warmups = WarmupEngine.generateWarmups(for: 50, exerciseType: .isolation)
+    func testIsolationAt30ReturnsOneWarmup() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 30,
+            exerciseType: .isolation
+        )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(25, 10)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(15, 10)
+            ]
+        )
     }
 
-    func test_isolation_atOrAboveSecondThreshold_returnsTwoWarmups() {
-        let warmups = WarmupEngine.generateWarmups(for: 80, exerciseType: .isolation)
+    func testIsolationBelow60ReturnsOneWarmup() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 50,
+            exerciseType: .isolation
+        )
 
-        XCTAssertEqual(warmups.map { ($0.weight, $0.reps) }.map(Pair.init), [
-            Pair(40, 10), Pair(60, 6)
-        ])
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(25, 10)
+            ]
+        )
+    }
+
+    func testIsolationAt60ReturnsTwoWarmups() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 60,
+            exerciseType: .isolation
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(30, 10),
+                Pair(45, 6)
+            ]
+        )
+    }
+
+    func testIsolationHighRangeReturnsTwoWarmups() {
+        let warmups = WarmupEngine.generateWarmups(
+            for: 80,
+            exerciseType: .isolation
+        )
+
+        XCTAssertEqual(
+            pairs(from: warmups),
+            [
+                Pair(40, 10),
+                Pair(60, 6)
+            ]
+        )
     }
 
     // MARK: - Bodyweight
 
-    func test_bodyweight_alwaysReturnsNoWarmups() {
-        let warmups = WarmupEngine.generateWarmups(for: 0, exerciseType: .bodyweight)
-        XCTAssertTrue(warmups.isEmpty)
+    func testBodyweightAlwaysReturnsNoWarmups() {
+        let workingWeights: [Double] = [
+            -10, 0, 50, 100
+        ]
+
+        for workingWeight in workingWeights {
+            let warmups = WarmupEngine.generateWarmups(
+                for: workingWeight,
+                exerciseType: .bodyweight
+            )
+
+            XCTAssertTrue(warmups.isEmpty)
+        }
+    }
+
+    // MARK: - General Invariants
+
+    func testGeneratedWarmupsNeverUseNegativeWeights() {
+        let scenarios: [
+            (
+                weight: Double,
+                type: ExerciseType,
+                usesBarbell: Bool
+            )
+        ] = [
+            (-10, .compound, true),
+            (-10, .compound, false),
+            (-10, .isolation, false),
+            (0, .compound, true),
+            (0, .compound, false),
+            (0, .isolation, false)
+        ]
+
+        for scenario in scenarios {
+            let warmups = WarmupEngine.generateWarmups(
+                for: scenario.weight,
+                exerciseType: scenario.type,
+                usesBarbell: scenario.usesBarbell,
+                barbellWeight: 45
+            )
+
+            XCTAssertTrue(
+                warmups.allSatisfy {
+                    $0.weight >= 0
+                }
+            )
+        }
+    }
+
+    func testGeneratedWarmupsAlwaysUsePositiveReps() {
+        let warmups =
+            WarmupEngine.generateWarmups(
+                for: 250,
+                exerciseType: .compound,
+                usesBarbell: true,
+                barbellWeight: 45
+            )
+            + WarmupEngine.generateWarmups(
+                for: 100,
+                exerciseType: .compound,
+                usesBarbell: false
+            )
+            + WarmupEngine.generateWarmups(
+                for: 80,
+                exerciseType: .isolation
+            )
+
+        XCTAssertTrue(
+            warmups.allSatisfy {
+                $0.reps > 0
+            }
+        )
+    }
+
+    func testGeneratedWarmupsUseOnlyApprovedRepCounts() {
+        let approvedRepCounts: Set<Int> = [
+            10, 8, 6, 5, 4, 3, 2, 1
+        ]
+
+        let warmups =
+            WarmupEngine.generateWarmups(
+                for: 250,
+                exerciseType: .compound,
+                usesBarbell: true,
+                barbellWeight: 45
+            )
+            + WarmupEngine.generateWarmups(
+                for: 100,
+                exerciseType: .compound,
+                usesBarbell: false
+            )
+            + WarmupEngine.generateWarmups(
+                for: 80,
+                exerciseType: .isolation
+            )
+
+        XCTAssertTrue(
+            warmups.allSatisfy {
+                approvedRepCounts.contains(
+                    $0.reps
+                )
+            }
+        )
+    }
+
+    // MARK: - Helpers
+
+    private func pairs(
+        from warmups: [WarmupSet]
+    ) -> [Pair] {
+        warmups.map {
+            Pair(
+                $0.weight,
+                $0.reps
+            )
+        }
+    }
+
+    private func isStrictlyIncreasing(
+        _ values: [Double]
+    ) -> Bool {
+        zip(
+            values,
+            values.dropFirst()
+        )
+        .allSatisfy(<)
     }
 }
 
-/// Small helper so warmup sets (weight, reps) can be compared with XCTAssertEqual
-/// without needing WarmupSet itself to conform to Equatable.
 private struct Pair: Equatable {
     let weight: Double
     let reps: Int
 
-    init(_ weight: Double, _ reps: Int) {
+    init(
+        _ weight: Double,
+        _ reps: Int
+    ) {
         self.weight = weight
         self.reps = reps
-    }
-
-    init(_ tuple: (Double, Int)) {
-        self.weight = tuple.0
-        self.reps = tuple.1
     }
 }

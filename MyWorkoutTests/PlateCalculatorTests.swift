@@ -3,14 +3,586 @@ import XCTest
 
 final class PlateCalculatorTests: XCTestCase {
 
+    // MARK: - Exact Loading
+
+    func testExactMatchUsesLargestAvailablePlate() {
+        let loading = PlateCalculator.loading(
+            for: 135,
+            inventory: inventory()
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [45]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            135
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testExactCombinationUsesMultiplePlateSizes() {
+        let loading = PlateCalculator.loading(
+            for: 205,
+            inventory: inventory()
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [45, 25, 10]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            205
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testNonCanonicalInventoryFindsExactCombinationGreedyWouldMiss() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                ),
+                PlateInventory(
+                    weight: 10,
+                    quantity: 6
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 105,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [10, 10, 10]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            105
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testEquivalentExactLoadsPreferFewerPlates() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 20,
+                    quantity: 2
+                ),
+                PlateInventory(
+                    weight: 10,
+                    quantity: 4
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 85,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [20]
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testEquivalentPlateCountsPreferHeavierPlatesFirst() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 15,
+                    quantity: 2
+                ),
+                PlateInventory(
+                    weight: 10,
+                    quantity: 2
+                ),
+                PlateInventory(
+                    weight: 5,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 75,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [15]
+        )
+    }
+
+    // MARK: - Residue
+
+    func testInsufficientPlatesReportsResidue() {
+        let limitedInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 45,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 405,
+            inventory: limitedInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [45]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            135
+        )
+        XCTAssertTrue(
+            loading.hasResidue
+        )
+    }
+
+    func testUnreachableTargetChoosesClosestWeightWithoutExceedingTarget() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                ),
+                PlateInventory(
+                    weight: 10,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 115,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25, 10]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            115
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testUnreachableTargetNeverLoadsAboveRequestedWeight() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 100,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            95
+        )
+        XCTAssertLessThanOrEqual(
+            loading.achievedWeight,
+            loading.totalWeight
+        )
+        XCTAssertTrue(
+            loading.hasResidue
+        )
+    }
+
+    // MARK: - Bar-Only Loading
+
+    func testWeightEqualToBarReturnsEmptyBar() {
+        let loading = PlateCalculator.loading(
+            for: 45,
+            inventory: inventory()
+        )
+
+        XCTAssertTrue(
+            loading.platesPerSide.isEmpty
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            45
+        )
+        XCTAssertEqual(
+            loading.displayText(in: .pounds),
+            "empty bar"
+        )
+    }
+
+    func testWeightBelowBarReturnsEmptyBarWithoutCrashing() {
+        let loading = PlateCalculator.loading(
+            for: 20,
+            inventory: inventory()
+        )
+
+        XCTAssertTrue(
+            loading.platesPerSide.isEmpty
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            45
+        )
+    }
+
+    func testZeroTargetReturnsEmptyBar() {
+        let loading = PlateCalculator.loading(
+            for: 0,
+            inventory: inventory()
+        )
+
+        XCTAssertTrue(
+            loading.platesPerSide.isEmpty
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            45
+        )
+    }
+
+    func testNegativeTargetReturnsEmptyBar() {
+        let loading = PlateCalculator.loading(
+            for: -100,
+            inventory: inventory()
+        )
+
+        XCTAssertTrue(
+            loading.platesPerSide.isEmpty
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            45
+        )
+    }
+
+    func testNoPlatesReturnsBarOnly() {
+        let loading = PlateCalculator.loading(
+            for: 225,
+            inventory: inventory(
+                plates: []
+            )
+        )
+
+        XCTAssertTrue(
+            loading.platesPerSide.isEmpty
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            45
+        )
+        XCTAssertTrue(
+            loading.hasResidue
+        )
+    }
+
+    // MARK: - Inventory Constraints
+
+    func testOddPlateQuantityRoundsDownToCompletePairs() {
+        let limitedInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 45,
+                    quantity: 3
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 225,
+            inventory: limitedInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [45]
+        )
+        XCTAssertTrue(
+            loading.hasResidue
+        )
+    }
+
+    func testZeroQuantityPlateIsIgnored() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 45,
+                    quantity: 0
+                ),
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 95,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25]
+        )
+    }
+
+    func testNegativeQuantityPlateIsIgnored() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 45,
+                    quantity: -2
+                ),
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 95,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25]
+        )
+    }
+
+    func testZeroWeightPlateIsIgnored() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 0,
+                    quantity: 20
+                ),
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 95,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25]
+        )
+    }
+
+    func testResultNeverUsesMoreThanAvailablePairs() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 10,
+                    quantity: 4
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 105,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [10, 10]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            85
+        )
+        XCTAssertTrue(
+            loading.hasResidue
+        )
+    }
+
+    // MARK: - Unit Conversion
+
+    func testKilogramInventoryConvertsToPoundsForCalculation() {
+        let barWeight = WeightConversion.toPounds(
+            20,
+            from: .kilograms
+        )
+
+        let plateWeight = WeightConversion.toPounds(
+            20,
+            from: .kilograms
+        )
+
+        let totalWeight =
+            barWeight + plateWeight * 2
+
+        let loading = PlateCalculator.loading(
+            for: totalWeight,
+            inventory: inventory(
+                barbellWeight: 20,
+                plates: [
+                    PlateInventory(
+                        weight: 20,
+                        quantity: 2
+                    )
+                ],
+                unitSystem: .kilograms
+            )
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide.count,
+            1
+        )
+        XCTAssertEqual(
+            loading.platesPerSide[0],
+            plateWeight,
+            accuracy: 0.001
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            totalWeight,
+            accuracy: 0.01
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    func testCustomBarbellWeightIsUsed() {
+        let customInventory = inventory(
+            barbellWeight: 35,
+            plates: [
+                PlateInventory(
+                    weight: 25,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 85,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [25]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            85
+        )
+    }
+
+    func testFractionalPlatesCanProduceExactLoading() {
+        let customInventory = inventory(
+            plates: [
+                PlateInventory(
+                    weight: 2.5,
+                    quantity: 2
+                )
+            ]
+        )
+
+        let loading = PlateCalculator.loading(
+            for: 50,
+            inventory: customInventory
+        )
+
+        XCTAssertEqual(
+            loading.platesPerSide,
+            [2.5]
+        )
+        XCTAssertEqual(
+            loading.achievedWeight,
+            50
+        )
+        XCTAssertFalse(
+            loading.hasResidue
+        )
+    }
+
+    // MARK: - Display
+
+    func testDisplayTextListsPlatesPerSide() {
+        let loading = PlateCalculator.loading(
+            for: 205,
+            inventory: inventory()
+        )
+
+        XCTAssertEqual(
+            loading.displayText(in: .pounds),
+            "45 + 25 + 10"
+        )
+    }
+
+    // MARK: - Fixtures
+
     private func inventory(
         barbellWeight: Double = 45,
         plates: [PlateInventory] = [
-            PlateInventory(weight: 45, quantity: 4),
-            PlateInventory(weight: 25, quantity: 4),
-            PlateInventory(weight: 10, quantity: 4),
-            PlateInventory(weight: 5, quantity: 4),
-            PlateInventory(weight: 2.5, quantity: 4)
+            PlateInventory(
+                weight: 45,
+                quantity: 4
+            ),
+            PlateInventory(
+                weight: 25,
+                quantity: 4
+            ),
+            PlateInventory(
+                weight: 10,
+                quantity: 4
+            ),
+            PlateInventory(
+                weight: 5,
+                quantity: 4
+            ),
+            PlateInventory(
+                weight: 2.5,
+                quantity: 4
+            )
         ],
         unitSystem: UnitSystem = .pounds
     ) -> EquipmentInventory {
@@ -20,96 +592,5 @@ final class PlateCalculatorTests: XCTestCase {
             plates: plates,
             dumbbells: []
         )
-    }
-
-    func test_exactMatch_usesLargestPlatesFirst() {
-        let loading = PlateCalculator.loading(for: 135, inventory: inventory())
-
-        // 135 - 45 bar = 90 total, 45 per side -> one 45 plate per side
-        XCTAssertEqual(loading.platesPerSide, [45])
-        XCTAssertEqual(loading.achievedWeight, 135)
-        XCTAssertFalse(loading.hasResidue)
-    }
-
-    func test_combinationOfPlates_greedyFillsPerSide() {
-        // 205 lb: 45 bar + 160 -> 80 per side -> 45 + 25 + 10 = 80
-        let loading = PlateCalculator.loading(for: 205, inventory: inventory())
-
-        XCTAssertEqual(loading.platesPerSide, [45, 25, 10])
-        XCTAssertEqual(loading.achievedWeight, 205)
-        XCTAssertFalse(loading.hasResidue)
-    }
-
-    func test_insufficientPlates_reportsResidue() {
-        // Only one 45 available (quantity 2 total -> 1 per side), asking for weight
-        // that would need two 45s per side.
-        let limitedInventory = inventory(
-            plates: [PlateInventory(weight: 45, quantity: 2)]
-        )
-
-        // 45 bar + want 180 per side (360 total) but only one 45/side available (45/side achievable)
-        let loading = PlateCalculator.loading(for: 405, inventory: limitedInventory)
-
-        XCTAssertEqual(loading.platesPerSide, [45])
-        XCTAssertEqual(loading.achievedWeight, 135) // 45 bar + 45*2
-        XCTAssertTrue(loading.hasResidue)
-    }
-
-    func test_weightAtOrBelowBarWeight_returnsEmptyBar() {
-        let loading = PlateCalculator.loading(for: 45, inventory: inventory())
-
-        XCTAssertEqual(loading.platesPerSide, [])
-        XCTAssertEqual(loading.achievedWeight, 45)
-        XCTAssertEqual(loading.displayText(in: .pounds), "empty bar")
-    }
-
-    func test_weightBelowBarWeight_returnsEmptyBarWithoutCrashing() {
-        let loading = PlateCalculator.loading(for: 20, inventory: inventory())
-
-        XCTAssertEqual(loading.platesPerSide, [])
-        XCTAssertEqual(loading.achievedWeight, 45)
-    }
-
-    func test_noPlatesInInventory_returnsBarOnly() {
-        let emptyInventory = inventory(plates: [])
-        let loading = PlateCalculator.loading(for: 225, inventory: emptyInventory)
-
-        XCTAssertEqual(loading.platesPerSide, [])
-        XCTAssertEqual(loading.achievedWeight, 45)
-        XCTAssertTrue(loading.hasResidue)
-    }
-
-    func test_oddQuantityPlates_roundDownToPairs() {
-        // 3 total 45s -> only 1 pair (1 per side) usable, since plates load in pairs.
-        let limitedInventory = inventory(
-            plates: [PlateInventory(weight: 45, quantity: 3)]
-        )
-        let loading = PlateCalculator.loading(for: 225, inventory: limitedInventory)
-
-        // 225 wants 90/side; only 1x45/side available -> residue
-        XCTAssertEqual(loading.platesPerSide, [45])
-        XCTAssertTrue(loading.hasResidue)
-    }
-
-    func test_kilogramInventory_convertsToPoundsForCalculation() {
-        // Bar 20kg and plates 20kg are converted to pounds before matching.
-        // totalWeight itself is always expressed in pounds, so request exactly
-        // bar + 2 plates (in pounds) to confirm the kg->lb conversion happened
-        // and one plate per side was selected.
-        let barLb = WeightConversion.toPounds(20, from: .kilograms)
-        let plateLb = WeightConversion.toPounds(20, from: .kilograms)
-        let totalWeight = barLb + (plateLb * 2)
-
-        let kgInventory = inventory(
-            barbellWeight: 20,
-            plates: [PlateInventory(weight: 20, quantity: 2)],
-            unitSystem: .kilograms
-        )
-
-        let loading = PlateCalculator.loading(for: totalWeight, inventory: kgInventory)
-
-        XCTAssertEqual(loading.platesPerSide.count, 1)
-        XCTAssertFalse(loading.hasResidue)
-        XCTAssertEqual(loading.achievedWeight, totalWeight, accuracy: 0.01)
     }
 }
