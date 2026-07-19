@@ -22,26 +22,24 @@ final class ActiveWorkoutStore: ObservableObject {
     }
 
     @Published private(set) var restSecondsRemaining: Int = 0
-
     @Published private(set) var persistenceError: StoreError?
 
-    private let persistence: any ActiveWorkoutPersisting
-
-    private let saveQueue = DispatchQueue(
-        label: "com.myworkout.activeworkoutstore.save",
-        qos: .utility
-    )
+    private let persistenceCoordinator:
+        ActiveWorkoutPersistenceCoordinator
 
     private var workoutTimer: Timer?
     private var isRestoring = false
     private var restTimer: Timer?
-    private var persistWorkItem: DispatchWorkItem?
 
     init(
         persistence: any ActiveWorkoutPersisting =
             FileActiveWorkoutPersistence()
     ) {
-        self.persistence = persistence
+        persistenceCoordinator =
+            ActiveWorkoutPersistenceCoordinator(
+                persistence: persistence
+            )
+
         restoreActiveWorkout()
     }
 
@@ -50,7 +48,9 @@ final class ActiveWorkoutStore: ObservableObject {
     }
 
     var hasLoggedSets: Bool {
-        exerciseStates.values.contains { !$0.loggedSets.isEmpty }
+        exerciseStates.values.contains {
+            !$0.loggedSets.isEmpty
+        }
     }
 
     var formattedElapsedTime: String {
@@ -59,17 +59,14 @@ final class ActiveWorkoutStore: ObservableObject {
 
     // MARK: - Rest Timer Compatibility
 
-    /// Preserves the existing read API used by workout views.
     var activeRestExerciseID: UUID? {
         restTimerState?.exerciseID
     }
 
-    /// Preserves the existing snapshot API until a future snapshot migration.
     var restStartedAt: Date? {
         restTimerState?.startedAt
     }
 
-    /// Preserves the existing snapshot and UI API.
     var restTotalSeconds: Int {
         restTimerState?.durationSeconds ?? 0
     }
@@ -85,7 +82,6 @@ final class ActiveWorkoutStore: ObservableObject {
         }
 
         beginWorkout(workout)
-
         return .started
     }
 
@@ -242,7 +238,7 @@ final class ActiveWorkoutStore: ObservableObject {
             stopRestTimer(clearPersistedState: true)
         }
     }
-    
+
     func replaceActiveWorkout(
         with workout: Workout
     ) {
@@ -267,11 +263,11 @@ final class ActiveWorkoutStore: ObservableObject {
             self?.updateRestSecondsRemaining()
         }
     }
-    
+
     private func beginWorkout(
         _ workout: Workout
     ) {
-        persistWorkItem?.cancel()
+        persistenceCoordinator.cancelScheduledRequest()
 
         activeWorkout = workout
         exerciseStates = [:]
@@ -337,7 +333,17 @@ final class ActiveWorkoutStore: ObservableObject {
             message: message
         )
     }
-    
+
+    private func clearPersistenceError(
+        for operation: StoreOperation
+    ) {
+        guard persistenceError?.operation == operation else {
+            return
+        }
+
+        persistenceError = nil
+    }
+
     // MARK: - Persistence Coordination
 
     private func schedulePersist() {
@@ -345,22 +351,15 @@ final class ActiveWorkoutStore: ObservableObject {
             return
         }
 
-        persistWorkItem?.cancel()
-
-        let workItem = DispatchWorkItem { [weak self] in
-            self?.persistActiveWorkout()
-        }
-
-        persistWorkItem = workItem
-
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + 0.3,
-            execute: workItem
+        persistenceCoordinator.schedule(
+            persistenceRequest(),
+            onSuccess: persistenceDidSucceed,
+            onFailure: persistenceDidFail
         )
     }
 
     private func clearActiveWorkout() {
-        persistWorkItem?.cancel()
+        persistenceCoordinator.cancelScheduledRequest()
 
         isRestoring = true
 
@@ -368,7 +367,6 @@ final class ActiveWorkoutStore: ObservableObject {
         exerciseStates = [:]
         startedAt = nil
         elapsedSeconds = 0
-
         restTimerState = nil
         restSecondsRemaining = 0
 
@@ -382,12 +380,37 @@ final class ActiveWorkoutStore: ObservableObject {
             return
         }
 
-        guard let activeWorkout else {
-            deletePersistedWorkout()
-            return
+        persistenceCoordinator.perform(
+            persistenceRequest(),
+            onSuccess: persistenceDidSucceed,
+            onFailure: persistenceDidFail
+        )
+    }
+
+    private func deletePersistedWorkout() {
+        persistenceCoordinator.perform(
+            .delete,
+            onSuccess: persistenceDidSucceed,
+            onFailure: persistenceDidFail
+        )
+    }
+
+    private func persistenceRequest()
+        -> ActiveWorkoutPersistenceCoordinator.Request {
+        guard let snapshot = activeWorkoutSnapshot() else {
+            return .delete
         }
 
-        let snapshot = ActiveWorkoutSnapshot(
+        return .save(snapshot)
+    }
+
+    private func activeWorkoutSnapshot()
+        -> ActiveWorkoutSnapshot? {
+        guard let activeWorkout else {
+            return nil
+        }
+
+        return ActiveWorkoutSnapshot(
             activeWorkout: activeWorkout,
             exerciseStates: exerciseStates.map {
                 ExerciseStateSnapshot(
@@ -403,96 +426,45 @@ final class ActiveWorkoutStore: ObservableObject {
             restTotalSeconds:
                 restTimerState?.durationSeconds ?? 0
         )
-
-        let persistence = persistence
-
-        saveQueue.async { [weak self] in
-            do {
-                try persistence.save(snapshot)
-
-                DispatchQueue.main.async {
-                    guard self?.persistenceError?.operation == .saving else {
-                        return
-                    }
-
-                    self?.persistenceError = nil
-                }
-            } catch {
-                print(
-                    "Failed to persist active workout: "
-                    + error.localizedDescription
-                )
-
-                DispatchQueue.main.async {
-                    self?.setPersistenceError(
-                        operation: .saving,
-                        message:
-                            "Couldn't save your active workout. "
-                            + "If the app closes, you may lose progress "
-                            + "on this session."
-                    )
-                }
-            }
-        }
     }
 
-    private func deletePersistedWorkout() {
-        let persistence = persistence
+    private func persistenceDidSucceed(
+        _ operation: StoreOperation
+    ) {
+        clearPersistenceError(for: operation)
+    }
 
-        saveQueue.async { [weak self] in
-            do {
-                try persistence.delete()
-
-                DispatchQueue.main.async {
-                    guard self?.persistenceError?.operation == .deleting else {
-                        return
-                    }
-
-                    self?.persistenceError = nil
-                }
-            } catch {
-                print(
-                    "Failed to delete active workout persistence: "
-                    + error.localizedDescription
-                )
-
-                DispatchQueue.main.async {
-                    self?.setPersistenceError(
-                        operation: .deleting,
-                        message:
-                            "Couldn't clear the saved active workout."
-                    )
-                }
-            }
-        }
+    private func persistenceDidFail(
+        _ operation: StoreOperation,
+        _ message: String
+    ) {
+        setPersistenceError(
+            operation: operation,
+            message: message
+        )
     }
 
     private func restoreActiveWorkout() {
         do {
-            guard let snapshot = try persistence.load() else {
-                if persistenceError?.operation == .loading {
-                    persistenceError = nil
-                }
+            guard let snapshot =
+                    try persistenceCoordinator.load() else {
+                clearPersistenceError(for: .loading)
                 return
             }
 
             isRestoring = true
 
             activeWorkout = snapshot.activeWorkout
-
             exerciseStates = Dictionary(
                 uniqueKeysWithValues:
                     snapshot.exerciseStates.map {
                         ($0.exerciseID, $0.state)
                     }
             )
-
             startedAt = snapshot.startedAt
 
-            if let exerciseID =
-                snapshot.activeRestExerciseID,
-               let restStartedAt =
-                snapshot.restStartedAt,
+            if let exerciseID = snapshot.activeRestExerciseID,
+               let restStartedAt = snapshot.restStartedAt,
                snapshot.restTotalSeconds > 0 {
                 restTimerState = RestTimerState(
                     exerciseID: exerciseID,
@@ -505,20 +477,17 @@ final class ActiveWorkoutStore: ObservableObject {
             }
 
             elapsedSeconds = currentDurationSeconds()
-
             isRestoring = false
 
             startTimerIfNeeded()
             restoreRestTimerIfNeeded()
-
-            if persistenceError?.operation == .loading {
-                persistenceError = nil
-            }
+            clearPersistenceError(for: .loading)
         } catch {
             isRestoring = false
 
             do {
-                try persistence.delete()
+                try persistenceCoordinator
+                    .deleteInvalidSnapshot()
             } catch {
                 print(
                     "Failed to delete invalid active workout "

@@ -137,56 +137,18 @@ struct CustomExercisesView: View {
     private func activeExerciseRow(
         _ exercise: Exercise
     ) -> some View {
-        Button {
-            onEditExercise(exercise)
-        } label: {
-            HStack(
-                spacing: AppTheme.Spacing.sm
-            ) {
-                VStack(
-                    alignment: .leading,
-                    spacing: 4
-                ) {
-                    Text(exercise.name)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-
-                    Text(exerciseSummary(exercise))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(
-            "\(exercise.name), \(exerciseSummary(exercise))"
-        )
-        .accessibilityHint(
-            "Opens this custom exercise for editing."
-        )
-        .swipeActions(
-            edge: .trailing,
-            allowsFullSwipe: false
-        ) {
-            Button(
-                role: .destructive
-            ) {
+        CustomExerciseRow(
+            exercise: exercise,
+            style: .active,
+            onSelect: {
+                onEditExercise(exercise)
+            },
+            onArchive: {
                 exercisePendingArchive = exercise
-            } label: {
-                Label(
-                    "Archive",
-                    systemImage: "archivebox"
-                )
-            }
-        }
+            },
+            onRestore: {},
+            onDelete: {}
+        )
     }
 
     // MARK: - Archived Exercises
@@ -213,66 +175,20 @@ struct CustomExercisesView: View {
     private func archivedExerciseRow(
         _ exercise: Exercise
     ) -> some View {
-        HStack(
-            spacing: AppTheme.Spacing.sm
-        ) {
-            VStack(
-                alignment: .leading,
-                spacing: 4
-            ) {
-                Text(exercise.name)
-                    .font(.headline)
-
-                Text(exerciseSummary(exercise))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            Button {
+        CustomExerciseRow(
+            exercise: exercise,
+            style: .archived,
+            onSelect: {},
+            onArchive: {},
+            onRestore: {
                 customExerciseStore.restore(
                     exerciseID: exercise.id
                 )
-            } label: {
-                Label(
-                    "Restore",
-                    systemImage: "arrow.uturn.backward"
-                )
-                .labelStyle(.iconOnly)
-            }
-            .buttonStyle(.borderless)
-            .accessibilityLabel(
-                "Restore \(exercise.name)"
-            )
-            .accessibilityHint(
-                "Makes this exercise active again."
-            )
-        }
-        .contentShape(Rectangle())
-        .swipeActions(
-            edge: .trailing,
-            allowsFullSwipe: false
-        ) {
-            Button(
-                role: .destructive
-            ) {
+            },
+            onDelete: {
                 requestPermanentDeletion(exercise)
-            } label: {
-                Label(
-                    "Delete",
-                    systemImage: "trash"
-                )
             }
-        }
-    }
-
-    // MARK: - Presentation
-
-    private func exerciseSummary(
-        _ exercise: Exercise
-    ) -> String {
-        "\(exercise.muscleGroup.displayName) · \(exercise.equipment.displayName)"
+        )
     }
 
     // MARK: - Archive Confirmation

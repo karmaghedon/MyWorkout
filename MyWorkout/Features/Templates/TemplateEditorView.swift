@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TemplateEditorView: View {
-    @EnvironmentObject var templateStore: WorkoutTemplateStore
+    @EnvironmentObject private var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @Environment(\.dismiss) private var dismiss
 
@@ -16,101 +16,166 @@ struct TemplateEditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             Form {
-                Section {
-                    ValidatedNameField(
-                        title: "Template name",
-                        text: $editableTemplate.name
-                    )
-                }
-
-                Section {
-                    Button {
-                        showingAddExercises.toggle()
-                    } label: {
-                        Label(
-                            showingAddExercises
-                                ? "Hide Exercises"
-                                : "Add Exercises",
-                            systemImage: showingAddExercises
-                                ? "minus.circle"
-                                : "plus.circle"
-                        )
-                    }
-
-                    if showingAddExercises {
-                        addExercisesPanel
-                    }
-                }
-
-                Section {
-                    ForEach(
-                        Array(editableTemplate.exercises.enumerated()),
-                        id: \.element.id
-                    ) { index, exercise in
-                        exerciseRow(
-                            index: index,
-                            exercise: exercise
-                        )
-                    }
-                    .onMove(perform: moveExercises)
-                    .onDelete(perform: deleteExercises)
-                } header: {
-                    Text("Exercises")
-                } footer: {
-                    Text("Tap Edit to reorder or remove exercises.")
-                }
+                templateNameSection
+                addExercisesSection
+                selectedExercisesSection
             }
             .scrollDismissesKeyboard(.interactively)
 
-            Button {
-                duplicateTemplate()
-            } label: {
-                Label(
-                    "Duplicate Template",
-                    systemImage: "doc.on.doc"
-                )
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppTheme.Spacing.sm)
-            }
-            .buttonStyle(.bordered)
-            .padding(.horizontal, AppTheme.Spacing.md)
-            .padding(.vertical, AppTheme.Spacing.sm)
-            .background(AppTheme.groupedBackground)
+            duplicateButton
         }
         .navigationTitle("Edit Template")
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
-                    dismiss()
-                }
+            editorToolbar
+        }
+    }
+
+    // MARK: - Sections
+
+    private var templateNameSection: some View {
+        Section {
+            ValidatedNameField(
+                title: "Template name",
+                text: $editableTemplate.name
+            )
+        }
+    }
+
+    private var addExercisesSection: some View {
+        Section {
+            Button {
+                showingAddExercises.toggle()
+            } label: {
+                Label(
+                    showingAddExercises
+                        ? "Hide Exercises"
+                        : "Add Exercises",
+                    systemImage: showingAddExercises
+                        ? "minus.circle"
+                        : "plus.circle"
+                )
             }
 
-            ToolbarItemGroup(placement: .primaryAction) {
-                EditButton()
-
-                Button("Save") {
-                    saveTemplate()
-                }
-                .fontWeight(.semibold)
-                .disabled(!canSave)
+            if showingAddExercises {
+                TemplateExercisePickerView(
+                    selectedEquipment: $selectedEquipment,
+                    exercises: availableExercises,
+                    onSelect: addExercise
+                )
             }
         }
     }
-    
+
+    private var selectedExercisesSection: some View {
+        Section {
+            ForEach(editableTemplate.exercises) { exercise in
+                ExerciseRowView(exercise: exercise)
+            }
+            .onMove(perform: moveExercises)
+            .onDelete(perform: deleteExercises)
+        } header: {
+            Text("Exercises")
+        } footer: {
+            Text("Tap Edit to reorder or remove exercises.")
+        }
+    }
+
+    // MARK: - Bottom Action
+
+    private var duplicateButton: some View {
+        Button {
+            duplicateTemplate()
+        } label: {
+            Label(
+                "Duplicate Template",
+                systemImage: "doc.on.doc"
+            )
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, AppTheme.Spacing.sm)
+        }
+        .buttonStyle(.bordered)
+        .disabled(!canSave)
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .padding(.vertical, AppTheme.Spacing.sm)
+        .background(AppTheme.groupedBackground)
+    }
+
+    // MARK: - Toolbar
+
+    @ToolbarContentBuilder
+    private var editorToolbar: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel") {
+                dismiss()
+            }
+        }
+
+        ToolbarItemGroup(placement: .primaryAction) {
+            EditButton()
+
+            Button("Save") {
+                saveTemplate()
+            }
+            .fontWeight(.semibold)
+            .disabled(!canSave)
+        }
+    }
+
+    // MARK: - Derived State
+
     private var canSave: Bool {
         editableTemplate.name.isValidName
             && !editableTemplate.exercises.isEmpty
     }
+
+    private var availableExercises: [Exercise] {
+        let registry = ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource(),
+                CustomExerciseSource(
+                    exercises: customExerciseStore.activeExercises
+                )
+            ]
+        )
+
+        return registry.exercises.filter { exercise in
+            !editableTemplate.exercises.contains {
+                $0.id == exercise.id
+            }
+        }
+    }
+
+    // MARK: - Exercise Actions
+
+    private func addExercise(_ exercise: Exercise) {
+        editableTemplate.exercises.append(exercise)
+        selectedEquipment = nil
+        showingAddExercises = false
+    }
+
+    private func moveExercises(
+        from source: IndexSet,
+        to destination: Int
+    ) {
+        editableTemplate.exercises.move(
+            fromOffsets: source,
+            toOffset: destination
+        )
+    }
+
+    private func deleteExercises(at offsets: IndexSet) {
+        editableTemplate.exercises.remove(atOffsets: offsets)
+    }
+
+    // MARK: - Template Actions
 
     private func saveTemplate() {
         guard canSave else {
             return
         }
 
-        editableTemplate.name =
-            editableTemplate.name.normalizedName
-
+        normalizeTemplateName()
         templateStore.update(editableTemplate)
         dismiss()
     }
@@ -120,99 +185,13 @@ struct TemplateEditorView: View {
             return
         }
 
-        editableTemplate.name =
-            editableTemplate.name.normalizedName
-
+        normalizeTemplateName()
         templateStore.duplicate(editableTemplate)
         dismiss()
     }
-    
-    private var addExercisesPanel: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Picker(
-                "Equipment",
-                selection: $selectedEquipment
-            ) {
-                Text("All")
-                    .tag(ExerciseEquipment?.none)
 
-                ForEach(equipmentOptions) { equipment in
-                    Text(equipment.displayName)
-                        .tag(Optional(equipment))
-                }
-            }
-            .pickerStyle(.menu)
-
-            if filteredAvailableExercises.isEmpty {
-                Text("No exercises available to add")
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(filteredAvailableExercises) { exercise in
-                    Button {
-                        editableTemplate.exercises.append(exercise)
-                        showingAddExercises = false
-                    } label: {
-                        HStack {
-                            ExerciseRowView(exercise: exercise)
-
-                            Spacer()
-
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(AppTheme.accent)
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(.vertical, AppTheme.Spacing.sm)
-    }
-
-    private func exerciseRow(index: Int, exercise: Exercise) -> some View {
-        ExerciseRowView(exercise: exercise)
-    }
-
-    private func moveExercises(from source: IndexSet, to destination: Int) {
-        editableTemplate.exercises.move(fromOffsets: source, toOffset: destination)
-    }
-
-    private func deleteExercises(at offsets: IndexSet) {
-        editableTemplate.exercises.remove(atOffsets: offsets)
-    }
-
-    private var availableExercises: [Exercise] {
-        let selectableExercises = ExerciseRegistry(
-            sources: [
-                BuiltInExerciseSource(),
-                CustomExerciseSource(
-                    exercises: customExerciseStore.activeExercises
-                )
-            ]
-        ).exercises
-
-        return selectableExercises.filter { exercise in
-            !editableTemplate.exercises.contains {
-                $0.id == exercise.id
-            }
-        }
-    }
-
-    private var equipmentOptions: [ExerciseEquipment] {
-        Array(
-            Set(availableExercises.map(\.equipment))
-        )
-        .sorted()
-    }
-
-    private var filteredAvailableExercises: [Exercise] {
-        guard let selectedEquipment else {
-            return availableExercises
-        }
-
-        return availableExercises.filter {
-            $0.equipment == selectedEquipment
-        }
+    private func normalizeTemplateName() {
+        editableTemplate.name =
+            editableTemplate.name.normalizedName
     }
 }

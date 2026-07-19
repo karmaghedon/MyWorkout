@@ -61,7 +61,7 @@ Views should not own persistence or complex training calculations.
 
 ### Components
 
-Reusable SwiftUI components are grouped under `Views/Components`.
+Reusable SwiftUI components live beside their owning feature under `Features/<Feature>/Components`. Components shared by multiple features live under `Features/Shared/Components`.
 
 Examples:
 

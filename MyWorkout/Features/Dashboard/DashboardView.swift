@@ -26,7 +26,9 @@ struct DashboardView: View {
                         .bold()
                         .padding(.horizontal)
 
-                    errorBanners
+                    DashboardStoreErrorsView(
+                        messages: currentErrorMessages
+                    )
 
                     DashboardStatsView()
 
@@ -290,32 +292,4 @@ struct DashboardView: View {
         )
     }
 
-    private var errorBanners: some View {
-        VStack(
-            alignment: .leading,
-            spacing: AppTheme.Spacing.sm
-        ) {
-            ForEach(
-                Array(currentErrorMessages.enumerated()),
-                id: \.offset
-            ) { _, message in
-                errorBanner(message)
-            }
-        }
-    }
-
-    private func errorBanner(
-        _ message: String
-    ) -> some View {
-        Text(message)
-            .foregroundStyle(.red)
-            .padding()
-            .background(.red.opacity(0.12))
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 12
-                )
-            )
-            .padding(.horizontal)
-    }
 }

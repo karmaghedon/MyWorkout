@@ -153,20 +153,20 @@ This project follows several core principles:
 
 ## Project status
 
-Phases 1–17.6 are complete.
+Phases 1–19 are complete, including the persistence integrity baseline,
+logic test baseline, documentation consolidation, folder migration, and
+responsibility-focused cleanup.
 
 The current work is:
 
 ```text
-Phase 18 — Documentation
-```
-
-Upcoming work:
-
-```text
-Phase 19 — Architecture and folder cleanup
 Phase 20 — Stabilization and release readiness
 ```
+
+Primary stabilization work includes release builds, regression testing,
+fresh-install and upgrade-path validation, backup compatibility, accessibility,
+and final release documentation.
+
 ---
 
 # License

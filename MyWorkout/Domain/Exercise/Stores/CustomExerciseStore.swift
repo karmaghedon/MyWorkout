@@ -83,12 +83,11 @@ final class CustomExerciseStore: ObservableObject {
         named name: String,
         excluding exerciseID: UUID? = nil
     ) -> Bool {
-        ExerciseNameValidator.validate(
+        isDuplicateName(
             name,
-            existingExercises:
-                exercisesReservedForNaming,
+            in: storedExercises,
             excluding: exerciseID
-        ) == .duplicate
+        )
     }
 
     // MARK: - Create
@@ -97,49 +96,47 @@ final class CustomExerciseStore: ObservableObject {
     func create(
         _ exercise: Exercise
     ) -> Bool {
-        guard canAttemptSave() else {
-            return false
-        }
+        performMutation { candidate in
+            guard !candidate.contains(
+                where: { $0.id == exercise.id }
+            ) else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "A custom exercise with this identifier "
+                        + "already exists."
+                )
 
-        guard !containsExercise(id: exercise.id) else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "A custom exercise with this identifier "
-                    + "already exists."
+                return .rejected
+            }
+
+            guard !isDuplicateName(
+                exercise.name,
+                in: candidate
+            ) else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "A custom exercise with this name already "
+                        + "exists, including archived exercises."
+                )
+
+                return .rejected
+            }
+
+            let now = Date()
+
+            candidate.append(
+                StoredCustomExercise(
+                    exercise: exercise,
+                    isArchived: false,
+                    createdAt: now,
+                    updatedAt: now
+                )
             )
 
-            return false
+            return .persist
         }
-
-        guard !containsExercise(
-            named: exercise.name
-        ) else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "A custom exercise with this name already "
-                    + "exists, including archived exercises."
-            )
-
-            return false
-        }
-
-        let now = Date()
-        var candidate = storedExercises
-
-        candidate.append(
-            StoredCustomExercise(
-                exercise: exercise,
-                isArchived: false,
-                createdAt: now,
-                updatedAt: now
-            )
-        )
-
-        return persistAndPublish(
-            candidate
-        )
     }
 
     // MARK: - Update
@@ -148,49 +145,45 @@ final class CustomExerciseStore: ObservableObject {
     func update(
         _ exercise: Exercise
     ) -> Bool {
-        guard canAttemptSave() else {
-            return false
-        }
+        performMutation { candidate in
+            guard let index = candidate.firstIndex(
+                where: { $0.id == exercise.id }
+            ) else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "The custom exercise could not be found."
+                )
 
-        guard let index = storedExercises.firstIndex(
-            where: { $0.id == exercise.id }
-        ) else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "The custom exercise could not be found."
+                return .rejected
+            }
+
+            guard !isDuplicateName(
+                exercise.name,
+                in: candidate,
+                excluding: exercise.id
+            ) else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "Another custom exercise already uses this "
+                        + "name, including archived exercises."
+                )
+
+                return .rejected
+            }
+
+            let existing = candidate[index]
+
+            candidate[index] = StoredCustomExercise(
+                exercise: exercise,
+                isArchived: existing.isArchived,
+                createdAt: existing.createdAt,
+                updatedAt: Date()
             )
 
-            return false
+            return .persist
         }
-
-        guard !containsExercise(
-            named: exercise.name,
-            excluding: exercise.id
-        ) else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "Another custom exercise already uses this "
-                    + "name, including archived exercises."
-            )
-
-            return false
-        }
-
-        let existing = storedExercises[index]
-        var candidate = storedExercises
-
-        candidate[index] = StoredCustomExercise(
-            exercise: exercise,
-            isArchived: existing.isArchived,
-            createdAt: existing.createdAt,
-            updatedAt: Date()
-        )
-
-        return persistAndPublish(
-            candidate
-        )
     }
 
     // MARK: - Permanent Deletion
@@ -199,33 +192,28 @@ final class CustomExerciseStore: ObservableObject {
     func permanentlyDelete(
         exerciseID: UUID
     ) -> Bool {
-        guard canAttemptSave() else {
-            return false
+        performMutation { candidate in
+            guard let index = candidate.firstIndex(
+                where: { $0.id == exerciseID }
+            ) else {
+                return .rejected
+            }
+
+            guard candidate[index].isArchived else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "Only archived custom exercises "
+                        + "can be permanently deleted."
+                )
+
+                return .rejected
+            }
+
+            candidate.remove(at: index)
+
+            return .persist
         }
-
-        guard let index = storedExercises.firstIndex(
-            where: { $0.id == exerciseID }
-        ) else {
-            return false
-        }
-
-        guard storedExercises[index].isArchived else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "Only archived custom exercises "
-                    + "can be permanently deleted."
-            )
-
-            return false
-        }
-
-        var candidate = storedExercises
-        candidate.remove(at: index)
-
-        return persistAndPublish(
-            candidate
-        )
     }
 
     // MARK: - Archive
@@ -234,33 +222,28 @@ final class CustomExerciseStore: ObservableObject {
     func archive(
         exerciseID: UUID
     ) -> Bool {
-        guard canAttemptSave() else {
-            return false
+        performMutation { candidate in
+            guard let index = candidate.firstIndex(
+                where: { $0.id == exerciseID }
+            ) else {
+                return .rejected
+            }
+
+            guard !candidate[index].isArchived else {
+                return .succeededWithoutPersistence
+            }
+
+            let existing = candidate[index]
+
+            candidate[index] = StoredCustomExercise(
+                exercise: existing.exercise,
+                isArchived: true,
+                createdAt: existing.createdAt,
+                updatedAt: Date()
+            )
+
+            return .persist
         }
-
-        guard let index = storedExercises.firstIndex(
-            where: { $0.id == exerciseID }
-        ) else {
-            return false
-        }
-
-        guard !storedExercises[index].isArchived else {
-            return true
-        }
-
-        let existing = storedExercises[index]
-        var candidate = storedExercises
-
-        candidate[index] = StoredCustomExercise(
-            exercise: existing.exercise,
-            isArchived: true,
-            createdAt: existing.createdAt,
-            updatedAt: Date()
-        )
-
-        return persistAndPublish(
-            candidate
-        )
     }
 
     // MARK: - Restore
@@ -269,48 +252,43 @@ final class CustomExerciseStore: ObservableObject {
     func restore(
         exerciseID: UUID
     ) -> Bool {
-        guard canAttemptSave() else {
-            return false
-        }
+        performMutation { candidate in
+            guard let index = candidate.firstIndex(
+                where: { $0.id == exerciseID }
+            ) else {
+                return .rejected
+            }
 
-        guard let index = storedExercises.firstIndex(
-            where: { $0.id == exerciseID }
-        ) else {
-            return false
-        }
+            let existing = candidate[index]
 
-        let existing = storedExercises[index]
+            guard existing.isArchived else {
+                return .succeededWithoutPersistence
+            }
 
-        guard existing.isArchived else {
-            return true
-        }
+            guard !isDuplicateName(
+                existing.exercise.name,
+                in: candidate,
+                excluding: exerciseID
+            ) else {
+                setPersistenceError(
+                    operation: .saving,
+                    message:
+                        "This exercise cannot be restored because "
+                        + "another custom exercise uses the same name."
+                )
 
-        guard !containsExercise(
-            named: existing.exercise.name,
-            excluding: exerciseID
-        ) else {
-            setPersistenceError(
-                operation: .saving,
-                message:
-                    "This exercise cannot be restored because "
-                    + "another custom exercise uses the same name."
+                return .rejected
+            }
+
+            candidate[index] = StoredCustomExercise(
+                exercise: existing.exercise,
+                isArchived: false,
+                createdAt: existing.createdAt,
+                updatedAt: Date()
             )
 
-            return false
+            return .persist
         }
-
-        var candidate = storedExercises
-
-        candidate[index] = StoredCustomExercise(
-            exercise: existing.exercise,
-            isArchived: false,
-            createdAt: existing.createdAt,
-            updatedAt: Date()
-        )
-
-        return persistAndPublish(
-            candidate
-        )
     }
 
     // MARK: - Backup Replacement
@@ -378,6 +356,37 @@ final class CustomExerciseStore: ObservableObject {
                 "Custom exercises could not be saved because "
                 + "the existing saved data could not be read."
         )
+    }
+
+    // MARK: - Mutation Coordination
+
+    private enum MutationOutcome {
+        case persist
+        case succeededWithoutPersistence
+        case rejected
+    }
+
+    private func performMutation(
+        _ mutation: (
+            inout [StoredCustomExercise]
+        ) -> MutationOutcome
+    ) -> Bool {
+        guard canAttemptSave() else {
+            return false
+        }
+
+        var candidate = storedExercises
+
+        switch mutation(&candidate) {
+        case .persist:
+            return persistAndPublish(candidate)
+
+        case .succeededWithoutPersistence:
+            return true
+
+        case .rejected:
+            return false
+        }
     }
 
     // MARK: - Persistence
@@ -460,7 +469,17 @@ final class CustomExerciseStore: ObservableObject {
         }
     }
 
-    private var exercisesReservedForNaming: [Exercise] {
-        reservedExercises + allExercises
+    private func isDuplicateName(
+        _ name: String,
+        in exercises: [StoredCustomExercise],
+        excluding exerciseID: UUID? = nil
+    ) -> Bool {
+        ExerciseNameValidator.validate(
+            name,
+            existingExercises:
+                reservedExercises
+                + exercises.map(\.exercise),
+            excluding: exerciseID
+        ) == .duplicate
     }
 }

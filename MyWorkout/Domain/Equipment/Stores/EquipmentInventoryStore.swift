@@ -256,72 +256,14 @@ final class EquipmentInventoryStore: ObservableObject {
     func convertInventory(
         to newUnit: UnitSystem
     ) {
-        let oldUnit =
-            inventory.unitSystem
-
-        guard newUnit != oldUnit else {
+        guard newUnit != inventory.unitSystem else {
             return
         }
 
-        func convert(
-            _ value: Double
-        ) -> Double {
-            switch (
-                oldUnit,
-                newUnit
-            ) {
-            case (
-                .pounds,
-                .kilograms
-            ):
-                return WeightConversion
-                    .poundsToKilograms(
-                        value
-                    )
-
-            case (
-                .kilograms,
-                .pounds
-            ):
-                return WeightConversion
-                    .kilogramsToPounds(
-                        value
-                    )
-
-            default:
-                return value
-            }
-        }
-
-        inventory.barbellWeight =
-            convert(
-                inventory.barbellWeight
-            )
-
-        inventory.plates =
-            inventory.plates.map {
-                PlateInventory(
-                    id: $0.id,
-                    weight: convert(
-                        $0.weight
-                    ),
-                    quantity: $0.quantity
-                )
-            }
-
-        inventory.dumbbells =
-            inventory.dumbbells.map {
-                DumbbellInventory(
-                    id: $0.id,
-                    weight: convert(
-                        $0.weight
-                    ),
-                    quantity: $0.quantity
-                )
-            }
-
-        inventory.unitSystem =
-            newUnit
+        inventory = EquipmentInventoryConverter.converted(
+            inventory,
+            to: newUnit
+        )
 
         sort()
         save()

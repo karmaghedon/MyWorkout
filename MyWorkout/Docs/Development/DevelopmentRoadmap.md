@@ -58,7 +58,11 @@ Phases 1–14 established the core product and architecture:
 
 ## Current phase
 
-# Phase 18 — Documentation
+# Phase 20 — Stabilization
+
+Phase 19 is complete. The codebase now uses the final App/Core/Domain/Features/Resources/Docs structure, and the last cleanup audit found no additional high-value view extraction that justified added complexity.
+
+## Phase 18 — Documentation
 
 - ✅ 18.1 Documentation structure
 - ✅ 18.2 Architecture documentation
@@ -67,68 +71,46 @@ Phases 1–14 established the core product and architecture:
 - ✅ 18.5 Development standards and workflow
 - ✅ 18.6 Release checklist
 - ☐ 18.7 Add project screenshots when final UI stabilizes
-- ☐ 18.8 Final documentation-to-code consistency review after Phase 19
+- ✅ 18.8 Documentation-to-code consistency review after Phase 19
 
 ## Phase 19 — Architecture Cleanup
 
 - ✅ 19.1 App/Core/Domain/Features/Resources/Docs structure established
+- ✅ 19.2 Dependency audit
+- ✅ 19.3 View-size and responsibility audit
+- ✅ 19.4 Dead and commented code cleanup
+- ✅ 19.5 Duplicate test-file cleanup
+- ✅ 19.6 Naming and folder consistency review
+- ✅ 19.7 Documentation refresh
 
-### 19.1 Folder structure audit
+Completed responsibility extractions:
 
-- evaluate `Core`, `Domain`, and feature-oriented grouping
-- move files in small buildable batches
-- keep behavior unchanged
+- active workout persistence coordinator
+- equipment inventory converter
+- custom exercise row
+- dashboard store error presentation
+- template exercise picker
+- custom exercise mutation consolidation
 
-### 19.2 Dependency audit
+The remaining large files were reviewed by responsibility rather than line count. No further extraction is planned unless a future feature creates a clear reusable boundary.
 
-- identify unnecessary concrete dependencies
-- keep protocols narrow
-- remove unused abstractions
-- verify dependency direction
+## Phase 20 — Stabilization checklist
 
-### 19.3 View-size audit
-
-- identify views exceeding approximately 150–200 lines
-- extract reusable components only where it adds value
-- avoid extraction for its own sake
-
-### 19.4 Dead-code cleanup
-
-- remove unused types
-- remove commented-out code
-- remove duplicate files
-- remove obsolete migration code only when compatibility policy allows it
-
-### 19.5 Naming and folder consistency
-
-- standardize folder names
-- standardize test-support naming
-- review `Helper` versus `Utilities`
-- review model placement
-
-### 19.6 Documentation refresh
-
-- update folder diagrams after final movement
-- update architecture paths
-- update README
-
-## Phase 20 — Stabilization
-
-- release configuration build
-- full unit test pass
-- manual regression checklist
-- fresh install
-- upgrade from an existing install
-- backup export
-- backup import
-- older backup compatibility
-- active workout interruption and restore
-- corrupted persistence behavior
-- performance review
-- accessibility review
-- version and build numbering
-- release notes
-- version 1.0 architecture review
+- ☐ release configuration build
+- ☐ full unit test pass
+- ☐ manual regression checklist
+- ☐ fresh install
+- ☐ upgrade from an existing install
+- ☐ backup export
+- ☐ backup import
+- ☐ older backup compatibility
+- ☐ active workout interruption and restore
+- ☐ corrupted persistence behavior
+- ☐ performance review
+- ☐ accessibility review
+- ☐ version and build numbering
+- ☐ release notes
+- ☐ version 1.0 architecture review
 
 ## Deferred product ideas
 
