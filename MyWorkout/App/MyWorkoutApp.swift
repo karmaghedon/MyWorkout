@@ -2,7 +2,6 @@ import SwiftUI
 
 @main
 struct MyWorkoutApp: App {
-    
     @StateObject private var logStore = WorkoutLogStore()
     @StateObject private var templateStore = WorkoutTemplateStore()
     @StateObject private var equipmentStore = EquipmentInventoryStore()
@@ -10,10 +9,10 @@ struct MyWorkoutApp: App {
     @StateObject private var activeWorkoutStore = ActiveWorkoutStore()
     @StateObject private var customExerciseStore = CustomExerciseStore()
     @StateObject private var analyticsCache = AnalyticsCache()
-    
+
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            AppShellView()
                 .environmentObject(logStore)
                 .environmentObject(templateStore)
                 .environmentObject(equipmentStore)

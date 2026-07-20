@@ -8,229 +8,91 @@ struct DashboardView: View {
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
 
-    @State private var navigationPath: [AppRoute] = []
-
     private var columns: [GridItem] {
         [GridItem(.flexible())]
     }
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            ScrollView {
-                VStack(
-                    alignment: .leading,
-                    spacing: AppTheme.Spacing.xl
-                ) {
-                    Text("MyWorkout")
-                        .font(.largeTitle)
-                        .bold()
-                        .padding(.horizontal)
+        ScrollView {
+            VStack(
+                alignment: .leading,
+                spacing: AppTheme.Spacing.xl
+            ) {
+                Text("MyWorkout")
+                    .font(.largeTitle)
+                    .bold()
+                    .padding(.horizontal)
 
-                    DashboardStoreErrorsView(
-                        messages: currentErrorMessages
+                DashboardStoreErrorsView(
+                    messages: currentErrorMessages
+                )
+
+                DashboardStatsView()
+
+                dashboardSection(title: "Train") {
+                    dashboardLink(
+                        title: "Start Workout",
+                        subtitle: "Begin training session",
+                        route: .startWorkout
                     )
 
-                    DashboardStatsView()
-
-                    dashboardSection(title: "Train") {
-                        dashboardLink(
-                            title: "Start Workout",
-                            subtitle: "Begin training session",
-                            route: .startWorkout
-                        )
-
-                        dashboardLink(
-                            title: "History",
-                            subtitle: "View previous workouts",
-                            route: .history
-                        )
-                    }
-
-                    dashboardSection(title: "Progress") {
-                        dashboardLink(
-                            title: "Analytics",
-                            subtitle: "PRs, volume, trends",
-                            route: .analytics
-                        )
-
-                        dashboardLink(
-                            title: "Strength",
-                            subtitle: "1RM progression",
-                            route: .strengthTrends
-                        )
-                    }
-
-                    dashboardSection(title: "Manage") {
-                        dashboardLink(
-                            title: "Templates",
-                            subtitle: "Create & edit workout plans",
-                            route: .templates
-                        )
-
-                        dashboardLink(
-                            title: "Equipment",
-                            subtitle: "Inventory & plates",
-                            route: .equipmentInventory
-                        )
-                        
-                        dashboardLink(
-                            title: "Custom Exercises",
-                            subtitle: "Create and manage your own exercises",
-                            route: .customExercises
-                        )
-                    }
-
-                    dashboardSection(title: "Settings") {
-                        dashboardLink(
-                            title: "Settings",
-                            subtitle: "Units, timers, formulas",
-                            route: .settings
-                        )
-
-                        dashboardLink(
-                            title: "Export",
-                            subtitle: "CSV backup & reports",
-                            route: .export
-                        )
-                    }
-                }
-                .padding(.bottom)
-            }
-            .navigationDestination(for: AppRoute.self) { route in
-                destination(for: route)
-            }
-        }
-    }
-
-    // MARK: - Navigation
-
-    @ViewBuilder
-    private func destination(
-        for route: AppRoute
-    ) -> some View {
-        switch route {
-        case .startWorkout:
-            StartWorkoutView()
-
-        case .history:
-            HistoryView()
-
-        case .analytics:
-            AnalyticsView()
-
-        case .strengthTrends:
-            StrengthTrendView()
-
-        case .templates:
-            TemplatesView()
-
-        case .equipmentInventory:
-            EquipmentInventoryView()
-
-        case .settings:
-            SettingsView()
-
-        case .export:
-            ExportView()
-
-        case .activeWorkout:
-            WorkoutSessionView()
-
-        case let .workoutLogDetail(logID):
-            if let log = logStore.logs.first(
-                where: { $0.id == logID }
-            ) {
-                WorkoutLogDetailView(log: log)
-            } else {
-                missingDestinationView(
-                    title: "Workout Not Found",
-                    message: "This workout may have been deleted."
-                )
-            }
-
-        case let .editTemplate(templateID):
-            if let template = templateStore.templates.first(
-                where: { $0.id == templateID }
-            ) {
-                TemplateEditorView(template: template)
-                    .id(template.id)
-            } else {
-                missingDestinationView(
-                    title: "Template Not Found",
-                    message: "This workout template may have been deleted."
-                )
-            }
-
-        case let .exerciseDetail(exerciseID):
-            if let exercise = exerciseRegistry.exercise(
-                id: exerciseID
-            ) {
-                ExerciseDetailView(exercise: exercise)
-            } else {
-                missingDestinationView(
-                    title: "Exercise Not Found",
-                    message: "This exercise is no longer available."
-                )
-            }
-            
-        case .customExercises:
-            CustomExercisesView(
-                onCreateExercise: {
-                    navigationPath.append(
-                        .createCustomExercise
-                    )
-                },
-                onEditExercise: { exercise in
-                    navigationPath.append(
-                        .editCustomExercise(
-                            exercise.id
-                        )
+                    dashboardLink(
+                        title: "History",
+                        subtitle: "View previous workouts",
+                        route: .history
                     )
                 }
-            )
 
-        case .createCustomExercise:
-            CustomExerciseFormView(
-                mode: .create
-            )
+                dashboardSection(title: "Progress") {
+                    dashboardLink(
+                        title: "Analytics",
+                        subtitle: "PRs, volume, trends",
+                        route: .analytics
+                    )
 
-        case let .editCustomExercise(exerciseID):
-            if let exercise = customExerciseStore.exercise(
-                id: exerciseID
-            ) {
-                CustomExerciseFormView(
-                    mode: .edit(exercise)
-                )
-            } else {
-                missingDestinationView(
-                    title: "Exercise Not Found",
-                    message:
-                        "This custom exercise may have been archived "
-                        + "or removed."
-                )
+                    dashboardLink(
+                        title: "Strength",
+                        subtitle: "1RM progression",
+                        route: .strengthTrends
+                    )
+                }
+
+                dashboardSection(title: "Manage") {
+                    dashboardLink(
+                        title: "Templates",
+                        subtitle: "Create & edit workout plans",
+                        route: .templates
+                    )
+
+                    dashboardLink(
+                        title: "Equipment",
+                        subtitle: "Inventory & plates",
+                        route: .equipmentInventory
+                    )
+
+                    dashboardLink(
+                        title: "Custom Exercises",
+                        subtitle: "Create and manage your own exercises",
+                        route: .customExercises
+                    )
+                }
+
+                dashboardSection(title: "Settings") {
+                    dashboardLink(
+                        title: "Settings",
+                        subtitle: "Units, timers, formulas",
+                        route: .settings
+                    )
+
+                    dashboardLink(
+                        title: "Export",
+                        subtitle: "CSV backup & reports",
+                        route: .export
+                    )
+                }
             }
+            .padding(.bottom)
         }
-    }
-
-    private var exerciseRegistry: ExerciseRegistry {
-        ExerciseRegistryFactory.make(
-            templates: templateStore.templates,
-            logs: logStore.logs,
-            customExercises: customExerciseStore.allExercises
-        )
-    }
-
-    private func missingDestinationView(
-        title: String,
-        message: String
-    ) -> some View {
-        AppEmptyStateView(
-            title: LocalizedStringKey(title),
-            message: LocalizedStringKey(message),
-            systemImage: "exclamationmark.triangle"
-        )
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Dashboard Sections
@@ -291,5 +153,4 @@ struct DashboardView: View {
             \.currentError
         )
     }
-
 }

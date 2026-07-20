@@ -134,6 +134,18 @@
 		F5B8EAF1300D4B7400CF5449 /* CustomExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF0300D4B7400CF5449 /* CustomExerciseRow.swift */; };
 		F5B8EAF3300D4BA800CF5449 /* DashboardStoreErrorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF2300D4BA800CF5449 /* DashboardStoreErrorsView.swift */; };
 		F5B8EAF6300D545C00CF5449 /* TemplateExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF5300D545C00CF5449 /* TemplateExercisePickerView.swift */; };
+		F5B8EB05300D9E2D00CF5449 /* NavigationArchitecture_F1.1.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB04300D9E2C00CF5449 /* NavigationArchitecture_F1.1.md */; };
+		F5B8EB07300D9E3800CF5449 /* ScreenInventory_F1.1.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB06300D9E3800CF5449 /* ScreenInventory_F1.1.md */; };
+		F5B8EB09300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB08300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md */; };
+		F5B8EB0B300DA37300CF5449 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EB0A300DA37300CF5449 /* AppTab.swift */; };
+		F5B8EB0D300DA37A00CF5449 /* AppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EB0C300DA37A00CF5449 /* AppShellView.swift */; };
+		F5B8EB0F300DA4C600CF5449 /* README_F1.2.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB0E300DA4C600CF5449 /* README_F1.2.md */; };
+		F5B8EB11300DA71F00CF5449 /* AppTabLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EB10300DA71F00CF5449 /* AppTabLabel.swift */; };
+		F5B8EB13300DA77100CF5449 /* README_F1.3.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB12300DA77100CF5449 /* README_F1.3.md */; };
+		F5B8EB15300DA96700CF5449 /* MyWorkoutTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EB14300DA96700CF5449 /* MyWorkoutTabBar.swift */; };
+		F5B8EB17300DA9A600CF5449 /* README_F1.4.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB16300DA9A600CF5449 /* README_F1.4.md */; };
+		F5B8EB19300DADF200CF5449 /* WorkoutTabPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EB18300DADF200CF5449 /* WorkoutTabPresentation.swift */; };
+		F5B8EB1B300DAE1C00CF5449 /* README_F1.5.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB1A300DAE1C00CF5449 /* README_F1.5.md */; };
 		F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5BF30342FF9473400AB5AD9 /* LaunchScreen.storyboard */; };
 		F5BF30372FF9662900AB5AD9 /* ActiveWorkoutStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */; };
 		F5BF30392FF9DC1800AB5AD9 /* ExerciseRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30382FF9DC1800AB5AD9 /* ExerciseRowView.swift */; };
@@ -358,6 +370,30 @@
 		F5B8EAF0300D4B7400CF5449 /* CustomExerciseRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomExerciseRow.swift; sourceTree = "<group>"; };
 		F5B8EAF2300D4BA800CF5449 /* DashboardStoreErrorsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardStoreErrorsView.swift; sourceTree = "<group>"; };
 		F5B8EAF5300D545C00CF5449 /* TemplateExercisePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateExercisePickerView.swift; sourceTree = "<group>"; };
+		F5B8EAF8300D987B00CF5449 /* ProductVision_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ProductVision_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAF9300D98A900CF5449 /* FrontendArchitecture_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FrontendArchitecture_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFA300D98C700CF5449 /* DesignSystem_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DesignSystem_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFB300D98E800CF5449 /* UXPrinciples_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UXPrinciples_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFC300D98FF00CF5449 /* FrontendRoadmap_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FrontendRoadmap_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFD300D992000CF5449 /* ComponentLibrary_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ComponentLibrary_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFE300D993500CF5449 /* NavigationArchitecture_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = NavigationArchitecture_F1.0.md; sourceTree = "<group>"; };
+		F5B8EAFF300D994F00CF5449 /* ScreenInventory_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ScreenInventory_F1.0.md; sourceTree = "<group>"; };
+		F5B8EB00300D996B00CF5449 /* FrontendDecisionLog_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FrontendDecisionLog_F1.0.md; sourceTree = "<group>"; };
+		F5B8EB01300D998E00CF5449 /* DesignPrinciples_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DesignPrinciples_F1.0.md; sourceTree = "<group>"; };
+		F5B8EB02300D99A900CF5449 /* MyWorkout Design Blueprint_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "MyWorkout Design Blueprint_F1.0.md"; sourceTree = "<group>"; };
+		F5B8EB04300D9E2C00CF5449 /* NavigationArchitecture_F1.1.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = NavigationArchitecture_F1.1.md; sourceTree = "<group>"; };
+		F5B8EB06300D9E3800CF5449 /* ScreenInventory_F1.1.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = ScreenInventory_F1.1.md; sourceTree = "<group>"; };
+		F5B8EB08300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = FrontendDecisionLog_F1.1_Entries.md; sourceTree = "<group>"; };
+		F5B8EB0A300DA37300CF5449 /* AppTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		F5B8EB0C300DA37A00CF5449 /* AppShellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppShellView.swift; sourceTree = "<group>"; };
+		F5B8EB0E300DA4C600CF5449 /* README_F1.2.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_F1.2.md; sourceTree = "<group>"; };
+		F5B8EB10300DA71F00CF5449 /* AppTabLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTabLabel.swift; sourceTree = "<group>"; };
+		F5B8EB12300DA77100CF5449 /* README_F1.3.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_F1.3.md; sourceTree = "<group>"; };
+		F5B8EB14300DA96700CF5449 /* MyWorkoutTabBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyWorkoutTabBar.swift; sourceTree = "<group>"; };
+		F5B8EB16300DA9A600CF5449 /* README_F1.4.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_F1.4.md; sourceTree = "<group>"; };
+		F5B8EB18300DADF200CF5449 /* WorkoutTabPresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutTabPresentation.swift; sourceTree = "<group>"; };
+		F5B8EB1A300DAE1C00CF5449 /* README_F1.5.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_F1.5.md; sourceTree = "<group>"; };
+		F5B8EB1D300DB17900CF5449 /* MyWorkout Design Blueprint_F1.1.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "MyWorkout Design Blueprint_F1.1.md"; sourceTree = "<group>"; };
 		F5BF30342FF9473400AB5AD9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5BF30362FF9662900AB5AD9 /* ActiveWorkoutStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutStore.swift; sourceTree = "<group>"; };
 		F5BF30382FF9DC1800AB5AD9 /* ExerciseRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRowView.swift; sourceTree = "<group>"; };
@@ -962,6 +998,7 @@
 		D14188FB19F871BE61015A6E /* Docs */ = {
 			isa = PBXGroup;
 			children = (
+				F5B8EAF7300D985500CF5449 /* Frontend */,
 				2DE22C526D548BAB3C2D0B14 /* Architecture */,
 				EB9BD10A76AA18CBEAA77F4D /* Development */,
 				B9E019B81C2142714AEFBDC6 /* Features */,
@@ -1100,6 +1137,40 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		F5B8EAF7300D985500CF5449 /* Frontend */ = {
+			isa = PBXGroup;
+			children = (
+				F5B8EB1A300DAE1C00CF5449 /* README_F1.5.md */,
+				F5B8EB03300D9E0100CF5449 /* Archive */,
+				F5B8EAF8300D987B00CF5449 /* ProductVision_F1.0.md */,
+				F5B8EAF9300D98A900CF5449 /* FrontendArchitecture_F1.0.md */,
+				F5B8EAFA300D98C700CF5449 /* DesignSystem_F1.0.md */,
+				F5B8EAFB300D98E800CF5449 /* UXPrinciples_F1.0.md */,
+				F5B8EAFC300D98FF00CF5449 /* FrontendRoadmap_F1.0.md */,
+				F5B8EAFD300D992000CF5449 /* ComponentLibrary_F1.0.md */,
+				F5B8EB04300D9E2C00CF5449 /* NavigationArchitecture_F1.1.md */,
+				F5B8EB06300D9E3800CF5449 /* ScreenInventory_F1.1.md */,
+				F5B8EB08300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md */,
+				F5B8EB01300D998E00CF5449 /* DesignPrinciples_F1.0.md */,
+				F5B8EB1D300DB17900CF5449 /* MyWorkout Design Blueprint_F1.1.md */,
+			);
+			path = Frontend;
+			sourceTree = "<group>";
+		};
+		F5B8EB03300D9E0100CF5449 /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				F5B8EB02300D99A900CF5449 /* MyWorkout Design Blueprint_F1.0.md */,
+				F5B8EB16300DA9A600CF5449 /* README_F1.4.md */,
+				F5B8EB12300DA77100CF5449 /* README_F1.3.md */,
+				F5B8EB0E300DA4C600CF5449 /* README_F1.2.md */,
+				F5B8EAFE300D993500CF5449 /* NavigationArchitecture_F1.0.md */,
+				F5B8EAFF300D994F00CF5449 /* ScreenInventory_F1.0.md */,
+				F5B8EB00300D996B00CF5449 /* FrontendDecisionLog_F1.0.md */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
 		F5BF30902FFDFF1600AB5AD9 /* MyWorkoutTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1149,6 +1220,11 @@
 		FB127745BE452A254728F3DE /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				F5B8EB18300DADF200CF5449 /* WorkoutTabPresentation.swift */,
+				F5B8EB14300DA96700CF5449 /* MyWorkoutTabBar.swift */,
+				F5B8EB10300DA71F00CF5449 /* AppTabLabel.swift */,
+				F5B8EB0C300DA37A00CF5449 /* AppShellView.swift */,
+				F5B8EB0A300DA37300CF5449 /* AppTab.swift */,
 				F54B80953006917800615DA0 /* AppRoute.swift */,
 			);
 			path = Navigation;
@@ -1286,7 +1362,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5BF30352FF9473400AB5AD9 /* LaunchScreen.storyboard in Resources */,
+				F5B8EB05300D9E2D00CF5449 /* NavigationArchitecture_F1.1.md in Resources */,
+				F5B8EB1B300DAE1C00CF5449 /* README_F1.5.md in Resources */,
+				F5B8EB13300DA77100CF5449 /* README_F1.3.md in Resources */,
+				F5B8EB07300D9E3800CF5449 /* ScreenInventory_F1.1.md in Resources */,
 				F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */,
+				F5B8EB0F300DA4C600CF5449 /* README_F1.2.md in Resources */,
+				F5B8EB17300DA9A600CF5449 /* README_F1.4.md in Resources */,
+				F5B8EB09300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md in Resources */,
 				F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1308,6 +1391,7 @@
 				F54B8113300CF6A400615DA0 /* CustomExerciseReplacing.swift in Sources */,
 				F54B80B43006E49800615DA0 /* WorkoutTemplateRepository.swift in Sources */,
 				F5BF30B92FFEDA7D00AB5AD9 /* ImportActionsSection.swift in Sources */,
+				F5B8EB0B300DA37300CF5449 /* AppTab.swift in Sources */,
 				F54B80C43008309E00615DA0 /* CustomExerciseIdentitySection.swift in Sources */,
 				F5BF30592FF9FA6F00AB5AD9 /* PreviousPerformanceView.swift in Sources */,
 				F5BF30392FF9DC1800AB5AD9 /* ExerciseRowView.swift in Sources */,
@@ -1332,6 +1416,7 @@
 				F54005122FF5C0990079CC05 /* WeightConversion.swift in Sources */,
 				F5BF303B2FF9DC4E00AB5AD9 /* DetailRow.swift in Sources */,
 				F540051C2FF69DD30079CC05 /* BackupDocument.swift in Sources */,
+				F5B8EB0D300DA37A00CF5449 /* AppShellView.swift in Sources */,
 				F54005162FF5CF8D0079CC05 /* WorkoutCSVExporter.swift in Sources */,
 				F54004E92FF413830079CC05 /* WarmupSet.swift in Sources */,
 				F5BF30C12FFF19E700AB5AD9 /* Rounding.swift in Sources */,
@@ -1371,8 +1456,10 @@
 				F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */,
 				F5630A393003EAF6000BB3AD /* ExerciseRegistryFactory.swift in Sources */,
 				F5BF30AE2FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift in Sources */,
+				F5B8EB11300DA71F00CF5449 /* AppTabLabel.swift in Sources */,
 				F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */,
 				F5BF30B42FFED4B300AB5AD9 /* PlatesInventorySection.swift in Sources */,
+				F5B8EB19300DADF200CF5449 /* WorkoutTabPresentation.swift in Sources */,
 				F5BF30AB2FFED42000AB5AD9 /* PersonalRecordsSection.swift in Sources */,
 				F54005062FF568570079CC05 /* RestTimerBadge.swift in Sources */,
 				F5BF30372FF9662900AB5AD9 /* ActiveWorkoutStore.swift in Sources */,
@@ -1415,6 +1502,7 @@
 				F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift in Sources */,
+				F5B8EB15300DA96700CF5449 /* MyWorkoutTabBar.swift in Sources */,
 				F54B80D730091DB500615DA0 /* ExerciseNameValidator.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
