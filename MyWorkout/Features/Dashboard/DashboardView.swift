@@ -30,6 +30,8 @@ struct DashboardView: View {
                 heroCard
                     .padding(.horizontal)
 
+                nextWorkoutSection
+
                 todaysProgressSection
 
                 prHighlightsSection
@@ -128,6 +130,76 @@ struct DashboardView: View {
                     systemImage: "figure.strengthtraining.traditional",
                     action: onStartWorkout
                 )
+            }
+        }
+    }
+
+    // MARK: - Next Workout
+
+    /// The template that's most "due" — least recently performed, with
+    /// never-performed templates treated as the most overdue of all.
+    private var suggestedNextTemplate: WorkoutTemplate? {
+        templateStore.templates.min {
+            (lastPerformedDate(for: $0) ?? .distantPast)
+                < (lastPerformedDate(for: $1) ?? .distantPast)
+        }
+    }
+
+    private func lastPerformedDate(for template: WorkoutTemplate) -> Date? {
+        logStore.logs
+            .filter { $0.workoutName == template.name }
+            .map(\.date)
+            .max()
+    }
+
+    private func nextWorkoutSubtitle(for template: WorkoutTemplate) -> String {
+        guard let lastDate = lastPerformedDate(for: template) else {
+            return "Not started yet"
+        }
+
+        return "Last done \(lastDate.formatted(.relative(presentation: .named)))"
+    }
+
+    private func startSuggestedWorkout(_ template: WorkoutTemplate) {
+        let workout = Workout(
+            name: template.name,
+            exercises: template.exercises
+        )
+
+        if case .started = activeWorkoutStore.start(workout) {
+            onStartWorkout()
+        }
+    }
+
+    @ViewBuilder
+    private var nextWorkoutSection: some View {
+        if !activeWorkoutStore.hasActiveWorkout,
+           let template = suggestedNextTemplate {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                SectionHeader(title: "Next Up")
+                    .padding(.horizontal)
+
+                AppCard {
+                    HStack(spacing: AppTheme.Spacing.md) {
+                        WorkoutCard(
+                            systemImage: "figure.strengthtraining.traditional",
+                            title: template.name
+                        ) {
+                            Text(nextWorkoutSubtitle(for: template))
+                                .font(AppTheme.Typography.caption)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+
+                        IconButton(
+                            systemImage: "play.fill",
+                            accessibilityLabel: "Start \(template.name)",
+                            color: AppTheme.accent
+                        ) {
+                            startSuggestedWorkout(template)
+                        }
+                    }
+                }
+                .padding(.horizontal)
             }
         }
     }
