@@ -26,16 +26,14 @@ struct LoggedSetsView: View {
                     Text("\(formatWeight(displayWeight(set.weight))) \(weightUnit) × \(set.reps)")
                         .font(AppTheme.Typography.numeric(16))
 
-                    Button {
+                    IconButton(
+                        systemImage: "xmark",
+                        accessibilityLabel: "Delete set \(set.setNumber)",
+                        size: 11,
+                        weight: .bold
+                    ) {
                         onDeleteSet(set.id)
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 28, height: 28)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Delete set \(set.setNumber)")
                 }
                 .padding(.vertical, 6)
             }

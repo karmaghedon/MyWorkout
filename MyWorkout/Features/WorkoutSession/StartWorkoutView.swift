@@ -19,10 +19,10 @@ struct StartWorkoutView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Resume \(activeWorkout.name)")
-                                .font(.headline)
+                                .font(AppTheme.Typography.cardTitle)
 
                             Text("Workout in progress • \(activeWorkoutStore.formattedElapsedTime)")
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -129,11 +129,11 @@ struct StartWorkoutView: View {
             ) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
-                        .font(.caption)
+                        .font(AppTheme.Typography.caption)
                         .foregroundStyle(AppTheme.secondaryText)
 
                     Text(lastPerformedText(for: template))
-                        .font(.caption2)
+                        .font(AppTheme.Typography.footnote)
                         .foregroundStyle(AppTheme.tertiaryText)
                 }
             }
@@ -141,7 +141,7 @@ struct StartWorkoutView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(AppTheme.Typography.caption)
                 .foregroundStyle(AppTheme.tertiaryText)
         }
     }

@@ -56,6 +56,8 @@ struct DoubleBigStepperControl: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
                 .accessibilityLabel("Decrease \(title.lowercased())")
                 .accessibilityValue(accessibilityValue)
 
@@ -66,6 +68,8 @@ struct DoubleBigStepperControl: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
                 .accessibilityLabel("Increase \(title.lowercased())")
                 .accessibilityValue(accessibilityValue)
             }
