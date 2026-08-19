@@ -20,7 +20,7 @@ struct ExerciseMusclesView: View {
     private func muscleGroup(title: String, muscles: [String]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.headline)
+                .font(AppTheme.Typography.label)
 
             FlowLayout(spacing: 8) {
                 ForEach(muscles, id: \.self) { muscle in

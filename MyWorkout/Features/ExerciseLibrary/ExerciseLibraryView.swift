@@ -89,12 +89,13 @@ struct ExerciseLibraryView: View {
                                 Text(
                                     "Show \(group.exercises.count - initialDisplayCount) more"
                                 )
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                                 .foregroundStyle(.secondary)
 
                                 Spacer()
                             }
-                            .padding(.vertical, 4)
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
                         }
                     }
                 }

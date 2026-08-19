@@ -7,7 +7,7 @@ struct ExerciseHeaderView: View {
         VStack(spacing: 12) {
             Image(systemName: iconName)
                 .font(.system(size: 42))
-                .foregroundStyle(.blue)
+                .foregroundStyle(AppTheme.accent)
 
             VStack(spacing: 4) {
                 Text(exercise.name)
@@ -17,7 +17,7 @@ struct ExerciseHeaderView: View {
                 Text(
                     "\(exercise.muscleGroup.displayName) • \(exercise.equipment.displayName) • \(exercise.exerciseType.rawValue.capitalized)"
                 )
-                    .font(.subheadline)
+                    .font(AppTheme.Typography.label)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }

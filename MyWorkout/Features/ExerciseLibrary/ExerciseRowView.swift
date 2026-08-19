@@ -28,12 +28,12 @@ struct ExerciseRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(exercise.name)
-                .font(.headline)
+                .font(AppTheme.Typography.cardTitle)
                 .foregroundStyle(.primary)
 
             if !subtitleParts.isEmpty {
                 Text(subtitleParts.joined(separator: " • "))
-                    .font(.caption)
+                    .font(AppTheme.Typography.caption)
                     .foregroundStyle(.secondary)
             }
         }
