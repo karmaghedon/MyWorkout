@@ -34,11 +34,11 @@ struct WorkoutLogDetailView: View {
                     if !exercise.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Notes")
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                                 .bold()
 
                             Text(exercise.notes)
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                                 .foregroundColor(.secondary)
                         }
                         .padding(.top, 6)

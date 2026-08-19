@@ -34,11 +34,11 @@ struct HistoryView: View {
                             ) {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(log.date.formatted(date: .omitted, time: .shortened))
-                                        .font(.caption)
+                                        .font(AppTheme.Typography.caption)
                                         .foregroundStyle(AppTheme.secondaryText)
 
                                     Text("\(setCount(for: log)) sets")
-                                        .font(.caption)
+                                        .font(AppTheme.Typography.caption)
                                 }
                             }
                         }
@@ -54,10 +54,11 @@ struct HistoryView: View {
                         HStack {
                             Spacer()
                             Text("Load More")
-                                .font(.subheadline)
+                                .font(AppTheme.Typography.label)
                             Spacer()
                         }
-                        .padding(.vertical,8)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                     }
                 }
             }
