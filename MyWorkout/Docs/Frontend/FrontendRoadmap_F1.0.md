@@ -80,19 +80,23 @@ F4 — Workout
 
 F5 — Library
 
-☐ (least mature phase)
+☑ (all sub-goals implemented; not yet device-tested — see
+`PendingDeviceTests.md`)
 
-- [ ] Rich Exercise Cards — `ExerciseRowView` (the list row) is a plain
-      name/subtitle row; `ExerciseDetailView` itself is already rich
-      (header, badges, muscles, instructions, tips, warnings) but the
-      browse experience isn't.
-- [ ] Filters — none. The list is grouped by muscle group only.
-- [ ] Muscle Chips — muscle info shows as plain text in list rows and as
-      `InfoBadge` in detail; not used as a browsable/filterable facet.
-- [ ] Equipment — shown as text/badge, not filterable.
-- [ ] Difficulty — shown in detail, not filterable.
-- [ ] Favorites — not built.
-- [ ] Related Exercises — not built.
+- [x] Rich Exercise Cards — `ExerciseRowView` redesigned with an
+      equipment icon badge and muscle/equipment/difficulty `Chip`s
+      instead of a plain joined-text subtitle.
+- [x] Filters — toolbar filter menu on `ExerciseLibraryView`: Equipment,
+      Difficulty (options derived from the actual exercise data), and
+      Favorites Only.
+- [x] Muscle Chips — muscle group now renders as a `Chip` on every row
+      (see Rich Exercise Cards).
+- [x] Equipment — filterable via the filter menu; shown as a `Chip` and
+      an icon badge on rows.
+- [x] Difficulty — filterable via the filter menu; shown as a `Chip`.
+- [x] Favorites — new `FavoriteExercisesStore`; star toggle per row.
+- [x] Related Exercises — `ExerciseDetailView` shows up to four other
+      exercises sharing the same muscle group.
 - [x] Custom Exercises — reachable and manageable from the Library tab
       (F5 nav work, prior version of this roadmap).
 

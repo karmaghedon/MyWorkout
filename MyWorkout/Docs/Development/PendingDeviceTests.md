@@ -58,3 +58,51 @@ Each entry: what changed, where, and exactly what to check.
   "previous" to compare against) but the summary still shows
   correctly otherwise. Confirm "Done" returns you to Start Workout, not
   back into the (now-finished) session.
+
+## F5 — Library
+
+### Rich Exercise Cards / Muscle Chips
+- **What:** Every exercise row (Library list, template exercise pickers,
+  template editor) now shows an equipment icon badge and
+  muscle/equipment/difficulty as small chips instead of a plain
+  "Muscle • Equipment • Type" text line.
+- **Test:** Open the Library tab and confirm rows look right at normal
+  and larger Dynamic Type sizes (chips wrapping/truncating gracefully,
+  not overlapping). Check the same row style still looks right inside
+  Create Workout Template's exercise picker and the Template Editor's
+  "Add Exercises" picker — those reuse the same component.
+
+### Filters
+- **What:** New filter icon in the Library toolbar — Equipment,
+  Difficulty, and "Favorites Only," with a "Clear Filters" option when
+  any are active. An empty state appears if a combination matches
+  nothing.
+- **Test:** Try each filter individually and combined. Confirm the
+  filter icon fills in (`line.3.horizontal.decrease.circle.fill`) when
+  any filter is active, and reverts to the outline icon when cleared.
+  Filter down to nothing (e.g. Favorites Only with no favorites yet) and
+  confirm the empty state shows instead of a blank list.
+
+### Favorites
+- **What:** Star button on each Library row (not inside the row's own
+  tap target — it's a sibling next to the `NavigationLink`, specifically
+  to avoid nesting one button inside another's label).
+- **Test — this is the one I'd flag as highest-risk to verify, since I
+  couldn't test the interaction live:** tap the star on a few rows and
+  confirm it toggles without also navigating into that exercise's detail
+  view (i.e. tapping the star should NOT trigger the row's NavigationLink).
+  Conversely, tapping anywhere else on the row should navigate to detail
+  without toggling the star. Confirm favorited state survives leaving and
+  returning to the tab (persisted).
+
+### Related Exercises
+- **What:** Exercise detail screens now show up to 4 other exercises
+  sharing the same muscle group, at the bottom, each pushing to its own
+  detail view.
+- **Test:** Open an exercise with several others in the same muscle
+  group — confirm the "Related Exercises" section appears and lists
+  sensible exercises (not itself). Tap into one — confirm it pushes
+  correctly and *that* screen also shows its own related exercises
+  (recursive navigation). Open an exercise that's the only one in its
+  muscle group (if any) — confirm the section is simply absent, not an
+  empty section header.
