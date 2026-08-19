@@ -29,6 +29,8 @@ struct DashboardView: View {
                 heroCard
                     .padding(.horizontal)
 
+                todaysProgressSection
+
                 DashboardStatsView()
 
                 if !recentLogs.isEmpty {
@@ -121,6 +123,52 @@ struct DashboardView: View {
                 )
             }
         }
+    }
+
+    // MARK: - Today's Progress
+
+    private var todaysLogs: [WorkoutLog] {
+        logStore.logs.filter {
+            Calendar.current.isDateInToday($0.date)
+        }
+    }
+
+    private var activeWorkoutStartedToday: Bool {
+        guard let startedAt = activeWorkoutStore.startedAt else {
+            return false
+        }
+
+        return Calendar.current.isDateInToday(startedAt)
+    }
+
+    private var workoutsToday: Int {
+        todaysLogs.count + (activeWorkoutStartedToday ? 1 : 0)
+    }
+
+    private var setsToday: Int {
+        let completedSets = todaysLogs.reduce(0) { total, log in
+            total + log.completedExercises.reduce(0) { $0 + $1.sets.count }
+        }
+
+        let activeSets = activeWorkoutStartedToday
+            ? activeWorkoutStore.exerciseStates.values.reduce(0) { $0 + $1.loggedSets.count }
+            : 0
+
+        return completedSets + activeSets
+    }
+
+    private var todaysProgressSection: some View {
+        AppCard {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                SectionHeader(title: "Today")
+
+                HStack(spacing: AppTheme.Spacing.md) {
+                    MetricView(label: "Workouts", value: "\(workoutsToday)")
+                    MetricView(label: "Sets", value: "\(setsToday)")
+                }
+            }
+        }
+        .padding(.horizontal)
     }
 
     // MARK: - Recent Activity
