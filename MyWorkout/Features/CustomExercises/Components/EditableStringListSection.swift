@@ -25,6 +25,8 @@ struct EditableStringListSection: View {
                         removeItem(at: index)
                     } label: {
                         Image(systemName: "minus.circle.fill")
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Rectangle())
                             .accessibilityHidden(true)
                     }
                     .buttonStyle(.borderless)

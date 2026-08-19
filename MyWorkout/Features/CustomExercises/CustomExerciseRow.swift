@@ -70,17 +70,12 @@ struct CustomExerciseRow: View {
 
             Spacer()
 
-            Button(action: onRestore) {
-                Label(
-                    "Restore",
-                    systemImage: "arrow.uturn.backward"
-                )
-                .labelStyle(.iconOnly)
+            IconButton(
+                systemImage: "arrow.uturn.backward",
+                accessibilityLabel: "Restore \(exercise.name)"
+            ) {
+                onRestore()
             }
-            .buttonStyle(.borderless)
-            .accessibilityLabel(
-                "Restore \(exercise.name)"
-            )
             .accessibilityHint(
                 "Makes this exercise active again."
             )
@@ -108,11 +103,11 @@ struct CustomExerciseRow: View {
             spacing: 4
         ) {
             Text(exercise.name)
-                .font(.headline)
+                .font(AppTheme.Typography.cardTitle)
                 .foregroundStyle(.primary)
 
             Text(summary)
-                .font(.subheadline)
+                .font(AppTheme.Typography.label)
                 .foregroundStyle(.secondary)
         }
     }
