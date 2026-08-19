@@ -21,11 +21,15 @@ struct AnalyticsView: View {
                 mostRecentWorkoutName: mostRecentWorkoutName
             )
 
+            ConsistencySection(logs: logStore.logs)
+
             RecoveryWarningsSection(warnings: analyticsCache.recoveryWarnings)
 
             PerformanceWarningsSection(warnings: analyticsCache.performanceWarnings)
 
             VolumeByMuscleGroupSection(volumeByMuscleGroup: analyticsCache.volumeByMuscleGroup)
+
+            VolumeTrendSection(logs: logStore.logs, settings: settingsStore.settings)
 
             PersonalRecordsSection(
                 personalRecords: analyticsCache.personalRecords,

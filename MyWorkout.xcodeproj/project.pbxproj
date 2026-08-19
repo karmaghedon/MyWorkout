@@ -214,6 +214,8 @@
 		F5BF30AC2FFED42000AB5AD9 /* RecentWorkoutsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30A62FFED42000AB5AD9 /* RecentWorkoutsSection.swift */; };
 		F5BF30AD2FFED42000AB5AD9 /* RecoveryWarningsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30A72FFED42000AB5AD9 /* RecoveryWarningsSection.swift */; };
 		F5BF30AE2FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30A82FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift */; };
+		4A3B65DDFD5DB2791C214599 /* ConsistencySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52A1E488BDB5559F9523FDC /* ConsistencySection.swift */; };
+		E83F41699EF8BF2CB25151CE /* VolumeTrendSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CEA233FCEB0453ED137EB78 /* VolumeTrendSection.swift */; };
 		F5BF30B22FFED4B300AB5AD9 /* BarbellInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30AF2FFED4B200AB5AD9 /* BarbellInventorySection.swift */; };
 		F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B02FFED4B300AB5AD9 /* DumbbellsInventorySection.swift */; };
 		F5BF30B42FFED4B300AB5AD9 /* PlatesInventorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B12FFED4B300AB5AD9 /* PlatesInventorySection.swift */; };
@@ -484,6 +486,8 @@
 		F5BF30A62FFED42000AB5AD9 /* RecentWorkoutsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentWorkoutsSection.swift; sourceTree = "<group>"; };
 		F5BF30A72FFED42000AB5AD9 /* RecoveryWarningsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoveryWarningsSection.swift; sourceTree = "<group>"; };
 		F5BF30A82FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeByMuscleGroupSection.swift; sourceTree = "<group>"; };
+		A52A1E488BDB5559F9523FDC /* ConsistencySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencySection.swift; sourceTree = "<group>"; };
+		2CEA233FCEB0453ED137EB78 /* VolumeTrendSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeTrendSection.swift; sourceTree = "<group>"; };
 		F5BF30AF2FFED4B200AB5AD9 /* BarbellInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarbellInventorySection.swift; sourceTree = "<group>"; };
 		F5BF30B02FFED4B300AB5AD9 /* DumbbellsInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DumbbellsInventorySection.swift; sourceTree = "<group>"; };
 		F5BF30B12FFED4B300AB5AD9 /* PlatesInventorySection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatesInventorySection.swift; sourceTree = "<group>"; };
@@ -911,11 +915,13 @@
 			isa = PBXGroup;
 			children = (
 				F5BF30A32FFED42000AB5AD9 /* AnalyticsOverviewSection.swift */,
+				A52A1E488BDB5559F9523FDC /* ConsistencySection.swift */,
 				F5BF30A42FFED42000AB5AD9 /* PerformanceWarningsSection.swift */,
 				F5BF30A52FFED42000AB5AD9 /* PersonalRecordsSection.swift */,
 				F5BF30A62FFED42000AB5AD9 /* RecentWorkoutsSection.swift */,
 				F5BF30A72FFED42000AB5AD9 /* RecoveryWarningsSection.swift */,
 				F5BF30A82FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift */,
+				2CEA233FCEB0453ED137EB78 /* VolumeTrendSection.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1534,6 +1540,8 @@
 				F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */,
 				F5630A393003EAF6000BB3AD /* ExerciseRegistryFactory.swift in Sources */,
 				F5BF30AE2FFED42000AB5AD9 /* VolumeByMuscleGroupSection.swift in Sources */,
+				4A3B65DDFD5DB2791C214599 /* ConsistencySection.swift in Sources */,
+				E83F41699EF8BF2CB25151CE /* VolumeTrendSection.swift in Sources */,
 				F5B8EB11300DA71F00CF5449 /* AppTabLabel.swift in Sources */,
 				F5BF30B32FFED4B300AB5AD9 /* DumbbellsInventorySection.swift in Sources */,
 				F5BF30B42FFED4B300AB5AD9 /* PlatesInventorySection.swift in Sources */,
