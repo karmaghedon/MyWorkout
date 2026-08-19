@@ -39,6 +39,19 @@ struct ProfileHubView: View {
                         route: .export
                     )
                 }
+
+                QuickActionSection(title: "About") {
+                    NavigationLink {
+                        AboutView()
+                    } label: {
+                        QuickActionRow(
+                            systemImage: "info.circle.fill",
+                            title: "About MyWorkout",
+                            subtitle: "Version, credits & app info"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .padding(.bottom)
         }

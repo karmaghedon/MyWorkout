@@ -68,6 +68,7 @@
 		B747F6539DEAF6498AC82612 /* QuickActionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A62BD9AF17B61273162F49 /* QuickActionSection.swift */; };
 		99870219ECB957A74E5DFED3 /* ProgressHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82B542EBA777CA86D33C186 /* ProgressHubView.swift */; };
 		23583A23477D6DDFF91A4CFD /* ProfileHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */; };
+		B475C8CD44F5E363D746AD69 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A423872DDB29572B68C36C /* AboutView.swift */; };
 		5043A4D640E3392C9F7CACC6 /* MetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE331815941BE343B36BDC5 /* MetricCard.swift */; };
 		C8432E3EB2BC0B9CF7BC0B8C /* WorkoutCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */; };
 		11B77DD8FFDAC1BEAC7B9D4B /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60925D9AC6021896DE70AAB9 /* Chip.swift */; };
@@ -306,6 +307,7 @@
 		41A62BD9AF17B61273162F49 /* QuickActionSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionSection.swift; sourceTree = "<group>"; };
 		E82B542EBA777CA86D33C186 /* ProgressHubView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHubView.swift; sourceTree = "<group>"; };
 		E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileHubView.swift; sourceTree = "<group>"; };
+		12A423872DDB29572B68C36C /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		5DE331815941BE343B36BDC5 /* MetricCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetricCard.swift; sourceTree = "<group>"; };
 		A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutCard.swift; sourceTree = "<group>"; };
 		60925D9AC6021896DE70AAB9 /* Chip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
@@ -614,6 +616,7 @@
 		02ACFC1728FBFBC10367F8B9 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				12A423872DDB29572B68C36C /* AboutView.swift */,
 				E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */,
 			);
 			path = Profile;
@@ -1635,6 +1638,7 @@
 				B747F6539DEAF6498AC82612 /* QuickActionSection.swift in Sources */,
 				99870219ECB957A74E5DFED3 /* ProgressHubView.swift in Sources */,
 				23583A23477D6DDFF91A4CFD /* ProfileHubView.swift in Sources */,
+				B475C8CD44F5E363D746AD69 /* AboutView.swift in Sources */,
 				C8894ED4D174A9E5ACF90A70 /* SecondaryButton.swift in Sources */,
 				BF345ED23499ECF01C1D91CE /* DestructiveButton.swift in Sources */,
 				5D162C70A6BD87A48BE66780 /* FloatingActionButton.swift in Sources */,
