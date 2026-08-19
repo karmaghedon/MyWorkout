@@ -7,6 +7,7 @@ struct DashboardView: View {
     @EnvironmentObject private var settingsStore: UserSettingsStore
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
+    @EnvironmentObject private var analyticsCache: AnalyticsCache
 
     /// Routes to the Workout tab, resuming an in-progress session when one
     /// exists. Owned by `AppShellView` since only it holds tab selection
@@ -30,6 +31,8 @@ struct DashboardView: View {
                     .padding(.horizontal)
 
                 todaysProgressSection
+
+                recoverySection
 
                 DashboardStatsView()
 
@@ -169,6 +172,71 @@ struct DashboardView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    // MARK: - Recovery
+
+    private var topRecoveryWarning: RecoveryWarning? {
+        analyticsCache.recoveryWarnings.max {
+            severityRank($0.severity) < severityRank($1.severity)
+        }
+    }
+
+    private func severityRank(_ severity: WarningSeverity) -> Int {
+        switch severity {
+        case .low:
+            0
+        case .medium:
+            1
+        case .high:
+            2
+        }
+    }
+
+    private func severityColor(_ severity: WarningSeverity) -> Color {
+        severity == .high ? AppTheme.error : AppTheme.warning
+    }
+
+    @ViewBuilder
+    private var recoverySection: some View {
+        if let warning = topRecoveryWarning {
+            NavigationLink(value: AppRoute.analytics) {
+                AppCard {
+                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                        HStack {
+                            Label("Recovery", systemImage: "heart.text.square.fill")
+                                .font(AppTheme.Typography.eyebrow)
+                                .foregroundStyle(AppTheme.secondaryText)
+
+                            Spacer()
+
+                            ProgressBadge(
+                                text: warning.severity.rawValue,
+                                color: severityColor(warning.severity)
+                            )
+                        }
+
+                        Text(warning.title)
+                            .font(AppTheme.Typography.cardTitle)
+                            .foregroundStyle(Color.primary)
+
+                        Text(warning.message)
+                            .font(AppTheme.Typography.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+
+                        if analyticsCache.recoveryWarnings.count > 1 {
+                            let remaining = analyticsCache.recoveryWarnings.count - 1
+
+                            Text("+\(remaining) more recovery warning\(remaining == 1 ? "" : "s")")
+                                .font(AppTheme.Typography.footnote)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal)
+        }
     }
 
     // MARK: - Recent Activity
