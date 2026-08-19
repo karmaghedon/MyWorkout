@@ -106,3 +106,23 @@ Each entry: what changed, where, and exactly what to check.
   (recursive navigation). Open an exercise that's the only one in its
   muscle group (if any) — confirm the section is simply absent, not an
   empty section header.
+
+## F6 — Progress
+
+### Volume Trend
+- **What:** New "Volume Trend" section on the Analytics screen — a bar
+  chart of total training volume per week, over the last 12 weeks that
+  have any data.
+- **Test:** With fewer than 2 weeks of history, confirm it shows the
+  "Log a few more weeks..." message instead of a broken/empty chart.
+  With more history, confirm the bars look proportionally right (a
+  heavier/higher-rep week should show a taller bar) and the weight unit
+  matches your Settings (lb/kg).
+
+### Consistency
+- **What:** New "Consistency" section on Analytics — current streak
+  (consecutive weeks with a workout) and a 12-week activity strip.
+- **Test:** Confirm the streak number matches reality (count backward
+  from this week — the first week with no workout should stop the
+  streak). Confirm the strip has exactly 12 segments and the filled
+  ones line up with weeks you actually trained.

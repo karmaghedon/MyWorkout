@@ -102,16 +102,16 @@ F5 — Library
 
 F6 — Progress
 
-☐ (partial, core analytics solid)
+☑ (Future Body Metrics excluded — deferred elsewhere; not yet
+device-tested — see `PendingDeviceTests.md`)
 
 - [x] Strength Trends — `StrengthTrendView`.
-- [ ] Volume Trends — `VolumeByMuscleGroupSection` shows current totals
-      per muscle group, not a trend over time.
-- [x] Muscle Distribution — effectively covered by
-      `VolumeByMuscleGroupSection`.
+- [x] Volume Trends — new `VolumeTrendSection`: weekly total volume
+      over the last 12 weeks with data, as a bar chart.
+- [x] Muscle Distribution — covered by `VolumeByMuscleGroupSection`.
 - [x] Personal Records — `PersonalRecordsSection`.
-- [ ] Consistency — no streak/consistency tracking exists anywhere in
-      the codebase.
+- [x] Consistency — new `ConsistencySection`: current streak (weeks in
+      a row with a workout) plus a 12-week activity strip.
 - [x] Recovery — `RecoveryWarningsSection`.
 - [ ] Future Body Metrics — not built; listed under "Deferred product
       ideas" in `Docs/Development/DevelopmentRoadmap.md`, so likely out
