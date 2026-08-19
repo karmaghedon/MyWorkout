@@ -126,3 +126,14 @@ Each entry: what changed, where, and exactly what to check.
   from this week — the first week with no workout should stop the
   streak). Confirm the strip has exactly 12 segments and the filled
   ones line up with weeks you actually trained.
+
+## F7 — Profile
+
+### About
+- **What:** New "About" section on the Profile tab hub, pushing to a
+  new `AboutView` with the app name, version/build number, and a short
+  description.
+- **Test:** Confirm the version/build number shown matches the actual
+  installed build (check Xcode's build settings or the Info.plist if
+  unsure) rather than showing "—" (the fallback if `Bundle.main` lookup
+  fails).

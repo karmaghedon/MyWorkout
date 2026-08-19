@@ -119,14 +119,16 @@ device-tested — see `PendingDeviceTests.md`)
 
 F7 — Profile
 
-☐ (nearly done)
+☑ (all sub-goals implemented; not yet device-tested — see
+`PendingDeviceTests.md`)
 
 - [x] Settings — `ProfileHubView` → `SettingsView`.
 - [x] Equipment — `ProfileHubView` → `EquipmentInventoryView`.
 - [x] Units — part of Settings.
 - [x] Backup — `ProfileHubView` → `ExportView` ("Backup & Data").
 - [x] Restore — import, part of Backup & Data.
-- [ ] About — no About screen exists (version, credits, support info).
+- [x] About — new `AboutView` (name, version/build, short description),
+      reachable from a new "About" section on `ProfileHubView`.
 
 F8 — Premium Polish
 
