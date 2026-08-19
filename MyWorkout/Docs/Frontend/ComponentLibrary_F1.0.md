@@ -1,4 +1,4 @@
-Version: 2.0
+Version: 2.1
 Last Updated: 2026-08-19
 Status: Active
 
@@ -15,6 +15,16 @@ existing screens — those note the sites they replaced. A few were built
 ahead of any consumer, matching the spec even where no current screen
 needs them yet; those are marked accordingly and are fair game for the
 F3+ screen redesigns to adopt.
+
+A later cross-screen audit found that "every one reads from `AppTheme`"
+wasn't fully true yet — several components (`InfoBadge`, `AppEmptyStateView`,
+`ErrorState`, `LoadingState`, `MetricCard`, `ProgressBadge`,
+`InformationCard`, and `WorkoutCard`) still had a raw `.headline`/
+`.caption`/`.subheadline` font left over from before extraction. That pass
+also found and fixed a handful of components with no guaranteed 44×44pt
+touch target and a couple of decorative icons not hidden from VoiceOver.
+Entries below reflect the corrected state; components marked
+"*(pre-existing, unchanged)*" below genuinely still are.
 
 ---
 
@@ -44,7 +54,10 @@ A single icon as a tappable control with a guaranteed 44×44pt minimum
 touch target, even when the icon itself is drawn smaller. Replaces the
 `Image(systemName:).buttonStyle(.plain)` pattern, which had no
 touch-target guarantee.
-**Used by:** `RestTimerBadge` (stop), `StoreErrorBanner` (dismiss).
+**Used by:** `RestTimerBadge` (stop), `StoreErrorBanner` (dismiss),
+`LoggedSetsView` (delete set — replaced a hand-rolled 28×28pt button
+found during the touch-target audit), `CustomExerciseRow` (restore —
+replaced a `.buttonStyle(.borderless)` icon button with the same gap).
 
 ### FloatingActionButton
 Circular, elevated icon button — the only component that reaches for
@@ -76,15 +89,24 @@ library — it's a reasonable fit for future tile-style content.
 ### MetricCard
 A single glanceable number in its own card (a strength estimate, a
 personal record).
-**Used by:** `StrengthTrendView`'s current-1RM card.
+**Used by:** `StrengthTrendView`'s current-1RM card. Its label previously
+used raw `.caption` instead of `AppTheme.Typography.caption`; fixed
+during the cross-screen font-token audit.
 
 ### WorkoutCard
 An icon-badge row for a workout-related item (template, session, log
 entry) — icon in an accent-tinted circle, title, caller-supplied
-subtitle content.
+subtitle content, and a trailing `Spacer()` so the row always fills its
+available width rather than hugging its content.
 **Used by:** `RecentWorkoutsSection`, `HistoryView`, `TemplatesView`,
-`StartWorkoutView`. These four screens had near-identical hand-rolled
-versions of this exact row before extraction.
+`StartWorkoutView`, `DashboardView`'s Recent Activity section. The first
+four screens had near-identical hand-rolled versions of this exact row
+before extraction. The trailing `Spacer()` was added when the F3 Home
+redesign put `WorkoutCard` inside a plain `VStack` for the first time
+(every prior consumer sits inside a `List`, whose rows auto-stretch to
+full width) — without it, each row centered instead of staying
+left-aligned, since a `List` row's automatic full-width behavior had
+been silently doing the job this component should do itself.
 
 ---
 
@@ -99,16 +121,25 @@ A compact capsule label — a previous-performance value, a set counter.
 A capsule that carries a status color, for severity/state indicators.
 **Used by:** `RecoveryWarningsSection` — this fixed a real bug: every
 warning severity (low/medium/high) previously rendered the same orange
-regardless of level; now high severity renders in `AppTheme.error`.
+regardless of level; now high severity renders in `AppTheme.error`. Its
+`.caption.bold()` font is now built from `AppTheme.Typography.caption`
+rather than the raw system font.
 
 ### MetricView
 A compact label-over-value stack without its own card surface, for use
-inside a parent card that already provides the background.
+inside a parent card that already provides the background. Its value text
+has `.minimumScaleFactor(0.7)` so a long value (e.g. a template name in
+the "Latest" slot) shrinks to fit instead of hard-truncating with an
+ellipsis — added during the touch-target/text-overflow audit.
 **Used by:** `DashboardStatsView`'s Workouts/Latest/Alerts row.
 
-### InfoBadge *(pre-existing, unchanged)*
-Tag-style descriptor on `.thinMaterial`. **Used by:** `ExerciseHeaderView`,
-`ExerciseMusclesView`.
+### InfoBadge
+Tag-style descriptor on `.thinMaterial`.
+**Used by:** `ExerciseHeaderView`, `ExerciseMusclesView`. Its icon is now
+`.accessibilityHidden(true)` and the row is a single combined
+accessibility element — previously a VoiceOver user would hear the
+icon's raw SF Symbol name as a separate, confusing stop before the label
+text. Also switched its `.font(.caption)` to `AppTheme.Typography.caption`.
 
 ### InfoRow
 Label-and-value row (renamed from `DetailRow`, moved from
@@ -158,23 +189,27 @@ comment ("the Dashboard's top-of-screen greeting").
 
 ## Empty / loading / error states
 
-### AppEmptyStateView *(pre-existing, unchanged)*
+### AppEmptyStateView
 Icon + title + message for an empty screen. Three more screens
 (`StrengthTrendView`, `TemplatesView`, `StartWorkoutView`) had hand-rolled
-duplicates of this exact pattern before being migrated onto it.
+duplicates of this exact pattern before being migrated onto it. Title and
+message previously used raw `.headline`/`.subheadline`; now
+`AppTheme.Typography.cardTitle`/`label`.
 
 ### LoadingState
 Centered spinner with an optional caption — the counterpart to
 `AppEmptyStateView`/`ErrorState` for a screen still fetching content.
 **Not yet consumed** — the app is fully local/synchronous today, so
 nothing currently shows a loading state, but it's here for when one is
-needed.
+needed. Its caption previously used raw `.subheadline`; now
+`AppTheme.Typography.label`.
 
 ### ErrorState
 Full-screen failure state (icon/title/message, tinted `AppTheme.error`).
 Distinct from `StoreErrorBanner` (below), which is a small, dismissible
 inline banner rather than a full-screen state.
-**Not yet consumed.**
+**Not yet consumed.** Title and message previously used raw
+`.headline`/`.subheadline`; now `AppTheme.Typography.cardTitle`/`label`.
 
 ### StoreErrorBanner *(pre-existing)*
 Dismissible inline banner for a `StoreError`. Migrated its icon/border

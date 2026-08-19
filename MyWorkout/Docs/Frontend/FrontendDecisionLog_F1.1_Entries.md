@@ -1,6 +1,6 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Date:** 2026-08-19  
 **Status:** Approved
 
@@ -252,3 +252,103 @@ consolidate navigation.
 - The Export destination's Home-facing label changes to "Backup & Data"
   per FDL-008's recommended user-facing name; the underlying `ExportView`
   type and route are unchanged.
+
+---
+
+## FDL-014 — Enforce AppTheme tokens, touch targets, and VoiceOver labeling across every screen, not just new ones
+
+**Decision**
+Run a screen-by-screen audit of every Feature screen — not just the ones
+F2/F3 touched directly — against three concrete rules: every piece of
+custom UI text uses an `AppTheme.Typography` token instead of a raw
+system font; every custom-drawn interactive control (not a native
+SwiftUI control) guarantees a 44×44pt minimum touch target; and every
+purely decorative icon sitting next to text that already conveys the
+same information is hidden from VoiceOver. Fix violations in place
+rather than filing them for a later phase.
+
+**Reason**
+F2 built the design-token system and shared component library, but
+didn't retrofit every screen onto it — several still had raw
+`.headline`/`.caption`/`.subheadline` fonts, and a handful of hand-rolled
+buttons (a 28×28pt delete button, unguarded stepper +/- controls, a
+borderless restore icon) had no touch-target guarantee despite the
+shared library having already established the `.frame(minHeight: 44)`/
+`IconButton` pattern for exactly this. Leaving these in place would let
+the design system's own stated rule — "every one reads from `AppTheme`…
+rather than hardcoded values," `ComponentLibrary_F1.0.md` — go stale the
+same way the roadmap itself had gone stale before FDL-013's correction.
+
+**Consequences**
+- Screens touched: WorkoutSession, Dashboard, Exercise Library,
+  Templates, Analytics, Equipment Inventory, Custom Exercises, History.
+  Settings and Export were audited and found already clean — built
+  entirely from native `Form`/`Picker`/`Stepper`, no custom styling.
+- Shared library components fixed for the same reasons: `WorkoutCard`,
+  `MetricCard`, `InfoBadge`, `ProgressBadge`, `LoadingState`,
+  `AppEmptyStateView`, `ErrorState`, `InformationCard`, `MetricView` —
+  see `ComponentLibrary_F1.0.md` for the specific fix on each.
+- Touch-target fixes: `BigStepperControl`/`DoubleBigStepperControl`'s
+  +/- buttons, `LoggedSetsView`'s delete-set button (converted to
+  `IconButton`), `InventoryItemRow`'s delete button, `CustomExerciseRow`'s
+  restore button (converted to `IconButton`), `EditableStringListSection`'s
+  remove-item button (backs five separate lists in the custom-exercise
+  form), and two "show/load more" pagination links (Exercise Library,
+  History).
+- A related bug surfaced during F3 QA — not from this audit directly,
+  but from the same "does this actually work outside its original
+  context" scrutiny: `WorkoutCard` had no trailing `Spacer()`, so it only
+  ever filled its own content width. Invisible in every prior consumer
+  (all inside a `List`, whose rows auto-stretch to full width) until
+  Home's new Recent Activity section put it in a plain `VStack` for the
+  first time and every row centered instead of staying left-aligned.
+  Fixed at the component level — see `ComponentLibrary_F1.0.md`.
+- This is a consistency/correctness pass, not the formal "F10 —
+  Accessibility" phase — it doesn't cover Dynamic Type at accessibility
+  text sizes, VoiceOver navigation order across a full flow, or Reduce
+  Motion. `ReleaseChecklist.md` §12 ("UI and accessibility") and
+  `DevelopmentRoadmap.md`'s Phase 20 "accessibility review" item remain
+  unchecked; this entry is groundwork for that review, not a substitute
+  for it.
+
+---
+
+## FDL-015 — Rest-timer feedback and workout-session screen wake
+
+**Decision**
+Wire the previously-unused `Haptics.restComplete()` call to the rest
+timer's actual completion — only from the live per-second countdown, not
+from the app-launch restore path, so reopening the app after a timer
+finished in the background doesn't buzz unexpectedly — add a short
+system sound alongside it, and disable the idle timer for the duration
+of the active-workout screen.
+
+**Reason**
+`Haptics.restComplete()` existed with a doc comment describing "the rest
+timer running out" as its exact purpose but was never called from
+anywhere — dead code for its documented use case, found while auditing
+haptic/feedback consistency at the user's request. The sound and
+screen-wake additions came directly from user feedback while testing the
+haptic fix: haptics alone are silenced by the system-wide "System
+Haptics" setting (confirmed via Apple's own developer guidance, which
+states this can't be detected or overridden by an app — Core Haptics is
+gated by the same setting, not an escape hatch), so a sound gives users a
+second, independent feedback channel; and a workout session is exactly
+the kind of long, hands-off-the-screen interaction the idle timer isn't
+designed for.
+
+**Consequences**
+- `Haptics.restComplete()` now fires from
+  `ActiveWorkoutStore.updateRestSecondsRemaining(playsCompletionHaptic:)`,
+  gated by a parameter so only the live countdown tick opts in.
+- The sound uses a built-in `SystemSoundID` (1016) via
+  `AudioServicesPlaySystemSound` rather than a bundled custom audio
+  asset — this project isn't set up with Xcode's synchronized-folder
+  resource mechanism, and safely registering a new bundle resource in
+  `project.pbxproj` by hand (or installing tooling to do it) wasn't
+  justified for this. Revisit with a proper custom chime if the project
+  migrates to that mechanism, or the `xcodeproj` gem becomes installable
+  in the dev environment. Tracked as a backlog item.
+- `WorkoutSessionView` sets `UIApplication.shared.isIdleTimerDisabled =
+  true` on appear and `false` on disappear. Scoped to that one screen
+  only; no other screen needs this.

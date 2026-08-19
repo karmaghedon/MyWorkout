@@ -105,6 +105,53 @@ block automatic overwrite
 
 This is used for history, templates, and settings where preserving unreadable data is safer than replacing it.
 
+### A hazard in the envelope/legacy fallback, and why it's settings-specific
+
+The envelope/legacy dual-decode described above (`try?` the versioned envelope,
+fall back to the legacy shape on failure) has a sharp edge: `try?` treats
+*every* envelope-decode failure the same way, whether the data isn't an
+envelope at all or whether it *is* an envelope whose payload merely has one
+corrupted or unrecognized field. `UserSettingsStore` hit this in practice —
+a `UserSettings` payload with, say, an unrecognized `appearanceMode` value
+failed the envelope decode, fell through to the legacy path, and because
+every field of `UserSettings.init(from:)` is `decodeIfPresent(...) ??
+defaults`, the legacy decoder "succeeded" against the mismatched
+envelope-shaped JSON — silently producing an all-defaults `UserSettings`
+that then overwrote the real persisted data via the migration-triggered
+save. This is the corruption-protection contract failing at exactly the
+point it exists to guard.
+
+The fix, in `UserSettingsStore.decodeSettings`: check whether the data is
+shaped like an envelope (top-level `schemaVersion` and `payload` keys, via
+`JSONSerialization`) *before* choosing a decode path, rather than inferring
+the path from whether the envelope decode happened to throw. Only data with
+no envelope keys at all falls to the legacy path now; envelope-shaped data
+with a bad payload field throws a real error, which the caller already
+handles correctly (preserve on-disk data, mark non-writable, surface the
+error).
+
+This exact vulnerability is specific to how `UserSettings` decodes — a
+struct where every field independently defaults via `decodeIfPresent(...) ??
+defaults`, so a shape mismatch can decode "successfully" into an
+unintentional all-defaults value. The other repositories using the same
+envelope/legacy dual-decode pattern (`FileWorkoutLogRepository`,
+`FileWorkoutTemplateRepository`, `FileCustomExerciseRepository`) were
+checked and don't share it: their legacy fallback target is a plain
+`Array` (`[WorkoutLog]`, `[WorkoutTemplate]`, `[StoredCustomExercise]`),
+and JSONDecoder cannot decode a JSON object (the envelope shape) as an
+array type at all — a corrupted payload there throws a real `DecodingError`
+from the legacy attempt too, correctly hitting the corruption-protection
+path rather than silently succeeding. `EquipmentInventoryStore` doesn't use
+this pattern at all — a single direct `JSONDecoder().decode` with no
+envelope/legacy fallback.
+
+The general lesson for future persisted types: this hazard reappears
+whenever a legacy/fallback decode target has every field defaulted
+independently (the way `UserSettings` does). If a future payload type
+adopts that same fully-optional-with-defaults shape for its legacy decode
+target, it needs the same explicit shape check `UserSettingsStore` uses,
+not just a bare `try?`.
+
 ## Error exposure
 
 Persistence-capable stores expose:
