@@ -8,6 +8,7 @@ struct InfoBadge: View {
         HStack(spacing: 4) {
             if let systemImage {
                 Image(systemName: systemImage)
+                    .accessibilityHidden(true)
             }
 
             Text(text)
@@ -18,6 +19,7 @@ struct InfoBadge: View {
         .padding(.vertical, 6)
         .background(.thinMaterial)
         .clipShape(Capsule())
+        .accessibilityElement(children: .combine)
     }
 }
 

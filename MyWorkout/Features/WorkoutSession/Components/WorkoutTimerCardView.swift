@@ -20,6 +20,7 @@ struct WorkoutTimerCardView: View {
                 Image(systemName: "timer")
                     .font(.title2)
                     .foregroundStyle(AppTheme.accent)
+                    .accessibilityHidden(true)
             }
         }
     }

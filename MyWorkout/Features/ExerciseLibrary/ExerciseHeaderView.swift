@@ -8,6 +8,7 @@ struct ExerciseHeaderView: View {
             Image(systemName: iconName)
                 .font(.system(size: 42))
                 .foregroundStyle(AppTheme.accent)
+                .accessibilityHidden(true)
 
             VStack(spacing: 4) {
                 Text(exercise.name)
