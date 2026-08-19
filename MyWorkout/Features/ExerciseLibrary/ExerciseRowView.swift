@@ -3,41 +3,32 @@ import SwiftUI
 struct ExerciseRowView: View {
     let exercise: Exercise
 
-    var showsMuscleGroup: Bool = true
-    var showsEquipment: Bool = true
-    var showsExerciseType: Bool = true
-
-    private var subtitleParts: [String] {
-        var parts: [String] = []
-
-        if showsMuscleGroup {
-            parts.append(exercise.muscleGroup.displayName)
-        }
-
-        if showsEquipment {
-            parts.append(exercise.equipment.displayName)
-        }
-
-        if showsExerciseType {
-            parts.append(exercise.exerciseType.rawValue.capitalized)
-        }
-
-        return parts
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(exercise.name)
-                .font(AppTheme.Typography.cardTitle)
-                .foregroundStyle(.primary)
+        HStack(spacing: AppTheme.Spacing.md) {
+            ZStack {
+                RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
+                    .fill(AppTheme.accentMuted)
 
-            if !subtitleParts.isEmpty {
-                Text(subtitleParts.joined(separator: " • "))
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(.secondary)
+                Image(systemName: exercise.equipment.systemImage)
+                    .foregroundStyle(AppTheme.accent)
+            }
+            .frame(width: 44, height: 44)
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(exercise.name)
+                    .font(AppTheme.Typography.cardTitle)
+                    .foregroundStyle(.primary)
+
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    Chip(text: exercise.muscleGroup.displayName)
+                    Chip(text: exercise.equipment.displayName)
+                    Chip(text: exercise.difficulty)
+                }
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -99,6 +99,7 @@
 		F54B80BC300827FE00615DA0 /* CustomExerciseRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80BB300827FE00615DA0 /* CustomExerciseRepository.swift */; };
 		F54B80BE3008289A00615DA0 /* FileCustomExerciseRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80BD3008289A00615DA0 /* FileCustomExerciseRepository.swift */; };
 		F54B80C03008294B00615DA0 /* CustomExerciseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80BF3008294B00615DA0 /* CustomExerciseStore.swift */; };
+		E0634E8D079BCAFCBD329A3D /* FavoriteExercisesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220E34A726F41B70D17FCE1 /* FavoriteExercisesStore.swift */; };
 		F54B80C230082DD600615DA0 /* CustomExerciseDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80C130082DD600615DA0 /* CustomExerciseDraft.swift */; };
 		F54B80C43008309E00615DA0 /* CustomExerciseIdentitySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80C33008309E00615DA0 /* CustomExerciseIdentitySection.swift */; };
 		F54B80C63008503700615DA0 /* EditableStringListSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54B80C53008503700615DA0 /* EditableStringListSection.swift */; };
@@ -334,6 +335,7 @@
 		F54B80BB300827FE00615DA0 /* CustomExerciseRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseRepository.swift; sourceTree = "<group>"; };
 		F54B80BD3008289A00615DA0 /* FileCustomExerciseRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCustomExerciseRepository.swift; sourceTree = "<group>"; };
 		F54B80BF3008294B00615DA0 /* CustomExerciseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseStore.swift; sourceTree = "<group>"; };
+		B220E34A726F41B70D17FCE1 /* FavoriteExercisesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteExercisesStore.swift; sourceTree = "<group>"; };
 		F54B80C130082DD600615DA0 /* CustomExerciseDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseDraft.swift; sourceTree = "<group>"; };
 		F54B80C33008309E00615DA0 /* CustomExerciseIdentitySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseIdentitySection.swift; sourceTree = "<group>"; };
 		F54B80C53008503700615DA0 /* EditableStringListSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableStringListSection.swift; sourceTree = "<group>"; };
@@ -1161,6 +1163,7 @@
 			isa = PBXGroup;
 			children = (
 				F54B80BF3008294B00615DA0 /* CustomExerciseStore.swift */,
+				B220E34A726F41B70D17FCE1 /* FavoriteExercisesStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -1596,6 +1599,7 @@
 				F54B80B23006E2B700615DA0 /* FileWorkoutLogRepository.swift in Sources */,
 				F54004F52FF41DEA0079CC05 /* EquipmentInventoryView.swift in Sources */,
 				F54B80C03008294B00615DA0 /* CustomExerciseStore.swift in Sources */,
+				E0634E8D079BCAFCBD329A3D /* FavoriteExercisesStore.swift in Sources */,
 				F54004C72FF0C8490079CC05 /* Workout.swift in Sources */,
 				F54004B12FF0C6FE0079CC05 /* MyWorkoutApp.swift in Sources */,
 				F54B80C63008503700615DA0 /* EditableStringListSection.swift in Sources */,
