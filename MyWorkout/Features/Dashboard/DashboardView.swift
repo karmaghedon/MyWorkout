@@ -34,60 +34,6 @@ struct DashboardView: View {
                 if !recentLogs.isEmpty {
                     recentActivitySection
                 }
-
-                dashboardSection(title: "Progress") {
-                    quickActionLink(
-                        systemImage: "chart.bar.fill",
-                        title: "Analytics",
-                        subtitle: "PRs, volume, trends",
-                        route: .analytics
-                    )
-
-                    Divider()
-
-                    quickActionLink(
-                        systemImage: "chart.line.uptrend.xyaxis",
-                        title: "Strength",
-                        subtitle: "1RM progression",
-                        route: .strengthTrends
-                    )
-                }
-
-                dashboardSection(title: "Manage") {
-                    quickActionLink(
-                        systemImage: "list.bullet.rectangle",
-                        title: "Templates",
-                        subtitle: "Create & edit workout plans",
-                        route: .templates
-                    )
-
-                    Divider()
-
-                    quickActionLink(
-                        systemImage: "scalemass",
-                        title: "Equipment",
-                        subtitle: "Inventory & plates",
-                        route: .equipmentInventory
-                    )
-
-                    Divider()
-
-                    quickActionLink(
-                        systemImage: "figure.strengthtraining.functional",
-                        title: "Custom Exercises",
-                        subtitle: "Create and manage your own exercises",
-                        route: .customExercises
-                    )
-
-                    Divider()
-
-                    quickActionLink(
-                        systemImage: "tray.and.arrow.up",
-                        title: "Backup & Data",
-                        subtitle: "CSV export, import & backup",
-                        route: .export
-                    )
-                }
             }
             .padding(.bottom)
         }
@@ -217,44 +163,6 @@ struct DashboardView: View {
             }
             .padding(.horizontal)
         }
-    }
-
-    // MARK: - Dashboard Sections
-
-    private func dashboardSection<Content: View>(
-        title: String,
-        @ViewBuilder content: @escaping () -> Content
-    ) -> some View {
-        VStack(
-            alignment: .leading,
-            spacing: AppTheme.Spacing.sm
-        ) {
-            SectionHeader(title: title)
-                .padding(.horizontal)
-
-            AppCard {
-                VStack(spacing: 0) {
-                    content()
-                }
-            }
-            .padding(.horizontal)
-        }
-    }
-
-    private func quickActionLink(
-        systemImage: String,
-        title: String,
-        subtitle: String,
-        route: AppRoute
-    ) -> some View {
-        NavigationLink(value: route) {
-            QuickActionRow(
-                systemImage: systemImage,
-                title: title,
-                subtitle: subtitle
-            )
-        }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Error Reporting

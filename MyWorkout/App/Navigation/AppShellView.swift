@@ -46,14 +46,14 @@ struct AppShellView: View {
                 .progress,
                 path: $progressPath
             ) {
-                HistoryView()
+                ProgressHubView()
             }
 
             appTab(
                 .profile,
                 path: $profilePath
             ) {
-                SettingsView()
+                ProfileHubView()
             }
         }
         .toolbar(.hidden, for: .tabBar)

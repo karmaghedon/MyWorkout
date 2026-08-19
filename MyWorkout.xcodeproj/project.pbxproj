@@ -64,6 +64,9 @@
 		5CAE61C3E32B8EDA5DB90F65 /* AppCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0A24B4D800D38682A83F1F /* AppCard.swift */; };
 		3541C0022FBF95DF8D12DF59 /* InformationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378EAF362D4A33DAEC8179C5 /* InformationCard.swift */; };
 		32508616758A90C71CF2C2C2 /* QuickActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */; };
+		B747F6539DEAF6498AC82612 /* QuickActionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A62BD9AF17B61273162F49 /* QuickActionSection.swift */; };
+		99870219ECB957A74E5DFED3 /* ProgressHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82B542EBA777CA86D33C186 /* ProgressHubView.swift */; };
+		23583A23477D6DDFF91A4CFD /* ProfileHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */; };
 		5043A4D640E3392C9F7CACC6 /* MetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE331815941BE343B36BDC5 /* MetricCard.swift */; };
 		C8432E3EB2BC0B9CF7BC0B8C /* WorkoutCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */; };
 		11B77DD8FFDAC1BEAC7B9D4B /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60925D9AC6021896DE70AAB9 /* Chip.swift */; };
@@ -295,6 +298,9 @@
 		3A0A24B4D800D38682A83F1F /* AppCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppCard.swift; sourceTree = "<group>"; };
 		378EAF362D4A33DAEC8179C5 /* InformationCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InformationCard.swift; sourceTree = "<group>"; };
 		E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionRow.swift; sourceTree = "<group>"; };
+		41A62BD9AF17B61273162F49 /* QuickActionSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionSection.swift; sourceTree = "<group>"; };
+		E82B542EBA777CA86D33C186 /* ProgressHubView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHubView.swift; sourceTree = "<group>"; };
+		E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileHubView.swift; sourceTree = "<group>"; };
 		5DE331815941BE343B36BDC5 /* MetricCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetricCard.swift; sourceTree = "<group>"; };
 		A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutCard.swift; sourceTree = "<group>"; };
 		60925D9AC6021896DE70AAB9 /* Chip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
@@ -587,12 +593,30 @@
 				980F1444F7A3FA85E035C5DC /* ExerciseLibrary */,
 				D5B0329385884637F91C8AD9 /* Export */,
 				6AC0719028128D2297FDAFDA /* History */,
+				02ACFC1728FBFBC10367F8B9 /* Profile */,
+				67FF71775A43602CEAAEEC28 /* Progress */,
 				CC0C23F35D49BC8A9B409B07 /* Settings */,
 				6A69A17EE2777845638CF0C6 /* Shared */,
 				4727A31A7822F6E422CEE9A3 /* Templates */,
 				85B257E037D9AA6052D979F4 /* WorkoutSession */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		02ACFC1728FBFBC10367F8B9 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				E478ABAF5BF518B3EFFE2AFB /* ProfileHubView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		67FF71775A43602CEAAEEC28 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				E82B542EBA777CA86D33C186 /* ProgressHubView.swift */,
+			);
+			path = Progress;
 			sourceTree = "<group>";
 		};
 		23AE92A7B7F541B4D8BB18F3 /* Loading */ = {
@@ -935,6 +959,7 @@
 				F54B809030068F7000615DA0 /* PrimaryButton.swift */,
 				29C307FF2C0B7B0343B00A35 /* ProgressBadge.swift */,
 				E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */,
+				41A62BD9AF17B61273162F49 /* QuickActionSection.swift */,
 				5C5A348D321EFC1D38FED736 /* ScreenHeader.swift */,
 				A95A93027D4164B6BCF69CB1 /* SectionHeader.swift */,
 				53A856D7B7F40813A0004032 /* SecondaryButton.swift */,
@@ -1591,6 +1616,9 @@
 				F54B809130068F7000615DA0 /* PrimaryButton.swift in Sources */,
 				8978D6379E358461E51DA42C /* IconButton.swift in Sources */,
 				32508616758A90C71CF2C2C2 /* QuickActionRow.swift in Sources */,
+				B747F6539DEAF6498AC82612 /* QuickActionSection.swift in Sources */,
+				99870219ECB957A74E5DFED3 /* ProgressHubView.swift in Sources */,
+				23583A23477D6DDFF91A4CFD /* ProfileHubView.swift in Sources */,
 				C8894ED4D174A9E5ACF90A70 /* SecondaryButton.swift in Sources */,
 				BF345ED23499ECF01C1D91CE /* DestructiveButton.swift in Sources */,
 				5D162C70A6BD87A48BE66780 /* FloatingActionButton.swift in Sources */,

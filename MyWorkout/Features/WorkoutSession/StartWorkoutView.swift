@@ -53,6 +53,13 @@ struct StartWorkoutView: View {
             }
         }
         .navigationTitle("Start Workout")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink(value: AppRoute.templates) {
+                    Label("Manage Templates", systemImage: "list.bullet.rectangle")
+                }
+            }
+        }
         .navigationDestination(isPresented: $showWorkoutSession) {
             WorkoutSessionView()
         }

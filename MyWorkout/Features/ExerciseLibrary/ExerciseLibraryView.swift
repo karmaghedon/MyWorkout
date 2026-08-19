@@ -102,5 +102,12 @@ struct ExerciseLibraryView: View {
             }
         }
         .navigationTitle("Exercise Library")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink(value: AppRoute.customExercises) {
+                    Label("Custom Exercises", systemImage: "figure.strengthtraining.functional")
+                }
+            }
+        }
     }
 }
