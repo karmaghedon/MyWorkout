@@ -41,8 +41,9 @@ F3 — Home
 
 - [x] Welcome — greeting header, time-of-day aware.
 - [x] Resume Workout — stateful hero card (start / resume).
-- [ ] Today's Progress — `DashboardStatsView` shows lifetime totals
-      (Workouts/Latest/Alerts), not a today-scoped view.
+- [x] Today's Progress — new "Today" card between the hero and the
+      lifetime Overview stats: workouts and sets logged today, counting
+      an active workout that started today alongside completed logs.
 - [ ] Recovery — recovery warnings exist (`RecoveryWarningsSection`,
       Progress tab) but aren't surfaced on Home.
 - [ ] Weekly Summary — not built.
