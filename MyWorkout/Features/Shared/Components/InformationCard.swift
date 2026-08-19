@@ -13,7 +13,7 @@ struct InformationCard: View {
                     .font(AppTheme.Typography.cardTitle)
 
                 Text(subtitle)
-                    .font(.caption)
+                    .font(AppTheme.Typography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
 
                 Spacer(minLength: 0)

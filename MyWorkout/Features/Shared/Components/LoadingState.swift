@@ -12,7 +12,7 @@ struct LoadingState: View {
 
             if let message {
                 Text(message)
-                    .font(.subheadline)
+                    .font(AppTheme.Typography.label)
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }

@@ -9,7 +9,7 @@ struct ProgressBadge: View {
 
     var body: some View {
         Text(text)
-            .font(.caption.bold())
+            .font(AppTheme.Typography.caption.bold())
             .foregroundStyle(color)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)

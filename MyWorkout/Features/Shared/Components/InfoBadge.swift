@@ -12,7 +12,7 @@ struct InfoBadge: View {
 
             Text(text)
         }
-        .font(.caption)
+        .font(AppTheme.Typography.caption)
         .fontWeight(.semibold)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)

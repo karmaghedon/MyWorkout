@@ -22,7 +22,7 @@ struct WorkoutCard<Subtitle: View>: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.headline)
+                    .font(AppTheme.Typography.cardTitle)
 
                 subtitle()
             }

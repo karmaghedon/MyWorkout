@@ -16,10 +16,10 @@ struct ErrorState: View {
                 .accessibilityHidden(true)
 
             Text(title)
-                .font(.headline)
+                .font(AppTheme.Typography.cardTitle)
 
             Text(message)
-                .font(.subheadline)
+                .font(AppTheme.Typography.label)
                 .foregroundStyle(AppTheme.secondaryText)
         }
         .multilineTextAlignment(.center)

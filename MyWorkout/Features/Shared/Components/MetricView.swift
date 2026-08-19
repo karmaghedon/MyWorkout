@@ -17,6 +17,7 @@ struct MetricView: View {
             Text(value)
                 .font(AppTheme.Typography.label)
                 .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

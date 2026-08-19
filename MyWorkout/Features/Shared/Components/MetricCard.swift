@@ -12,7 +12,7 @@ struct MetricCard: View {
         AppCard(backgroundColor: backgroundColor, padding: AppTheme.Spacing.md) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.caption)
+                    .font(AppTheme.Typography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
 
                 Text(value)
