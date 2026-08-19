@@ -32,6 +32,8 @@ struct DashboardView: View {
 
                 todaysProgressSection
 
+                prHighlightsSection
+
                 weeklySummarySection
 
                 recoverySection
@@ -174,6 +176,76 @@ struct DashboardView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    // MARK: - PR Highlights
+
+    /// Current all-time personal records that were set by a set logged
+    /// *today* — i.e. genuinely new, not just the standing best. Compares
+    /// each all-time record against today's logged sets for the same
+    /// exercise rather than requiring a date on `PersonalRecord` itself.
+    private var newPersonalRecordsToday: [PersonalRecord] {
+        let todaysSets: [(key: String, set: LoggedSet)] = todaysLogs.flatMap { log in
+            log.completedExercises.flatMap { exercise -> [(key: String, set: LoggedSet)] in
+                let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
+                return exercise.sets.map { (key, $0) }
+            }
+        }
+
+        return analyticsCache.personalRecords.filter { record in
+            let recordKey = record.exerciseID?.uuidString ?? record.exerciseName
+
+            return todaysSets.contains {
+                $0.key == recordKey
+                    && $0.set.weight == record.weightPounds
+                    && $0.set.reps == record.reps
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var prHighlightsSection: some View {
+        if !newPersonalRecordsToday.isEmpty {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                SectionHeader(title: "New Personal Records")
+                    .padding(.horizontal)
+
+                AppCard(backgroundColor: AppTheme.accentMuted) {
+                    VStack(spacing: AppTheme.Spacing.md) {
+                        ForEach(
+                            Array(newPersonalRecordsToday.enumerated()),
+                            id: \.element.id
+                        ) { index, record in
+                            HStack(spacing: AppTheme.Spacing.md) {
+                                Image(systemName: "trophy.fill")
+                                    .foregroundStyle(.yellow)
+                                    .accessibilityHidden(true)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(record.exerciseName)
+                                        .font(AppTheme.Typography.cardTitle)
+
+                                    Text(
+                                        "\(formatWeight(settingsStore.settings.displayWeight(record.weightPounds))) "
+                                        + "\(settingsStore.settings.weightUnitLabel) × \(record.reps)"
+                                    )
+                                    .font(AppTheme.Typography.caption)
+                                    .foregroundStyle(AppTheme.secondaryText)
+                                }
+
+                                Spacer(minLength: 0)
+                            }
+                            .accessibilityElement(children: .combine)
+
+                            if index < newPersonalRecordsToday.count - 1 {
+                                Divider()
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
     }
 
     // MARK: - Weekly Summary
