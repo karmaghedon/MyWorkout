@@ -32,6 +32,8 @@ struct DashboardView: View {
 
                 todaysProgressSection
 
+                weeklySummarySection
+
                 recoverySection
 
                 DashboardStatsView()
@@ -169,6 +171,130 @@ struct DashboardView: View {
                     MetricView(label: "Workouts", value: "\(workoutsToday)")
                     MetricView(label: "Sets", value: "\(setsToday)")
                 }
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Weekly Summary
+
+    private var currentWeekInterval: DateInterval? {
+        Calendar.current.dateInterval(of: .weekOfYear, for: .now)
+    }
+
+    private var weekDays: [Date] {
+        guard let interval = currentWeekInterval else {
+            return []
+        }
+
+        let calendar = Calendar.current
+        var days: [Date] = []
+        var day = interval.start
+
+        while day < interval.end {
+            days.append(day)
+
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else {
+                break
+            }
+
+            day = nextDay
+        }
+
+        return days
+    }
+
+    private var thisWeeksLogs: [WorkoutLog] {
+        guard let interval = currentWeekInterval else {
+            return []
+        }
+
+        return logStore.logs.filter {
+            interval.contains($0.date)
+        }
+    }
+
+    private var activeWorkoutStartedThisWeek: Bool {
+        guard let startedAt = activeWorkoutStore.startedAt,
+              let interval = currentWeekInterval else {
+            return false
+        }
+
+        return interval.contains(startedAt)
+    }
+
+    private var workoutsThisWeek: Int {
+        thisWeeksLogs.count + (activeWorkoutStartedThisWeek ? 1 : 0)
+    }
+
+    private var setsThisWeek: Int {
+        let completedSets = thisWeeksLogs.reduce(0) { total, log in
+            total + log.completedExercises.reduce(0) { $0 + $1.sets.count }
+        }
+
+        let activeSets = activeWorkoutStartedThisWeek
+            ? activeWorkoutStore.exerciseStates.values.reduce(0) { $0 + $1.loggedSets.count }
+            : 0
+
+        return completedSets + activeSets
+    }
+
+    private func hasWorkout(on day: Date) -> Bool {
+        let calendar = Calendar.current
+
+        let hasLoggedWorkout = logStore.logs.contains {
+            calendar.isDate($0.date, inSameDayAs: day)
+        }
+
+        let hasActiveWorkoutStartedThatDay = activeWorkoutStore.startedAt.map {
+            calendar.isDate($0, inSameDayAs: day)
+        } ?? false
+
+        return hasLoggedWorkout || hasActiveWorkoutStartedThatDay
+    }
+
+    private var weekDayAccessibilityLabel: String {
+        let workoutDayNames = weekDays
+            .filter { hasWorkout(on: $0) }
+            .map { $0.formatted(.dateTime.weekday(.wide)) }
+
+        guard !workoutDayNames.isEmpty else {
+            return "No workouts this week yet"
+        }
+
+        return "Workout days this week: " + workoutDayNames.joined(separator: ", ")
+    }
+
+    private var weeklySummarySection: some View {
+        AppCard {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                SectionHeader(title: "This Week")
+
+                HStack(spacing: AppTheme.Spacing.md) {
+                    MetricView(label: "Workouts", value: "\(workoutsThisWeek)")
+                    MetricView(label: "Sets", value: "\(setsThisWeek)")
+                }
+
+                HStack(spacing: AppTheme.Spacing.sm) {
+                    ForEach(weekDays, id: \.self) { day in
+                        VStack(spacing: 4) {
+                            Text(day.formatted(.dateTime.weekday(.narrow)))
+                                .font(AppTheme.Typography.footnote)
+                                .foregroundStyle(AppTheme.tertiaryText)
+
+                            Circle()
+                                .fill(
+                                    hasWorkout(on: day)
+                                        ? AppTheme.accent
+                                        : AppTheme.subtleFill
+                                )
+                                .frame(width: 10, height: 10)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(weekDayAccessibilityLabel)
             }
         }
         .padding(.horizontal)
