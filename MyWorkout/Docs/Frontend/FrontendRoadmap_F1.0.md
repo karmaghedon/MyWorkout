@@ -44,8 +44,9 @@ F3 — Home
 - [x] Today's Progress — new "Today" card between the hero and the
       lifetime Overview stats: workouts and sets logged today, counting
       an active workout that started today alongside completed logs.
-- [ ] Recovery — recovery warnings exist (`RecoveryWarningsSection`,
-      Progress tab) but aren't surfaced on Home.
+- [x] Recovery — Home now surfaces the most severe recovery warning (if
+      any), with a count of additional warnings and a link into
+      Analytics. Hidden entirely when there are none.
 - [ ] Weekly Summary — not built.
 - [ ] PR Highlights — personal records exist (`PersonalRecordsSection`,
       Progress tab) but aren't surfaced on Home.
