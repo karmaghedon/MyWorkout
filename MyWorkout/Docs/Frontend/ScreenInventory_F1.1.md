@@ -82,7 +82,7 @@ The following are components, not navigable screens:
 - Exercise education sections.
 - Equipment inventory sections and rows.
 - Workout session cards, timer, set controls, notes, warmups, previous performance, and dialogs.
-- Shared controls: `AppEmptyStateView`, `InfoBadge`, `PrimaryFormActionButton`, `ValidatedNameField`, `StoreErrorBanner`, and `FlowLayout`.
+- Shared controls: `AppEmptyStateView`, `InfoBadge`, `SecondaryButton`, `ValidatedNameField`, `StoreErrorBanner`, and `FlowLayout`.
 
 ## Current Navigation Risks
 

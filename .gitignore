@@ -35,3 +35,5 @@ Carthage/Build/
 
 # Tooling output (not part of the application)
 graphify-out/
+# local-only adversarial review reports — not for version control
+.adversarial-reviews/

@@ -37,35 +37,54 @@ if [ -z "$UDID" ]; then
     log "No device UDID given — auto-detecting a connected iPhone/iPad..."
     # xctrace lists "Name (OS version) (UDID)" under "== Devices ==" for
     # anything currently reachable (USB or network), one per line.
-    DEVICE_LINE=$(xcrun xctrace list devices 2>&1 \
+    DEVICE_CANDIDATES=$(xcrun xctrace list devices 2>&1 \
         | sed -n '/== Devices ==/,/== Devices Offline ==/p' \
         | grep -Ev "== Devices|Offline|Mac$|Mac \(" \
-        | grep -E "iPhone|iPad" \
-        | head -1)
+        | grep -E "iPhone|iPad" || true)
 
-    [ -n "$DEVICE_LINE" ] || fail "No connected iPhone/iPad found. Plug in or connect over Wi-Fi, unlock it, and trust this Mac."
+    [ -n "$DEVICE_CANDIDATES" ] || fail "No connected iPhone/iPad found. Plug in or connect over Wi-Fi, unlock it, and trust this Mac."
 
-    UDID=$(echo "$DEVICE_LINE" | grep -oE '\(([0-9A-Fa-f-]{25,})\)' | tail -1 | tr -d '()')
-    DEVICE_NAME=$(echo "$DEVICE_LINE" | sed -E 's/ \([^)]*\)( \([^)]*\))?$//')
+    DEVICE_CANDIDATE_COUNT=$(echo "$DEVICE_CANDIDATES" | grep -c .)
+    if [ "$DEVICE_CANDIDATE_COUNT" -gt 1 ]; then
+        fail "Multiple connected iPhone/iPad devices found — re-run with a specific UDID (second arg) to pick one:
+$DEVICE_CANDIDATES"
+    fi
 
-    [ -n "$UDID" ] || fail "Found a device line but couldn't parse its UDID: $DEVICE_LINE"
+    UDID=$(echo "$DEVICE_CANDIDATES" | grep -oE '\(([0-9A-Fa-f-]{25,})\)' | tail -1 | tr -d '()')
+    DEVICE_NAME=$(echo "$DEVICE_CANDIDATES" | sed -E 's/ \([^)]*\)( \([^)]*\))?$//')
+
+    [ -n "$UDID" ] || fail "Found a device line but couldn't parse its UDID: $DEVICE_CANDIDATES"
     log "Found: $DEVICE_NAME ($UDID)"
 fi
 
 # devicectl uses a separate "CoreDevice identifier", not the classic UDID
 # xctrace/xcodebuild use, and there's no reliable field to join the two
 # listings on (name/hostname formatting differs and isn't UDID-based for
-# an iPhone). Assume a single actively-connected iPhone/iPad, find its row
-# by connection state, and pull the Identifier out by UUID shape rather
-# than column position — the Name/Model columns are variable-width and
-# shift awk's field numbering around.
-DEVICECTL_ID=$(xcrun devicectl list devices 2>&1 \
+# an iPhone). Assume a single reachable iPhone/iPad: its State column
+# reads "connected", a launchd-transport-qualified variant of that, or
+# "available (paired)" depending on how it's reached, so match anything
+# except an explicit "unavailable" rather than the literal word
+# "connected" (which several genuinely-reachable states don't contain).
+# Pull the Identifier out by UUID shape rather than column position — the
+# Name/Model columns are variable-width and shift awk's field numbering
+# around. Fail rather than silently pick one if more than one reachable
+# device is present, since there's no reliable way to confirm devicectl's
+# pick is the same physical device xctrace selected above.
+DEVICECTL_CANDIDATES=$(xcrun devicectl list devices 2>&1 \
     | grep -E "iPhone|iPad" \
-    | grep "connected" \
-    | grep -oE '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}' \
-    | head -1)
+    | grep -vi "unavailable" || true)
 
-[ -n "$DEVICECTL_ID" ] || fail "No device in 'connected' state found via devicectl. Is it unlocked and connected?"
+[ -n "$DEVICECTL_CANDIDATES" ] || fail "No reachable device found via devicectl. Is it unlocked and connected?"
+
+DEVICECTL_CANDIDATE_COUNT=$(echo "$DEVICECTL_CANDIDATES" | grep -c .)
+if [ "$DEVICECTL_CANDIDATE_COUNT" -gt 1 ]; then
+    fail "Multiple reachable iPhone/iPad devices found via devicectl — disconnect all but one and re-run, since devicectl and xctrace listings can't be reliably matched to the same physical device:
+$DEVICECTL_CANDIDATES"
+fi
+
+DEVICECTL_ID=$(echo "$DEVICECTL_CANDIDATES" | grep -oE '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}' | head -1)
+
+[ -n "$DEVICECTL_ID" ] || fail "Found a device via devicectl but couldn't parse its identifier: $DEVICECTL_CANDIDATES"
 
 # --- 2. Build for the device --------------------------------------------
 

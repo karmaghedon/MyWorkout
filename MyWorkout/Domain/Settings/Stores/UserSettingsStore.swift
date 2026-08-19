@@ -195,10 +195,23 @@ final class UserSettingsStore: ObservableObject {
     ) throws -> DecodedSettings {
         let decoder = JSONDecoder()
 
-        if let envelope = try? decoder.decode(
-            PersistedEnvelope<UserSettings>.self,
-            from: data
-        ) {
+        /*
+         Only treat the data as the legacy unwrapped format when it isn't
+         shaped like an envelope at all. If it has envelope keys but the
+         payload fails to decode (e.g. a corrupted or unrecognized field
+         value), that must surface as a real failure rather than falling
+         through to the legacy path — the legacy `UserSettings` decoder
+         is tolerant-by-design (every field defaults via
+         `decodeIfPresent(...) ?? defaults`), so handing it envelope-shaped
+         JSON would silently "succeed" with all-default settings and then
+         immediately persist that wipe over the user's real data.
+         */
+        if isEnvelopeShaped(data) {
+            let envelope = try decoder.decode(
+                PersistedEnvelope<UserSettings>.self,
+                from: data
+            )
+
             guard envelope.schemaVersion
                     == currentSchemaVersion else {
                 throw UserSettingsPersistenceError
@@ -226,6 +239,17 @@ final class UserSettingsStore: ObservableObject {
             settings: legacySettings,
             requiresMigration: true
         )
+    }
+
+    private static func isEnvelopeShaped(_ data: Data) -> Bool {
+        guard let object = try? JSONSerialization.jsonObject(
+            with: data
+        ) as? [String: Any] else {
+            return false
+        }
+
+        return object["schemaVersion"] != nil
+            && object["payload"] != nil
     }
 }
 

@@ -41,11 +41,19 @@ enum AppTheme {
     static let error = Color(.systemRed)
 
     /// Content color for text/icons drawn directly on a solid `accent`
-    /// fill (primary buttons, the FAB). White-on-accent measures 3.15:1,
-    /// below the 4.5:1 WCAG AA floor for text — black clears it at 6.66:1.
-    /// Fixed rather than dynamic: the accent fill itself doesn't change
-    /// between light and dark mode, so neither should this.
-    static let onAccentFill = Color.black
+    /// fill (primary buttons, the FAB). Must be dynamic, not fixed: the
+    /// base accent's light-mode Increase Contrast variant (0.80, 0.16,
+    /// 0.02) is dark enough that black text on it only measures 3.88:1,
+    /// below the 4.5:1 WCAG AA floor, while white on that same variant
+    /// measures 5.41:1 and passes. Every other variant (light/dark
+    /// normal at 6.65:1, dark high-contrast at 8.76:1) is well served by
+    /// black, so white is the exception rather than the rule.
+    static let onAccentFill = dynamicColor(
+        light: .black,
+        dark: .black,
+        lightHighContrast: .white,
+        darkHighContrast: .black
+    )
 
     /// Adaptive surfaces — these automatically flip for light/dark mode.
     static let background = Color(.systemBackground)
