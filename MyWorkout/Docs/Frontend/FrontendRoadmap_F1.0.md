@@ -47,7 +47,9 @@ F3 — Home
 - [x] Recovery — Home now surfaces the most severe recovery warning (if
       any), with a count of additional warnings and a link into
       Analytics. Hidden entirely when there are none.
-- [ ] Weekly Summary — not built.
+- [x] Weekly Summary — new "This Week" card: workout/set totals for the
+      current calendar week plus a 7-day strip showing which days had
+      a workout.
 - [ ] PR Highlights — personal records exist (`PersonalRecordsSection`,
       Progress tab) but aren't surfaced on Home.
 - [ ] Next Workout — no "what's next" preview; Home shows recent
