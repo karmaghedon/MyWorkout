@@ -67,6 +67,8 @@ struct InventoryItemRow: View {
     private var deleteButton: some View {
         Button(role: .destructive, action: onDelete) {
             Image(systemName: "trash")
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel("Delete \(itemLabel.lowercased()), \(weight, specifier: "%g") \(unit)")
     }
