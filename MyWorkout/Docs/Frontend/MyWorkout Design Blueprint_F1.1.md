@@ -1,6 +1,13 @@
 Version: 1.2
 Last Updated: 2026-08-19
-Status: Active
+Status: Active — authoritative phase scope (see FDL-017)
+
+This document's phase definitions (F1-F8) are the source of truth for
+what each phase includes. `FrontendRoadmap_F1.0.md` tracks completion
+status against this document's scope, itemized per sub-goal; it
+previously used the same phase numbers for a narrower, now-retired
+definition — see FDL-017 in `FrontendDecisionLog_F1.1_Entries.md` for
+why and what changed.
 
 MyWorkout Frontend Roadmap
 Phase F1 — Navigation Foundation ✅ COMPLETE

@@ -1,6 +1,6 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.4  
+**Version:** 1.5  
 **Date:** 2026-08-19  
 **Status:** Approved
 
@@ -407,3 +407,65 @@ of leaving Home in a half-cleaned state between phases.
   from their hub, not the tab's direct root) — a deliberate trade of one
   extra tap for the hub screen's stated purpose of surfacing progress/
   profile options that were previously invisible outside Home.
+
+---
+
+## FDL-017 — Adopt the Design Blueprint's phase scope as authoritative; retire the 12-phase roadmap structure
+
+**Decision**
+`FrontendRoadmap_F1.0.md` previously defined 12 narrow phases, where
+F4-F7 meant specifically "give this destination a tab-owned route" (see
+FDL-016) and F8-F12 split "polish" into five separate small phases
+(Components, Micro Interactions, Accessibility, Performance, Final
+Polish). Replace that structure with `MyWorkout Design Blueprint_F1.1.md`'s
+8-phase scope, where the same F3-F7 numbers mean the full feature vision
+for each destination (e.g. Blueprint-F5 "Library" includes filters,
+favorites, and related exercises — not just "Custom Exercises is
+reachable"), and F8 "Premium Polish" is a single phase bundling
+everything the old F8-F12 split apart. Un-check F3-F7 on the roadmap and
+replace their single checkbox with an itemized per-goal list showing
+exactly what's built versus not, rather than leaving them showing
+"done" against a scope they don't actually cover.
+
+**Reason**
+Both documents used identical phase numbers (F1-F7) for substantially
+different scope, discovered when asked to survey "the rest of the
+roadmap" (F8-F12) after F4-F7 had just been marked done — under the
+Blueprint's definition, none of F3-F7 are actually complete. Leaving two
+roadmap documents disagreeing under the same phase numbers is worse than
+either being wrong alone: a reader consulting one document would
+reasonably believe a phase is finished when the other says otherwise, and
+neither document flagged the conflict. The user chose the Blueprint as
+authoritative — it's the more detailed and evidently more current
+product vision (the Home Blueprint's own F3 goals — recovery signals, PR
+highlights, next-workout preview — go well beyond what shipped in
+FDL-013's Home redesign).
+
+**Consequences**
+- `FrontendRoadmap_F1.0.md` is now structurally identical to the
+  Blueprint's phase list (F1-F8, not F1-F12). Version bumped 1.2 → 2.0
+  to signal the structural change, not just a content update.
+- F1 and F2 remain checked — both documents already agreed those were
+  fully done, and verification confirmed it (tab shell, 17-component
+  design-token library).
+- F3-F7 are now itemized per Blueprint sub-goal rather than single
+  checkboxes, so future work can check off individual items (e.g. "PR
+  Highlights" on Home) without needing every other item in that phase
+  finished first to show any progress at all.
+- The real, valuable work already done under the old F4-F7 definition
+  (Templates/Custom Exercises/Analytics/Strength/Equipment/Backup &
+  Data all reachable from their owning tab) isn't lost — it's now
+  correctly represented as partial progress within the broader Blueprint
+  phases (e.g. "Custom Exercises" checked under F5, alongside unchecked
+  "Filters," "Favorites," "Related Exercises").
+- What's actually missing across F3-F8 is substantial, closer to new
+  feature work than the wiring-level F4-F7 navigation pass was:  Home
+  needs recovery/weekly-summary/PR-highlight/next-workout content;
+  Workout needs a real Finish Summary and post-workout insights; Library
+  needs filters, favorites, and related exercises — its least-built
+  phase; Progress needs volume trends over time and consistency
+  tracking; Profile needs an About screen; Premium Polish needs a
+  performance pass and an exhaustive (not just substantial) accessibility
+  review. None of this was implemented as part of this decision — see
+  `FrontendRoadmap_F1.0.md` for the itemized list and prioritize from
+  there.
