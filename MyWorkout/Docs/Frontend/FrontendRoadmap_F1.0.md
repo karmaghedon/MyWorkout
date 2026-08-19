@@ -37,7 +37,8 @@ done — see `ComponentLibrary_F1.0.md` and `DesignSystem_F1.0.md`.
 
 F3 — Home
 
-☐ (partial)
+☑ (all sub-goals implemented; not yet device-tested — see
+`PendingDeviceTests.md`)
 
 - [x] Welcome — greeting header, time-of-day aware.
 - [x] Resume Workout — stateful hero card (start / resume).
@@ -50,10 +51,12 @@ F3 — Home
 - [x] Weekly Summary — new "This Week" card: workout/set totals for the
       current calendar week plus a 7-day strip showing which days had
       a workout.
-- [ ] PR Highlights — personal records exist (`PersonalRecordsSection`,
-      Progress tab) but aren't surfaced on Home.
-- [ ] Next Workout — no "what's next" preview; Home shows recent
-      activity (the past), not an upcoming suggestion.
+- [x] PR Highlights — new "New Personal Records" card, shown when a set
+      logged today ties/beats an all-time personal record. Not yet
+      device-tested — see `PendingDeviceTests.md`.
+- [x] Next Workout — new "Next Up" card suggesting the
+      least-recently-performed template, with a one-tap start button.
+      Hidden while a workout is already active. Not yet device-tested.
 
 F4 — Workout
 
