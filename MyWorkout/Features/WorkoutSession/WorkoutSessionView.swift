@@ -14,6 +14,14 @@ struct WorkoutSessionView: View {
     @State private var showFinishSummary = false
     @State private var showLeaveConfirmation = false
     @State private var showCancelConfirmation = false
+    @State private var completedWorkout: CompletedWorkout?
+
+    private struct CompletedWorkout: Identifiable {
+        let id = UUID()
+        let log: WorkoutLog
+        let previousLog: WorkoutLog?
+        let newPersonalRecords: [PersonalRecord]
+    }
 
     private var workout: Workout? {
         activeWorkoutStore.activeWorkout
@@ -83,6 +91,19 @@ struct WorkoutSessionView: View {
                 dismiss()
             }
         )
+        .fullScreenCover(item: $completedWorkout) { completed in
+            NavigationStack {
+                WorkoutFinishSummaryView(
+                    log: completed.log,
+                    previousLog: completed.previousLog,
+                    newPersonalRecords: completed.newPersonalRecords,
+                    onDone: {
+                        completedWorkout = nil
+                        dismiss()
+                    }
+                )
+            }
+        }
     }
 
     private func workoutContent(_ workout: Workout) -> some View {
@@ -136,8 +157,24 @@ struct WorkoutSessionView: View {
             return
         }
 
+        let priorLogs = logStore.logs
+
+        let previousLog = priorLogs
+            .filter { $0.workoutName == log.workoutName }
+            .max { $0.date < $1.date }
+
+        let newPersonalRecords = WorkoutSessionEngine.newPersonalRecords(
+            in: log,
+            priorLogs: priorLogs
+        )
+
         logStore.add(log)
         activeWorkoutStore.finish()
-        dismiss()
+
+        completedWorkout = CompletedWorkout(
+            log: log,
+            previousLog: previousLog,
+            newPersonalRecords: newPersonalRecords
+        )
     }
 }

@@ -201,4 +201,86 @@ enum WorkoutSessionEngine {
             completedAt: date
         )
     }
+
+    // MARK: - Finish Summary
+
+    /// Total volume (weight × reps, summed across every set) in a log.
+    static func totalVolume(in log: WorkoutLog) -> Double {
+        log.completedExercises.reduce(0) { total, exercise in
+            total + exercise.sets.reduce(0) { $0 + $1.weight * Double($1.reps) }
+        }
+    }
+
+    /// Personal records set *by this specific log*, compared against the
+    /// best set for each exercise across `priorLogs` only. Computed
+    /// directly rather than via `AnalyticsCache` — that cache recomputes
+    /// on a 300ms debounce, so reading it immediately after finishing a
+    /// workout would show stale (pre-finish) data.
+    static func newPersonalRecords(
+        in log: WorkoutLog,
+        priorLogs: [WorkoutLog]
+    ) -> [PersonalRecord] {
+        var priorBest: [String: LoggedSet] = [:]
+
+        for priorLog in priorLogs {
+            for exercise in priorLog.completedExercises {
+                let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
+
+                for set in exercise.sets {
+                    if let current = priorBest[key] {
+                        if isBetterSet(set, than: current) {
+                            priorBest[key] = set
+                        }
+                    } else {
+                        priorBest[key] = set
+                    }
+                }
+            }
+        }
+
+        var newRecords: [PersonalRecord] = []
+
+        for exercise in log.completedExercises {
+            let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
+
+            guard let bestSetThisSession = exercise.sets.max(
+                by: { isBetterSet($1, than: $0) }
+            ) else {
+                continue
+            }
+
+            let isNewRecord: Bool
+            if let priorBestSet = priorBest[key] {
+                isNewRecord = isBetterSet(bestSetThisSession, than: priorBestSet)
+            } else {
+                isNewRecord = true
+            }
+
+            if isNewRecord {
+                newRecords.append(
+                    PersonalRecord(
+                        exerciseID: exercise.exerciseID,
+                        exerciseName: exercise.exerciseName,
+                        weightPounds: bestSetThisSession.weight,
+                        reps: bestSetThisSession.reps
+                    )
+                )
+            }
+        }
+
+        return newRecords
+    }
+
+    /// Matches `AnalyticsEngine`'s private comparison: heavier wins;
+    /// equal weight falls back to more reps.
+    private static func isBetterSet(
+        _ newSet: LoggedSet,
+        than oldSet: LoggedSet
+    ) -> Bool {
+        if newSet.weight != oldSet.weight {
+            return newSet.weight > oldSet.weight
+        }
+
+        return newSet.reps > oldSet.reps
+    }
 }
