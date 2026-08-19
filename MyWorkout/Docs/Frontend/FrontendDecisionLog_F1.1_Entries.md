@@ -1,6 +1,6 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.3  
+**Version:** 1.4  
 **Date:** 2026-08-19  
 **Status:** Approved
 
@@ -352,3 +352,58 @@ designed for.
 - `WorkoutSessionView` sets `UIApplication.shared.isIdleTimerDisabled =
   true` on appear and `false` on disappear. Scoped to that one screen
   only; no other screen needs this.
+
+---
+
+## FDL-016 — Implement F4-F7: give every screen a tab-owned route, not just a Home shortcut
+
+**Decision**
+Wire the six destinations `NavigationArchitecture_F1.1.md` assigns to
+Workout, Library, Progress, and Profile — Templates, Custom Exercises,
+Analytics, Strength Trends, Equipment, and Backup & Data — into their
+owning tabs, and remove them from Home now that they no longer need a
+placeholder home there. Concretely: a "Manage Templates" toolbar link
+from `StartWorkoutView` (F4); a "Custom Exercises" toolbar link from
+`ExerciseLibraryView` (F5); a new `ProgressHubView` tab root organizing
+History/Analytics/Strength (F6); a new `ProfileHubView` tab root
+organizing Settings/Equipment/Backup & Data (F7).
+
+**Reason**
+`NavigationArchitecture_F1.1.md` (written before F1 even landed) already
+specified this ownership. FDL-013 called it out explicitly as a known
+gap: Home kept these four Manage-section destinations as a "deliberate
+placeholder, not a final decision," waiting on exactly F5 and F7. Doing
+all four phases together (rather than one at a time) let Home's cleanup
+happen in the same pass its last placeholder link was removed, instead
+of leaving Home in a half-cleaned state between phases.
+
+**Consequences**
+- `ProgressHubView` and `ProfileHubView` are new tab roots, both reusing
+  a new shared `QuickActionSection` component (a titled card of
+  `QuickActionRow` links) — extracted from `DashboardView`'s
+  `dashboardSection`, which had the identical shape before its Manage/
+  Progress sections were removed.
+- No `AppRoute` cases changed. Every destination (`.templates`,
+  `.customExercises`, `.analytics`, `.strengthTrends`, `.equipmentInventory`,
+  `.export`, `.settings`, `.history`) was already registered in
+  `AppShellView`'s shared route resolver; this work only added new
+  places that push to those existing routes.
+- `DashboardView` lost its "Progress" and "Manage" sections and the
+  now-dead `dashboardSection`/`quickActionLink` helpers that built them.
+  Home is now exactly what `NavigationArchitecture_F1.1.md` specifies:
+  greeting, active-workout/start hero, stats, recent activity — no
+  destination duplicated with a permanent tab.
+- One documented target from `NavigationArchitecture_F1.1.md`'s Library
+  section is knowingly still unmet: custom exercise creation
+  (`AppRoute.createCustomExercise`) remains a push destination, not the
+  sheet the doc recommends. Fixing it would mean moving `CustomExercisesView`
+  off the shared `AppRoute`-push pattern for creation specifically (onto
+  a local `@State` + `.sheet`, the same shape `TemplatesView` already
+  uses for `CreateWorkoutTemplateView`) without touching how editing is
+  reached, which stays a push. Left as a tracked follow-up rather than
+  bundled into this pass — the feature is fully functional as a push,
+  this is a presentation-style refinement, not a gap in reachability.
+- History and Settings are now one level deeper than before F6/F7 (pushed
+  from their hub, not the tab's direct root) — a deliberate trade of one
+  extra tap for the hub screen's stated purpose of surfacing progress/
+  profile options that were previously invisible outside Home.

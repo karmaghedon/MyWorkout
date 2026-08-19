@@ -4,6 +4,17 @@
 **Date:** 2026-07-19  
 **Status:** Approved baseline for F1 implementation
 
+**Implementation status (2026-08-19):** Sections 2-4's target screen
+ownership is now implemented for every destination — see
+`ScreenInventory_F1.1.md` and `FrontendRoadmap_F1.0.md` (F1, F3-F7 done)
+for current status. Two items from this document remain open and are
+tracked, not forgotten: §7's feature-owned route split (`AppRoute` is
+still one shared enum), and custom exercise creation is still a push
+destination rather than the sheet §4's Library section recommends (see
+FDL-016). Everything else below — tab ownership, push/sheet/cover/alert
+rules, the active-workout contract — reflects the shipped app, not just
+the plan.
+
 ## 1. Purpose
 
 This document defines the top-level navigation model for MyWorkout before the native app shell is implemented. It is the source of truth for tab ownership, push navigation, modal presentation, active-workout behavior, and route placement.
