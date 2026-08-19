@@ -22,7 +22,7 @@ struct TemplatesView: View {
                         title: template.name
                     ) {
                         Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
-                            .font(.caption)
+                            .font(AppTheme.Typography.caption)
                             .foregroundStyle(AppTheme.secondaryText)
                     }
                 }

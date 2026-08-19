@@ -83,19 +83,12 @@ struct TemplateEditorView: View {
     // MARK: - Bottom Action
 
     private var duplicateButton: some View {
-        Button {
-            duplicateTemplate()
-        } label: {
-            Label(
-                "Duplicate Template",
-                systemImage: "doc.on.doc"
-            )
-            .font(.headline)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.sm)
-        }
-        .buttonStyle(.bordered)
-        .disabled(!canSave)
+        SecondaryButton(
+            title: "Duplicate Template",
+            systemImage: "doc.on.doc",
+            isEnabled: canSave,
+            action: duplicateTemplate
+        )
         .padding(.horizontal, AppTheme.Spacing.md)
         .padding(.vertical, AppTheme.Spacing.sm)
         .background(AppTheme.groupedBackground)
