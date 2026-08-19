@@ -60,7 +60,8 @@ F3 — Home
 
 F4 — Workout
 
-☐ (partial)
+☑ (all sub-goals implemented; not yet device-tested — see
+`PendingDeviceTests.md`)
 
 - [x] Template Cards — `StartWorkoutView`'s template rows (`WorkoutCard`).
 - [x] Workout Dashboard — `StartWorkoutView` serves as the hub; templates
@@ -68,13 +69,14 @@ F4 — Workout
       work, prior version of this roadmap).
 - [x] Session Progress — `WorkoutSessionView`'s timer, current-set card,
       logged sets, rest timer.
-- [ ] Finish Summary — currently just a confirmation-dialog message
-      string (`WorkoutSessionEngine.summaryText`), not a dedicated
-      summary screen/moment.
+- [x] Finish Summary — new `WorkoutFinishSummaryView`, a full-screen
+      cover shown after the existing "Finish Workout?" confirmation
+      saves the log: duration, exercises, sets, and a volume-vs-last-time
+      comparison.
 - [x] Exercise Flow — `ExerciseSessionCardView`'s warmups, current set,
       logged sets, notes.
-- [ ] Workout Insights — no "new PR" / "volume up X% from last time"
-      style callouts after finishing.
+- [x] Workout Insights — the same Finish Summary screen calls out any
+      new personal records set specifically by that session.
 
 F5 — Library
 

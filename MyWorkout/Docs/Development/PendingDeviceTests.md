@@ -35,3 +35,26 @@ Each entry: what changed, where, and exactly what to check.
   Workout. Then start any workout from elsewhere and return to Home —
   the "Next Up" card should disappear while a workout is active (the
   hero card owns that state instead).
+
+## F4 — Workout
+
+### Finish Summary + Workout Insights
+- **What:** After tapping "Finish Workout" → "Save Workout" on the
+  existing confirmation dialog, a new full-screen "Workout Complete"
+  summary now appears instead of returning straight to Start Workout:
+  duration/exercises/sets, a "+X%/-X% volume vs last time" line (only
+  shown if you've done this exact template-named workout before), and
+  a "New Personal Records" card for any exercise where this session's
+  best set beat (or tied) your prior all-time best for that exercise.
+  Tapping "Done" dismisses the summary and returns to Start Workout,
+  same as before.
+- **Test:** Finish a workout where you log a set heavier (or same
+  weight/more reps) than your previous best for that exercise —
+  confirm it shows up under "New Personal Records" with the right
+  weight/reps. Finish a workout for a template you've done before with
+  a different total volume — confirm the volume comparison line shows
+  and the percentage looks right. Finish a workout for a *brand new*
+  template (first time ever) — confirm the volume line is absent (no
+  "previous" to compare against) but the summary still shows
+  correctly otherwise. Confirm "Done" returns you to Start Workout, not
+  back into the (now-finished) session.
