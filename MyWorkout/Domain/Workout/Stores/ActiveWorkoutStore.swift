@@ -260,7 +260,9 @@ final class ActiveWorkoutStore: ObservableObject {
             withTimeInterval: 1,
             repeats: true
         ) { [weak self] _ in
-            self?.updateRestSecondsRemaining()
+            self?.updateRestSecondsRemaining(
+                playsCompletionHaptic: true
+            )
         }
     }
 
@@ -278,7 +280,13 @@ final class ActiveWorkoutStore: ObservableObject {
         persistActiveWorkout()
     }
 
-    private func updateRestSecondsRemaining() {
+    /// `playsCompletionHaptic` is only `true` from the live per-second
+    /// countdown tick. The restore-on-launch caller passes `false` so
+    /// reopening the app after a rest timer already finished in the
+    /// background doesn't buzz the phone.
+    private func updateRestSecondsRemaining(
+        playsCompletionHaptic: Bool = false
+    ) {
         guard let restTimerState else {
             restSecondsRemaining = 0
             return
@@ -291,6 +299,10 @@ final class ActiveWorkoutStore: ObservableObject {
 
         if remaining == 0 {
             stopRestTimer(clearPersistedState: true)
+
+            if playsCompletionHaptic {
+                Haptics.restComplete()
+            }
         }
     }
 

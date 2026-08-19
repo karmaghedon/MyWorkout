@@ -1,5 +1,9 @@
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 struct WorkoutSessionView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
@@ -48,9 +52,18 @@ struct WorkoutSessionView: View {
                     equipmentInventory: equipmentStore.inventory
                 )
             }
+            // Keep the screen from auto-locking during an active workout —
+            // the user needs it readable between sets without repeatedly
+            // waking the phone.
+            #if canImport(UIKit)
+            UIApplication.shared.isIdleTimerDisabled = true
+            #endif
         }
         .onDisappear {
             // Keep rest timer running in ActiveWorkoutStore
+            #if canImport(UIKit)
+            UIApplication.shared.isIdleTimerDisabled = false
+            #endif
         }
         .workoutSessionDialogs(
             showFinishSummary: $showFinishSummary,
