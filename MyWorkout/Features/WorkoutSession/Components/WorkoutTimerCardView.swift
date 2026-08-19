@@ -4,27 +4,23 @@ struct WorkoutTimerCardView: View {
     let elapsedTime: String
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("WORKOUT TIME")
-                    .font(AppTheme.Typography.eyebrow)
-                    .foregroundStyle(.secondary)
+        AppCard {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("WORKOUT TIME")
+                        .font(AppTheme.Typography.eyebrow)
+                        .foregroundStyle(AppTheme.secondaryText)
 
-                Text(elapsedTime)
-                    .font(AppTheme.Typography.numeric(28))
-                    .monospacedDigit()
+                    Text(elapsedTime)
+                        .font(AppTheme.Typography.numeric(28))
+                }
+
+                Spacer()
+
+                Image(systemName: "timer")
+                    .font(.title2)
+                    .foregroundStyle(AppTheme.accent)
             }
-
-            Spacer()
-
-            Image(systemName: "timer")
-                .font(.title2)
-                .foregroundStyle(AppTheme.accent)
         }
-        .padding(AppTheme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
     }
 }

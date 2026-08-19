@@ -17,27 +17,14 @@ struct TemplatesView: View {
                     TemplateEditorView(template: template)
                         .id(template.id)
                 } label: {
-                    HStack(spacing: AppTheme.Spacing.md) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(AppTheme.accentMuted)
-
-                            Image(systemName: "list.bullet.clipboard")
-                                .foregroundStyle(AppTheme.accent)
-                        }
-                        .frame(width: 44, height: 44)
-                        .accessibilityHidden(true)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(template.name)
-                                .font(.headline)
-
-                            Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                    WorkoutCard(
+                        systemImage: "list.bullet.clipboard",
+                        title: template.name
+                    ) {
+                        Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
                     }
-                    .padding(.vertical, 4)
                 }
             }
             .onDelete(perform: templateStore.delete)
@@ -65,19 +52,10 @@ struct TemplatesView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "list.bullet.rectangle")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-
-            Text("No Templates Yet")
-                .font(.headline)
-
-            Text("Tap + to build your first workout template.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .multilineTextAlignment(.center)
-        .padding()
+        AppEmptyStateView(
+            title: "No Templates Yet",
+            message: "Tap + to build your first workout template.",
+            systemImage: "list.bullet.rectangle"
+        )
     }
 }

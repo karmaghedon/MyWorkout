@@ -23,13 +23,13 @@ struct RestTimerBadge: View {
         HStack(spacing: AppTheme.Spacing.md) {
             ZStack {
                 Circle()
-                    .stroke(AppTheme.accent.opacity(0.2), lineWidth: 4)
+                    .stroke(AppTheme.accent.opacity(0.2), lineWidth: AppTheme.StrokeWidth.ring)
 
                 Circle()
                     .trim(from: 0, to: progress)
-                    .stroke(AppTheme.accent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .stroke(AppTheme.accent, style: StrokeStyle(lineWidth: AppTheme.StrokeWidth.ring, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 1), value: progress)
+                    .animation(.linear(duration: AppTheme.Motion.linearContinuous), value: progress)
 
                 Image(systemName: "timer")
                     .font(.system(size: 13, weight: .bold))
@@ -45,26 +45,24 @@ struct RestTimerBadge: View {
 
                 Text(timeText)
                     .font(AppTheme.Typography.numeric(22))
-                    .monospacedDigit()
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Resting, \(timeText) remaining")
 
             Spacer()
 
-            Button(action: onStop) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 22))
-                    .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Stop rest timer")
+            IconButton(
+                systemImage: "xmark.circle.fill",
+                accessibilityLabel: "Stop rest timer",
+                size: 22,
+                action: onStop
+            )
         }
         .padding(AppTheme.Spacing.md)
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
                 .fill(AppTheme.accentMuted)
         )
-        .transition(.opacity.combined(with: .move(edge: .top)))
+        .transition(AppTheme.Motion.cardTransition)
     }
 }

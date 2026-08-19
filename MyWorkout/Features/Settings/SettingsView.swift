@@ -6,6 +6,17 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Appearance") {
+                Picker("Appearance", selection: $settingsStore.settings.appearanceMode) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+                .onChange(of: settingsStore.settings.appearanceMode) { _, _ in
+                    settingsStore.save()
+                }
+            }
+
             Section("Units") {
                 Picker("Weight Unit", selection: $settingsStore.settings.unitSystem) {
                     ForEach(UnitSystem.allCases) { unit in

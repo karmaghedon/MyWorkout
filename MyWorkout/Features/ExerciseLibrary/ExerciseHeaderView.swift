@@ -11,8 +11,7 @@ struct ExerciseHeaderView: View {
 
             VStack(spacing: 4) {
                 Text(exercise.name)
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(AppTheme.Typography.screenTitle)
                     .multilineTextAlignment(.center)
 
                 Text(

@@ -9,31 +9,19 @@ struct RecentWorkoutsSection: View {
                 NavigationLink {
                     WorkoutLogDetailView(log: log)
                 } label: {
-                    HStack(spacing: AppTheme.Spacing.md) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(AppTheme.accentMuted)
-
-                            Image(systemName: "checkmark.seal.fill")
-                                .foregroundStyle(AppTheme.accent)
-                        }
-                        .frame(width: 44, height: 44)
-                        .accessibilityHidden(true)
-
+                    WorkoutCard(
+                        systemImage: "checkmark.seal.fill",
+                        title: log.workoutName
+                    ) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(log.workoutName)
-                                .font(.headline)
-
                             Text(log.date.formatted(date: .abbreviated, time: .shortened))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(AppTheme.secondaryText)
 
                             Text("\(setCount(for: log)) sets")
                                 .font(.caption)
                         }
                     }
-                    .padding(.vertical, 4)
-                    .accessibilityElement(children: .combine)
                 }
             }
         } header: {

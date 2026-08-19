@@ -115,7 +115,9 @@ final class UserSettingsStore: ObservableObject {
                 max(
                     1,
                     min(settings.isolationIncrement, 25)
-                )
+                ),
+            appearanceMode:
+                settings.appearanceMode
         )
     }
 

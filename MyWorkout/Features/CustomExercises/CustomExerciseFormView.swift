@@ -58,7 +58,7 @@ struct CustomExerciseFormView: View {
             )
 
             Section {
-                PrimaryFormActionButton(
+                PrimaryButton(
                     title: actionTitle,
                     systemImage: actionSystemImage,
                     isEnabled: canSave,

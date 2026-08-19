@@ -96,38 +96,19 @@ struct StrengthTrendView: View {
     private func currentBestCard(latest: StrengthPoint) -> some View {
         let displayValue = formatWeight(settingsStore.settings.displayWeight(latest.estimatedOneRepMax))
 
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Current Est. 1RM")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Text("\(displayValue) \(settingsStore.settings.weightUnitLabel)")
-                .font(.system(size: 34, weight: .bold, design: .rounded))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppTheme.Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(AppTheme.accentMuted)
+        MetricCard(
+            label: "Current Est. 1RM",
+            value: "\(displayValue) \(settingsStore.settings.weightUnitLabel)"
         )
     }
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "chart.line.uptrend.xyaxis")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-
-            Text("No Strength Data Yet")
-                .font(.headline)
-
-            Text("Log a few workouts and your estimated 1RM trends will show up here.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
+        AppEmptyStateView(
+            title: "No Strength Data Yet",
+            message: "Log a few workouts and your estimated 1RM trends will show up here.",
+            systemImage: "chart.line.uptrend.xyaxis"
+        )
         .frame(maxWidth: .infinity)
-        .padding()
     }
 
     private func estimatedOneRepMax(weight: Double, reps: Int) -> Double {

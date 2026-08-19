@@ -37,10 +37,9 @@ struct BarbellInventorySection: View {
                 }
             }
 
-            Button("Reset Inventory to Default") {
+            DestructiveButton(title: "Reset Inventory to Default") {
                 showResetConfirmation = true
             }
-            .foregroundStyle(.red)
             .accessibilityHint("Replaces all plates and dumbbells with the default set. This cannot be undone.")
             .confirmationDialog(
                 "Reset Inventory",

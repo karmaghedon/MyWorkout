@@ -7,7 +7,7 @@ struct StoreErrorBanner: View {
     var body: some View {
         HStack(alignment: .top, spacing: AppTheme.Spacing.sm) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.orange)
+                .foregroundStyle(AppTheme.error)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -21,14 +21,13 @@ struct StoreErrorBanner: View {
 
             Spacer()
 
-            Button {
-                onDismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.caption.weight(.semibold))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Dismiss error")
+            IconButton(
+                systemImage: "xmark",
+                accessibilityLabel: "Dismiss error",
+                size: 13,
+                weight: .semibold,
+                action: onDismiss
+            )
         }
         .padding(AppTheme.Spacing.md)
         .background(
@@ -43,7 +42,7 @@ struct StoreErrorBanner: View {
                 cornerRadius: AppTheme.Radius.control,
                 style: .continuous
             )
-            .stroke(.orange.opacity(0.35))
+            .stroke(AppTheme.error.opacity(0.35), lineWidth: AppTheme.StrokeWidth.hairline)
         }
         .accessibilityElement(children: .combine)
     }

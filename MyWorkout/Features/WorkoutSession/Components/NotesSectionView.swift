@@ -28,6 +28,6 @@ struct NotesSectionView: View {
             .padding(.top, AppTheme.Spacing.sm)
         }
         .font(AppTheme.Typography.label)
-        .tint(AppTheme.accent)
+        .tint(Color.primary)
     }
 }

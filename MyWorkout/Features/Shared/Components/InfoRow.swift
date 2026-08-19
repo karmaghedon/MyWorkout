@@ -1,6 +1,8 @@
 import SwiftUI
 
-struct DetailRow: View {
+/// A label-and-value row — exercise detail facts, settings summaries,
+/// anywhere a title/value pair needs consistent spacing and truncation.
+struct InfoRow: View {
     let title: String
     let value: String
 
@@ -11,7 +13,7 @@ struct DetailRow: View {
             Spacer(minLength: AppTheme.Spacing.md)
 
             Text(value)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.secondaryText)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -19,6 +21,6 @@ struct DetailRow: View {
 
 #Preview {
     List {
-        DetailRow(title: "Equipment", value: "Barbell")
+        InfoRow(title: "Equipment", value: "Barbell")
     }
 }

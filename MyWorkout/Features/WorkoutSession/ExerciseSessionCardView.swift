@@ -111,7 +111,7 @@ struct ExerciseSessionCardView: View {
                 .padding(.top, AppTheme.Spacing.sm)
             }
             .font(AppTheme.Typography.label)
-            .tint(AppTheme.accent)
+            .tint(Color.primary)
 
             NotesSectionView(notes: $state.notes)
         }
@@ -120,7 +120,7 @@ struct ExerciseSessionCardView: View {
     private func suggestionBanner(_ text: String) -> some View {
         Label(text, systemImage: "arrow.up.right.circle.fill")
             .font(AppTheme.Typography.caption)
-            .foregroundStyle(AppTheme.accent)
+            .foregroundStyle(Color.primary)
             .padding(AppTheme.Spacing.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
@@ -149,7 +149,7 @@ struct ExerciseSessionCardView: View {
             if loading.hasResidue {
                 Text("Plates can't match exactly — closest achievable load shown.")
                     .font(.caption2)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(AppTheme.warning)
             }
         }
     }

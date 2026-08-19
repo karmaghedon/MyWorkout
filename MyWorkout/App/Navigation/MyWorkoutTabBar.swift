@@ -62,7 +62,7 @@ struct MyWorkoutTabBar: View {
         .buttonStyle(.plain)
         .foregroundStyle(
             isSelected(tab)
-                ? Color.accentColor
+                ? AppTheme.accent
                 : .secondary
         )
         .accessibilityLabel(tab.accessibilityLabel)
@@ -80,7 +80,7 @@ struct MyWorkoutTabBar: View {
             VStack(spacing: 4) {
                 ZStack {
                     Circle()
-                        .fill(Color.accentColor)
+                        .fill(AppTheme.accent)
                         .frame(width: 52, height: 52)
 
                     Image(systemName: tab.systemImage)
@@ -90,7 +90,7 @@ struct MyWorkoutTabBar: View {
                                 weight: .semibold
                             )
                         )
-                        .foregroundStyle(.white)
+                        .foregroundStyle(AppTheme.onAccentFill)
                 }
                 .overlay {
                     if isSelected(tab) {
@@ -125,7 +125,7 @@ struct MyWorkoutTabBar: View {
         .buttonStyle(.plain)
         .foregroundStyle(
             isSelected(tab)
-                ? Color.accentColor
+                ? AppTheme.accent
                 : .primary
         )
         .accessibilityLabel(

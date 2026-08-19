@@ -1,5 +1,5 @@
-Version: 1.1
-Last Updated: 2026-07-19
+Version: 1.2
+Last Updated: 2026-08-19
 Status: Active
 
 MyWorkout Frontend Roadmap
@@ -53,9 +53,18 @@ Prevent workout replacement.
 Preserve session.
 Build
 Must compile.
-Phase F2 — Design System
+Phase F2 — Design System ✅ COMPLETE
 Goal
 Create every reusable UI component before redesigning screens.
+Result
+17 components built in Features/Shared/Components/, all reading from
+AppTheme tokens. Full inventory and per-token rationale in
+DesignSystem_F1.0.md and ComponentLibrary_F1.0.md. Several sub-phases
+also eliminated real duplication found by auditing existing screens
+(four hand-rolled icon-row variants unified into WorkoutCard, three
+hand-rolled empty states unified into AppEmptyStateView, a misplaced
+View in the Domain layer deleted). A WCAG contrast audit of the accent
+color found and fixed a pre-existing failure — see FDL-010.
 F2.1 — Color System
 Create semantic colors.
 Accent

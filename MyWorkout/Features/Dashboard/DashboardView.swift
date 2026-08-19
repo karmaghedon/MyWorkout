@@ -18,9 +18,7 @@ struct DashboardView: View {
                 alignment: .leading,
                 spacing: AppTheme.Spacing.xl
             ) {
-                Text("MyWorkout")
-                    .font(.largeTitle)
-                    .bold()
+                ScreenHeader(title: "MyWorkout")
                     .padding(.horizontal)
 
                 DashboardStoreErrorsView(
@@ -105,8 +103,7 @@ struct DashboardView: View {
             alignment: .leading,
             spacing: AppTheme.Spacing.sm
         ) {
-            Text(title)
-                .font(AppTheme.Typography.sectionTitle)
+            SectionHeader(title: title)
                 .padding(.horizontal)
 
             LazyVGrid(
@@ -125,7 +122,7 @@ struct DashboardView: View {
         route: AppRoute
     ) -> some View {
         NavigationLink(value: route) {
-            DashboardCard(
+            InformationCard(
                 title: title,
                 subtitle: subtitle
             )

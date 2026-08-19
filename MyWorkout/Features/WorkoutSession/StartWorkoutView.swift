@@ -123,53 +123,35 @@ struct StartWorkoutView: View {
 
     private func row(for template: WorkoutTemplate) -> some View {
         HStack(spacing: AppTheme.Spacing.md) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(AppTheme.accentMuted)
+            WorkoutCard(
+                systemImage: "figure.strengthtraining.traditional",
+                title: template.name
+            ) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
 
-                Image(systemName: "figure.strengthtraining.traditional")
-                    .foregroundStyle(AppTheme.accent)
-            }
-            .frame(width: 44, height: 44)
-            .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(template.name)
-                    .font(.headline)
-
-                Text("\(template.exercises.count) exercise\(template.exercises.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Text(lastPerformedText(for: template))
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    Text(lastPerformedText(for: template))
+                        .font(.caption2)
+                        .foregroundStyle(AppTheme.tertiaryText)
+                }
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(AppTheme.tertiaryText)
         }
-        .padding(.vertical, 4)
     }
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "figure.strengthtraining.traditional")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-
-            Text("No Templates Yet")
-                .font(.headline)
-
-            Text("Build a workout template first, then start it from here.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
+        AppEmptyStateView(
+            title: "No Templates Yet",
+            message: "Build a workout template first, then start it from here.",
+            systemImage: "figure.strengthtraining.traditional"
+        )
     }
 
     private func lastPerformedText(for template: WorkoutTemplate) -> String {

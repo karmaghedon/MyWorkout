@@ -103,7 +103,7 @@ struct CreateWorkoutTemplateView: View {
                 )
             }
 
-            PrimaryFormActionButton(
+            PrimaryButton(
                 title: "Save Template",
                 systemImage: "checkmark",
                 isEnabled: canSave,

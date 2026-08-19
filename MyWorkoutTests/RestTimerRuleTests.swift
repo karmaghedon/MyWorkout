@@ -15,7 +15,8 @@ final class RestTimerRuleTests: XCTestCase {
             bodyweightRestSeconds: bodyweight,
             oneRepMaxFormula: .epley,
             compoundIncrement: 5,
-            isolationIncrement: 5
+            isolationIncrement: 5,
+            appearanceMode: .system
         )
     }
 

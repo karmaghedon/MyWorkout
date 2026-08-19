@@ -13,12 +13,12 @@ struct DashboardStoreErrorsView: View {
                 id: \.offset
             ) { _, message in
                 Text(message)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppTheme.error)
                     .padding()
-                    .background(.red.opacity(0.12))
+                    .background(AppTheme.error.opacity(0.12))
                     .clipShape(
                         RoundedRectangle(
-                            cornerRadius: 12
+                            cornerRadius: AppTheme.Radius.control
                         )
                     )
                     .padding(.horizontal)

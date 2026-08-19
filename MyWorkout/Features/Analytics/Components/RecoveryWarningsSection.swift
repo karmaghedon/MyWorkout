@@ -17,13 +17,11 @@ struct RecoveryWarningsSection: View {
 
                             Spacer()
 
-                            Text(warning.severity.rawValue)
-                                .font(.caption.bold())
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(.orange.opacity(0.2))
-                                .clipShape(Capsule())
-                                .accessibilityLabel("Severity: \(warning.severity.rawValue)")
+                            ProgressBadge(
+                                text: warning.severity.rawValue,
+                                color: severityColor(warning.severity)
+                            )
+                            .accessibilityLabel("Severity: \(warning.severity.rawValue)")
                         }
 
                         Text(warning.message)
@@ -40,6 +38,10 @@ struct RecoveryWarningsSection: View {
         } header: {
             Label("Recovery / Fatigue", systemImage: "heart.text.square.fill")
         }
+    }
+
+    private func severityColor(_ severity: WarningSeverity) -> Color {
+        severity == .high ? AppTheme.error : AppTheme.warning
     }
 }
 

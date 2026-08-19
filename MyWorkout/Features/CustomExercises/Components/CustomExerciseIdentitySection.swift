@@ -16,7 +16,7 @@ struct CustomExerciseIdentitySection: View {
             if let nameValidationMessage {
                 Text(nameValidationMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppTheme.error)
                     .accessibilityLabel(
                         "Exercise name error: \(nameValidationMessage)"
                     )

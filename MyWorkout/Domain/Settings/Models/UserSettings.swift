@@ -28,6 +28,35 @@ enum OneRepMaxFormula:
     }
 }
 
+/// The app's display appearance. Kept free of SwiftUI (no `ColorScheme`)
+/// so this Domain model has no UI-framework dependency; the View layer
+/// maps this to `ColorScheme` where it applies `.preferredColorScheme`.
+enum AppearanceMode:
+    String,
+    Codable,
+    CaseIterable,
+    Identifiable {
+
+    case system
+    case light
+    case dark
+
+    var id: String {
+        rawValue
+    }
+
+    var displayName: String {
+        switch self {
+        case .system:
+            "Auto"
+        case .light:
+            "Day"
+        case .dark:
+            "Night"
+        }
+    }
+}
+
 struct UserSettings: Codable {
     var unitSystem: UnitSystem
     var compoundRestSeconds: Int
@@ -36,6 +65,7 @@ struct UserSettings: Codable {
     var oneRepMaxFormula: OneRepMaxFormula
     var compoundIncrement: Int
     var isolationIncrement: Int
+    var appearanceMode: AppearanceMode
 
     static let defaults = UserSettings(
         unitSystem: .pounds,
@@ -44,7 +74,8 @@ struct UserSettings: Codable {
         bodyweightRestSeconds: 120,
         oneRepMaxFormula: .epley,
         compoundIncrement: 5,
-        isolationIncrement: 5
+        isolationIncrement: 5,
+        appearanceMode: .system
     )
 
     var weightUnitLabel: String {
@@ -79,6 +110,7 @@ struct UserSettings: Codable {
         case oneRepMaxFormula
         case compoundIncrement
         case isolationIncrement
+        case appearanceMode
     }
 
     init(
@@ -88,7 +120,8 @@ struct UserSettings: Codable {
         bodyweightRestSeconds: Int,
         oneRepMaxFormula: OneRepMaxFormula,
         compoundIncrement: Int,
-        isolationIncrement: Int
+        isolationIncrement: Int,
+        appearanceMode: AppearanceMode
     ) {
         self.unitSystem = unitSystem
         self.compoundRestSeconds = compoundRestSeconds
@@ -97,6 +130,7 @@ struct UserSettings: Codable {
         self.oneRepMaxFormula = oneRepMaxFormula
         self.compoundIncrement = compoundIncrement
         self.isolationIncrement = isolationIncrement
+        self.appearanceMode = appearanceMode
     }
 
     init(from decoder: Decoder) throws {
@@ -140,5 +174,10 @@ struct UserSettings: Codable {
             Int.self,
             forKey: .isolationIncrement
         ) ?? defaults.isolationIncrement
+
+        appearanceMode = try container.decodeIfPresent(
+            AppearanceMode.self,
+            forKey: .appearanceMode
+        ) ?? defaults.appearanceMode
     }
 }

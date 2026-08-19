@@ -5,6 +5,7 @@ struct AppShellView: View {
     @EnvironmentObject private var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
+    @EnvironmentObject private var settingsStore: UserSettingsStore
 
     @State private var selectedTab: AppTab = .home
 
@@ -70,6 +71,22 @@ struct AppShellView: View {
             workoutPath.removeAll {
                 $0 == .activeWorkout
             }
+        }
+        .preferredColorScheme(preferredColorScheme)
+    }
+
+    // MARK: - Appearance
+
+    private var preferredColorScheme: ColorScheme? {
+        switch settingsStore.settings.appearanceMode {
+        case .system:
+            nil
+
+        case .light:
+            .light
+
+        case .dark:
+            .dark
         }
     }
 

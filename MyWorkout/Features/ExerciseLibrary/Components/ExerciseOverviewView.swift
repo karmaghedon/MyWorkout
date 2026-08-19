@@ -5,14 +5,14 @@ struct ExerciseOverviewView: View {
 
     var body: some View {
         Section("Overview") {
-            DetailRow(title: "Muscle Group", value: exercise.muscleGroup.displayName)
-            DetailRow(
+            InfoRow(title: "Muscle Group", value: exercise.muscleGroup.displayName)
+            InfoRow(
                 title: "Equipment",
                 value: exercise.equipment.displayName
             )
-            DetailRow(title: "Difficulty", value: exercise.difficulty)
-            DetailRow(title: "Type", value: exercise.exerciseType.rawValue.capitalized)
-            DetailRow(title: "Progression", value: exercise.progressionStrategy.rawValue.capitalized)
+            InfoRow(title: "Difficulty", value: exercise.difficulty)
+            InfoRow(title: "Type", value: exercise.exerciseType.rawValue.capitalized)
+            InfoRow(title: "Progression", value: exercise.progressionStrategy.rawValue.capitalized)
         }
     }
 }

@@ -11,6 +11,7 @@ struct WorkoutSessionActionsView: View {
             } label: {
                 Text("Finish Workout")
                     .font(AppTheme.Typography.label)
+                    .foregroundStyle(AppTheme.onAccentFill)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)

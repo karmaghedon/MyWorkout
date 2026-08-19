@@ -13,16 +13,12 @@ struct InventorySectionCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text(title)
-                .font(AppTheme.Typography.sectionTitle)
+        AppCard {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                SectionHeader(title: title)
 
-            content()
+                content()
+            }
         }
-        .padding(AppTheme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
     }
 }

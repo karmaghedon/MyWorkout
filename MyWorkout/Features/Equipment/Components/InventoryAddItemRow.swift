@@ -56,6 +56,7 @@ struct InventoryAddItemRow: View {
     private var addButton: some View {
         Button(action: onAdd) {
             Label(title, systemImage: "plus.circle.fill")
+                .foregroundStyle(AppTheme.onAccentFill)
         }
         .buttonStyle(.borderedProminent)
         .tint(AppTheme.accent)

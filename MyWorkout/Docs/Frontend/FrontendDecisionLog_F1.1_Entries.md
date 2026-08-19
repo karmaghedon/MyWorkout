@@ -1,7 +1,7 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.1  
-**Date:** 2026-07-19  
+**Version:** 1.2  
+**Date:** 2026-08-19  
 **Status:** Approved
 
 ## FDL-001 — Five durable destinations
@@ -132,3 +132,80 @@ That would combine two architectural concepts and increase migration risk.
 **Consequences**
 - F1.2 may temporarily reuse existing route mechanisms.
 - Route ownership becomes a separate build-safe refactor after independent stacks are working.
+
+---
+
+## FDL-010 — Fix accent contrast by changing pairing, not the brand color
+
+**Decision**  
+Keep the ember-orange accent at full saturation. Where it failed WCAG AA
+as text/icon foreground or as white-on-accent inside a filled button,
+change the *pairing* instead: black content (`AppTheme.onAccentFill`) on
+a solid accent fill, `Color.primary` on an accent-tinted (`accentMuted`)
+surface. Purely decorative icons may keep using accent as their own
+color.
+
+**Reason**  
+A `/mobile-app-design` audit measured white-on-accent at 3.15:1 (needs
+4.5:1) and accent-as-text on `accentMuted` at 2.65–4.47:1 depending on
+mode — both below the WCAG AA floor. The accent orange is the app's
+signature color and a deliberate brand choice; darkening it to pass
+contrast was rejected in favor of fixing where it functions as
+foreground content versus decoration.
+
+**Consequences**
+- Every solid-accent-fill button (`PrimaryButton`, `FloatingActionButton`,
+  the Log Set / Add / Finish Workout buttons) now sets its label color
+  explicitly rather than relying on the system's automatic white.
+- `SecondaryButton` and other bordered/tinted-text controls that
+  previously tinted `AppTheme.accent` now tint `Color.primary`.
+- Decorative icons (timer glyphs, badge icons) were left unchanged —
+  they clear the more permissive 3:1 non-text threshold already.
+
+---
+
+## FDL-011 — AccentColor asset must mirror AppTheme.accent
+
+**Decision**  
+Populate the `AccentColor` asset catalog entry with the same RGB value as
+`AppTheme.accent`, and replace remaining `Color.accentColor` references
+in `MyWorkoutTabBar` with `AppTheme.accent` directly.
+
+**Reason**  
+`AccentColor.colorset` had no color defined, so any control relying on
+the system's implicit accent tint (the tab bar's selection highlight, the
+Workout tab's circle badge) silently fell back to default iOS blue
+instead of the app's orange — visible as a mix of orange and blue icons
+across the app.
+
+**Consequences**
+- The asset catalog and `AppTheme.accent` are now two copies of the same
+  value; if the brand color ever changes, both need updating.
+- The Workout tab's circle-badge icon also picked up the FDL-010 fix
+  (`AppTheme.onAccentFill` instead of hardcoded white), since its
+  background is now genuinely the accent orange rather than blue.
+
+---
+
+## FDL-012 — Appearance mode lives in UserSettings, not a separate store
+
+**Decision**  
+Add a Day/Night/Auto appearance override as `AppearanceMode` on the
+existing `UserSettings` model, surfaced in `SettingsView` under a new
+"Appearance" section, applied via `.preferredColorScheme` in
+`AppShellView`.
+
+**Reason**  
+It's a single user preference with the same persistence, defaulting, and
+backward-compatible-decoding needs as every other setting (unit system,
+rest timers, 1RM formula) — introducing a dedicated store would duplicate
+that machinery for one field. `AppearanceMode` itself is Foundation-only
+(no `ColorScheme` import) so the Domain layer stays free of SwiftUI; the
+View-layer mapping to `ColorScheme` happens in `AppShellView`.
+
+**Consequences**
+- Old saved settings without `appearanceMode` decode to `.system`
+  (Auto) via the same `decodeIfPresent ?? defaults` pattern already used
+  for every other field — no schema version bump needed.
+- Any code constructing `UserSettings` directly (tests included) must
+  now supply `appearanceMode`.
