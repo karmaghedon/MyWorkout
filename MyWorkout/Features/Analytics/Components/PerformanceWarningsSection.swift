@@ -12,10 +12,10 @@ struct PerformanceWarningsSection: View {
                 ForEach(warnings) { warning in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(warning.exerciseName)
-                            .font(.headline)
+                            .font(AppTheme.Typography.cardTitle)
 
                         Text(warning.message)
-                            .font(.caption)
+                            .font(AppTheme.Typography.caption)
                             .foregroundStyle(.secondary)
                     }
                     .accessibilityElement(children: .combine)

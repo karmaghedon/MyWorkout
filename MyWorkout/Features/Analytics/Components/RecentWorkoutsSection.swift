@@ -15,11 +15,11 @@ struct RecentWorkoutsSection: View {
                     ) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(log.date.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                                 .foregroundStyle(AppTheme.secondaryText)
 
                             Text("\(setCount(for: log)) sets")
-                                .font(.caption)
+                                .font(AppTheme.Typography.caption)
                         }
                     }
                 }

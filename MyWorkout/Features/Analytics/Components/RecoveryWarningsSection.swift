@@ -13,7 +13,7 @@ struct RecoveryWarningsSection: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text(warning.title)
-                                .font(.headline)
+                                .font(AppTheme.Typography.cardTitle)
 
                             Spacer()
 
@@ -25,11 +25,11 @@ struct RecoveryWarningsSection: View {
                         }
 
                         Text(warning.message)
-                            .font(.caption)
+                            .font(AppTheme.Typography.caption)
                             .foregroundStyle(.secondary)
 
                         Text("Suggested action: \(warning.recommendation)")
-                            .font(.caption)
+                            .font(AppTheme.Typography.caption)
                     }
                     .padding(.vertical, 4)
                     .accessibilityElement(children: .combine)
