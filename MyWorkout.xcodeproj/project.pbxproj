@@ -63,6 +63,7 @@
 		5D162C70A6BD87A48BE66780 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952B994D2A14EB8871E47E72 /* FloatingActionButton.swift */; };
 		5CAE61C3E32B8EDA5DB90F65 /* AppCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0A24B4D800D38682A83F1F /* AppCard.swift */; };
 		3541C0022FBF95DF8D12DF59 /* InformationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378EAF362D4A33DAEC8179C5 /* InformationCard.swift */; };
+		32508616758A90C71CF2C2C2 /* QuickActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */; };
 		5043A4D640E3392C9F7CACC6 /* MetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE331815941BE343B36BDC5 /* MetricCard.swift */; };
 		C8432E3EB2BC0B9CF7BC0B8C /* WorkoutCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */; };
 		11B77DD8FFDAC1BEAC7B9D4B /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60925D9AC6021896DE70AAB9 /* Chip.swift */; };
@@ -293,6 +294,7 @@
 		952B994D2A14EB8871E47E72 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		3A0A24B4D800D38682A83F1F /* AppCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppCard.swift; sourceTree = "<group>"; };
 		378EAF362D4A33DAEC8179C5 /* InformationCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InformationCard.swift; sourceTree = "<group>"; };
+		E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionRow.swift; sourceTree = "<group>"; };
 		5DE331815941BE343B36BDC5 /* MetricCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetricCard.swift; sourceTree = "<group>"; };
 		A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutCard.swift; sourceTree = "<group>"; };
 		60925D9AC6021896DE70AAB9 /* Chip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
@@ -932,6 +934,7 @@
 				37ADEE57752806370BEFB555 /* MetricView.swift */,
 				F54B809030068F7000615DA0 /* PrimaryButton.swift */,
 				29C307FF2C0B7B0343B00A35 /* ProgressBadge.swift */,
+				E952FCB7BED4FAD8E46788E7 /* QuickActionRow.swift */,
 				5C5A348D321EFC1D38FED736 /* ScreenHeader.swift */,
 				A95A93027D4164B6BCF69CB1 /* SectionHeader.swift */,
 				53A856D7B7F40813A0004032 /* SecondaryButton.swift */,
@@ -1587,6 +1590,7 @@
 				F54004D52FF0CF5C0079CC05 /* WorkoutLogStore.swift in Sources */,
 				F54B809130068F7000615DA0 /* PrimaryButton.swift in Sources */,
 				8978D6379E358461E51DA42C /* IconButton.swift in Sources */,
+				32508616758A90C71CF2C2C2 /* QuickActionRow.swift in Sources */,
 				C8894ED4D174A9E5ACF90A70 /* SecondaryButton.swift in Sources */,
 				BF345ED23499ECF01C1D91CE /* DestructiveButton.swift in Sources */,
 				5D162C70A6BD87A48BE66780 /* FloatingActionButton.swift in Sources */,

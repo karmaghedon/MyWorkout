@@ -1,25 +1,30 @@
-Version: 1.0
-Last Updated: 2026-07-19
+Version: 1.1
+Last Updated: 2026-08-19
 Status: Active
 
+Phases are checked off as their work lands on `remodeling`, not when
+they're merely planned. F1–F3 below reflect the actual state of the
+branch as of this update (see git history and `FrontendDecisionLog_F1.1_Entries.md`
+for how each phase was reasoned through), correcting a roadmap that had
+gone stale relative to completed work.
 
 F1
 
 Navigation
 
-☐
+☑
 
 F2
 
 Design System
 
-☐
+☑
 
 F3
 
 Home
 
-☐
+☑
 
 F4
 

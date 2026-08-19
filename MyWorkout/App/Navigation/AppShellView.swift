@@ -21,7 +21,11 @@ struct AppShellView: View {
                 .home,
                 path: $homePath
             ) {
-                DashboardView()
+                DashboardView(
+                    onStartWorkout: {
+                        handleTabSelection(.workout)
+                    }
+                )
             }
 
             appTab(

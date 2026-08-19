@@ -26,6 +26,8 @@ struct WorkoutCard<Subtitle: View>: View {
 
                 subtitle()
             }
+
+            Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)

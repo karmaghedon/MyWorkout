@@ -209,3 +209,46 @@ View-layer mapping to `ColorScheme` happens in `AppShellView`.
   for every other field — no schema version bump needed.
 - Any code constructing `UserSettings` directly (tests included) must
   now supply `appearanceMode`.
+
+---
+
+## FDL-013 — Home becomes a today-focused screen, not a menu
+
+**Decision**
+Redesign `DashboardView` (Home) around a greeting header, a single
+stateful hero action (start or resume a workout), the existing
+`DashboardStatsView` overview, and a preview of recent activity — and
+drop the menu cards that now duplicate a permanent tab: Start Workout
+(Workout tab), History (Progress tab), and Settings (Profile tab).
+Templates, Equipment, Custom Exercises, and Backup & Data remain on Home,
+presented as compact `QuickActionRow` rows grouped under "Progress" and
+"Manage," since Workout and Profile haven't absorbed them yet.
+
+**Reason**
+FDL-001 already named Home's menu role as something to remove, but F1
+only introduced the tab shell — it didn't touch Home's content. Leaving
+the full original card menu in place after the shell landed meant three
+destinations were reachable two ways (Home card and tab root), which
+contradicts "Minimal taps" and "Never surprise the user" from
+`UXPrinciples_F1.0.md`. The remaining four destinations have no other
+home yet, so removing their links would create dead ends rather than
+consolidate navigation.
+
+**Consequences**
+- `DashboardView` gains a required `onStartWorkout: () -> Void`,
+  supplied by `AppShellView` as `{ handleTabSelection(.workout) }` — the
+  same tab-switch-and-resume logic the tab bar's Workout item already
+  uses, so Home's hero action and the tab bar can never disagree about
+  what "start/resume" means.
+- New `QuickActionRow` component (compact icon + title + subtitle +
+  chevron) replaces `InformationCard` for these menu-style destinations.
+  `InformationCard` no longer has a consumer in the codebase as of this
+  change but is left in place — it's a reasonable fit for a future
+  screen's tile-style content and deleting it isn't this phase's concern.
+- Templates, Equipment, Custom Exercises, and Backup & Data staying on
+  Home is a deliberate placeholder, not a final decision — F5 (Library)
+  and F7 (Profile) are expected to relocate them per FDL-001, at which
+  point Home's "Manage" section should shrink or disappear.
+- The Export destination's Home-facing label changes to "Backup & Data"
+  per FDL-008's recommended user-facing name; the underlying `ExportView`
+  type and route are unchanged.

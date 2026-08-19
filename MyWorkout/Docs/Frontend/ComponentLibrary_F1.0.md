@@ -66,9 +66,12 @@ duplicated four times).
 
 ### InformationCard
 Title + short supporting line, e.g. a dashboard tile.
-**Used by:** `DashboardView`'s `dashboardLink` (replaces the old
-`DashboardCard`, which lived incorrectly in `Domain/Analytics/Models` — a
-View in the Domain layer. Deleted as part of this migration.)
+**Not currently consumed** — used by `DashboardView`'s `dashboardLink`
+(itself built to replace the old `DashboardCard`, which lived
+incorrectly in `Domain/Analytics/Models` — a View in the Domain layer)
+until the F3 Home redesign replaced that tile-menu layout with
+`QuickActionRow` rows (see "Status & metrics" below). Left in the
+library — it's a reasonable fit for future tile-style content.
 
 ### MetricCard
 A single glanceable number in its own card (a strength estimate, a
@@ -113,6 +116,17 @@ Label-and-value row (renamed from `DetailRow`, moved from
 generic, not exercise-specific).
 **Used by:** `ExerciseOverviewView`.
 
+### QuickActionRow
+Compact icon-badge row with a trailing chevron, for a menu-style
+navigation destination rather than workout content — visually close to
+`WorkoutCard` (same icon-badge treatment) but terminated with a chevron
+since it always represents "tap to go elsewhere," and not scoped to
+workout-specific items the way `WorkoutCard`'s naming and doc comment are.
+**Used by:** `DashboardView`'s Progress/Manage sections (Analytics,
+Strength, Templates, Equipment, Custom Exercises, Backup & Data) — built
+during the F3 Home redesign to replace six near-identical `InformationCard`
+tiles with a scannable list.
+
 ---
 
 ## Section headers
@@ -120,8 +134,9 @@ generic, not exercise-specific).
 ### SectionHeader
 A section-level title (`AppTheme.Typography.sectionTitle`), centralized
 so the treatment can evolve in one place.
-**Used by:** `DashboardView`'s `dashboardSection`, `InventorySectionCard`,
-`DashboardStatsView`'s "Overview" heading.
+**Used by:** `DashboardView`'s `dashboardSection` and recent-activity
+section, `InventorySectionCard`, `DashboardStatsView`'s "Overview"
+heading.
 
 ### CardHeader
 A card's title row with room for a trailing accessory (a chip, a button),
@@ -134,7 +149,10 @@ element on the active-workout screen), while `CardHeader` is fixed to
 ### ScreenHeader
 A screen-level title for a scrolling root screen not carried by
 `.navigationTitle`.
-**Used by:** `DashboardView`'s "MyWorkout" header.
+**Used by:** `DashboardView`'s header — since the F3 redesign, this
+renders a time-of-day greeting ("Good morning") rather than the static
+"MyWorkout" wordmark, per `AppTheme.Typography.heroTitle`'s own doc
+comment ("the Dashboard's top-of-screen greeting").
 
 ---
 
