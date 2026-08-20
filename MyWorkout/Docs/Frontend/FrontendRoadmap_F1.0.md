@@ -161,3 +161,24 @@ F8 — Premium Polish
       currently needs one.
 - [ ] Transition Polish — not specifically addressed.
 - [ ] Final UI Review — not done.
+
+Additional Work — Workout Session Redesign
+
+☐ implemented, not yet device-tested
+
+Outside the Blueprint's original 8 phases — a separate, later initiative
+covering the Workout session screen specifically. See FDL-020 for the
+full decision record.
+
+- [x] Settings toggle (`WorkoutSessionLayout`: Classic / Checklist,
+      defaults to Classic) under Settings → Workout Session.
+- [x] Pinned workout timer (`CompactWorkoutTimerBar`) above the scrolling
+      exercise list, on both layouts.
+- [x] Checklist layout — warm-up and working sets as tappable checklist
+      rows (`ChecklistExerciseSessionCardView`, `SetChecklistRow`)
+      instead of Classic's stepper.
+- [x] Template-defined working-set count (`Exercise.targetSets`,
+      configurable 1–10 per exercise in template creation/editing) plus
+      a session-time "Add Set" affordance.
+- [ ] Device-tested — not yet; the physical device wasn't reachable when
+      this landed. Build and build-for-testing both succeed.

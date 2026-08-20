@@ -1,5 +1,5 @@
-Version: 2.1
-Last Updated: 2026-08-19
+Version: 2.2
+Last Updated: 2026-08-20
 Status: Active
 
 # MyWorkout Component Library
@@ -223,3 +223,30 @@ to `IconButton`.
 
 - **ValidatedNameField** — form field with centralized name validation.
 - **FlowLayout** — wrapping layout for tag/chip collections.
+
+## Workout Session components (FDL-020)
+
+Live in `Features/WorkoutSession/Components/` and
+`Features/WorkoutSession/`, not `Features/Shared/Components/` — scoped to
+the Workout session screen specifically rather than general-purpose.
+Still built on `AppTheme` tokens throughout.
+
+### CompactWorkoutTimerBar
+Single-row, opaque-background timer bar pinned above the scrolling
+exercise list via `LazyVStack`/`Section`/`pinnedViews: [.sectionHeaders]`.
+Replaces the full-width `WorkoutTimerCardView` on the session screen for
+both layouts; `WorkoutTimerCardView` itself is left in place, unused,
+rather than deleted.
+
+### SetChecklistRow
+One checklist row — checkbox, title/subtitle, optional plate `Chip` —
+shared by both warm-up and working-set rows in the Checklist layout.
+Guarantees a 44×44 touch target around its visually smaller (26×26)
+checkbox circle, matching `IconButton`'s convention.
+
+### ChecklistExerciseSessionCardView
+Checklist-layout sibling of `ExerciseSessionCardView` — renders warm-up
+and working sets as `SetChecklistRow`s instead of a single stepper.
+Selected per exercise card by the `WorkoutSessionLayout` setting
+(`WorkoutExerciseListView` branches between this and
+`ExerciseSessionCardView`).

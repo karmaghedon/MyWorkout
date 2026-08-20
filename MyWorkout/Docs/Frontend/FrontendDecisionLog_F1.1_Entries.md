@@ -1,7 +1,7 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.7  
-**Date:** 2026-08-19  
+**Version:** 1.8  
+**Date:** 2026-08-20  
 **Status:** Approved
 
 ## FDL-001 — Five durable destinations
@@ -571,3 +571,79 @@ Home's new card.
   memory), so verification was static code reading plus the physical
   device, the same constraint every change this session has worked
   under.
+
+---
+
+## FDL-020 — Workout Session redesign: Checklist layout, pinned timer, template-defined set counts
+
+**Decision**
+Add a `WorkoutSessionLayout` setting (`classic` / `checklist`, defaulting
+to `classic`) under Settings → Workout Session. Both layouts share a new
+`CompactWorkoutTimerBar` pinned above the scrolling exercise list via
+`LazyVStack`/`Section`/`pinnedViews: [.sectionHeaders]`, replacing the old
+full-width `WorkoutTimerCardView` on the session screen (that view is
+left in place, unused, rather than deleted in the same change). The new
+`checklist` layout renders `ChecklistExerciseSessionCardView` instead of
+`ExerciseSessionCardView`: warm-up sets and working sets each render as a
+tappable `SetChecklistRow` (checkbox + weight×reps + plate chip) instead
+of a single stepper. Warm-up completion is tracked per exercise, keyed by
+weight rather than `WarmupSet.id` (that id is a fresh `UUID()` on every
+call to `WarmupEngine.generateWarmups`, which runs fresh on every render).
+Checking a warm-up row only marks it done and gives a haptic tap — it
+never starts a rest timer, checked or unchecked; only logging a working
+set does, unchanged from Classic. How many working-set rows a Checklist
+card shows is now driven by a new `Exercise.targetSets` field (default 3,
+configurable per exercise when creating or editing a template via a
+`Stepper`, 1–10) plus a session-scoped `extraWorkingSets` counter
+(`ActiveWorkoutStore.addExtraSet`) for the Checklist card's "Add Set"
+button — tapping it is a one-off "one more today," not a template edit.
+
+**Reason**
+Implements the mockups at the companion Workout Session Redesign
+artifact, per an approved implementation plan (v2) that resolved three
+open product questions from an earlier draft: (1) working-set count
+should come from the template, with a session-time "add a set" escape
+hatch, rather than a hardcoded placeholder; (2) warm-up weights should
+already reflect progression history — traced end to end
+(`WorkoutSessionEngine.initialState` → `ProgressionEngine.suggestion` →
+`WarmupEngine.generateWarmups`) and confirmed this was already true, so
+no code changed for that point; (3) warm-up completion should never
+trigger a rest timer, unlike an earlier draft that proposed a hardcoded
+30-second warm-up rest.
+
+`Exercise.targetSets` required special handling because `Exercise`
+already had a hand-written `encode(to:)` but a compiler-synthesized
+`init(from:)`. Adding a plain stored property would have made the
+synthesized decoder require the new key on every decode — and every
+`Exercise` already persisted on a device (inside a saved
+`WorkoutTemplate`, a custom exercise, an in-progress workout snapshot, an
+exported backup) predates the field, so the first launch after shipping
+would throw decoding every one of them. `Exercise` now has an explicit,
+hand-written `init(from:)` mirroring its `encode(to:)`, using
+`decodeIfPresent(...) ?? 3` only for `targetSets` — verified with a test
+that encodes a real `Exercise`, strips the key back out to simulate a
+pre-change payload, and confirms it decodes rather than throwing
+(`ExerciseCodableTests`). `ExerciseSessionState`'s two new fields
+(`completedWarmupWeights`, `extraWorkingSets`) already had a
+hand-written decoder from an earlier change, so they only needed the
+same `decodeIfPresent ?? default` treatment, covered by
+`ExerciseSessionStateCodableTests`.
+
+**Consequences**
+- `WorkoutTemplate.exercises` holds `Exercise` value copies, not
+  references, so the same exercise can carry a different `targetSets` in
+  different templates for free — no extra keying by template needed.
+- Warm-up completions never enter `WorkoutSessionEngine.workoutLog(...)`
+  (it only reads `state.loggedSets`), and working sets logged from the
+  Checklist card's "next" row call the same `ActiveWorkoutStore.logSet`
+  path Classic's stepper uses — Finish Summary, PR detection, and CSV
+  export all behave identically regardless of which layout logged a set,
+  and neither `targetSets` nor `extraWorkingSets` ever reach analytics.
+- Existing users default to `classic` and see no visual change until they
+  opt into Checklist from Settings; existing templates/custom
+  exercises/saved workouts all decode with `targetSets == 3`.
+- Not yet device-tested — the physical device wasn't reachable when this
+  landed (see the `myworkout-simulator-broken-use-device` memory; this
+  environment's CoreSimulator can't stand in). Build and
+  build-for-testing both succeed. Flagged on `FrontendRoadmap_F1.0.md`
+  pending a device pass.
