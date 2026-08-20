@@ -224,7 +224,13 @@ enum WorkoutSessionEngine {
 
         for priorLog in priorLogs {
             for exercise in priorLog.completedExercises {
-                let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
+                // Same reasoning as `AnalyticsEngine.personalRecords`:
+                // built-in exercises get a fresh `id` every app launch, so
+                // grouping by `exerciseID` fragments one exercise's history
+                // per launch instead of matching it up. `priorLogs` almost
+                // always spans multiple launches, so this key must be
+                // launch-stable — normalized name, not raw ID.
+                let key = ExerciseNameValidator.normalize(exercise.exerciseName)
 
                 for set in exercise.sets {
                     if let current = priorBest[key] {
@@ -241,7 +247,7 @@ enum WorkoutSessionEngine {
         var newRecords: [PersonalRecord] = []
 
         for exercise in log.completedExercises {
-            let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
+            let key = ExerciseNameValidator.normalize(exercise.exerciseName)
 
             guard let bestSetThisSession = exercise.sets.max(
                 by: { isBetterSet($1, than: $0) }

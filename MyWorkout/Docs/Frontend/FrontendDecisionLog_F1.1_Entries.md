@@ -1,6 +1,6 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.6  
+**Version:** 1.7  
 **Date:** 2026-08-19  
 **Status:** Approved
 
@@ -508,3 +508,66 @@ own note to do so once everything was checked off.
 - Only F8 (Premium Polish) remains on the roadmap. It's intentionally
   still last — a final polish/audit pass reads best against a feature
   set that's actually finished, which F3-F7 now are.
+
+---
+
+## FDL-019 — Fix built-in exercise identity churn (Favorites, Personal Records)
+
+**Decision**
+Stop keying exercise identity by `Exercise.id`/`CompletedExercise.exerciseID`
+for any comparison that has to hold across app launches, and use
+`ExerciseNameValidator.normalize(name)` instead — in
+`AnalyticsEngine.personalRecords`, `WorkoutSessionEngine.newPersonalRecords`,
+and `FavoriteExercisesStore` (which switches from persisting `Set<UUID>`
+to `Set<String>` of normalized names). Also fix `DashboardView`'s "New
+Personal Records" card to reuse `WorkoutSessionEngine.newPersonalRecords`
+instead of a second, slightly different hand-rolled comparison; switch its
+trophy icon and the Library favorite-star's filled color from raw
+`.yellow` off `AppTheme`; and sort the Library difficulty filter by
+Beginner → Intermediate → Advanced instead of alphabetically.
+
+**Reason**
+An external code-review of this branch's F3-F7 commits (`507f397..93ab086`)
+found that `SeedData`'s exercise factory never passes `id:` to `Exercise.init`,
+so built-in exercises get a fresh random `id` every app launch — and
+`ExerciseRegistry.exercise(id:name:)` already has an ID-then-name fallback
+specifically because of this, but nothing else in the codebase used it.
+Verifying the report surfaced a larger blast radius than the review itself
+scoped: `AnalyticsEngine.personalRecords` and
+`WorkoutSessionEngine.newPersonalRecords` also grouped by
+`exerciseID?.uuidString ?? exerciseName`, and since `exerciseID` is
+populated from that session's live `Exercise.id` on essentially every
+real logged set, the `?? exerciseName` fallback almost never actually
+fires — meaning a built-in exercise's logged history silently fragmented
+into a separate "exercise" every single app launch, not just in the two
+sites (`FavoriteExercisesStore`, `DashboardView`) the review flagged.
+That's the source feeding `AnalyticsCache.personalRecords`, so
+`PersonalRecordsSection` on the Analytics tab was affected too, not only
+Home's new card.
+
+**Consequences**
+- `ExerciseNameValidator.normalize(_:)` (already public, already the
+  function enforcing name uniqueness across built-in and custom
+  exercises at creation time) is now the shared stable identity key for
+  all three fixed call sites, rather than introducing a new type — it
+  already did exactly this job.
+- `FavoriteExercisesStore` persists under a new UserDefaults key
+  (`favorite_exercise_keys`, not `favorite_exercise_ids`); any
+  already-persisted favorites from before this fix are not migrated —
+  they were already silently lost on every relaunch before this fix, so
+  there's nothing worth preserving.
+- Two related findings from the same review — "Next Up" matching
+  `WorkoutLog.workoutName == template.name` (breaks if a template is
+  renamed) and "Today's Progress" counting an active session by its
+  start time rather than each set's own timestamp (undercounts a
+  session that crosses midnight) — are deliberately *not* fixed here.
+  Both would need new fields threaded through `Workout`/`WorkoutLog`/
+  `LoggedSet` and their persistence/decode paths, which is a
+  disproportionate amount of data-model change for two narrow edge
+  cases. Documented as known limitations on `FrontendRoadmap_F1.0.md`
+  under F3's Today's Progress / Next Workout entries instead.
+- Not run against the automated test suite — this environment's
+  CoreSimulator is broken (see the `myworkout-simulator-broken-use-device`
+  memory), so verification was static code reading plus the physical
+  device, the same constraint every change this session has worked
+  under.

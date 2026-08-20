@@ -30,8 +30,23 @@ struct ExerciseLibraryView: View {
         Array(Set(allExercises.map(\.equipment))).sorted()
     }
 
+    /// Beginner → Intermediate → Advanced, not alphabetical (which would
+    /// read "Advanced, Beginner, Intermediate"). Any difficulty string
+    /// outside this canonical set — none exist today, since custom
+    /// exercises only offer these three — sorts alphabetically after it.
     private var difficultyOptions: [String] {
-        Array(Set(allExercises.map(\.difficulty))).sorted()
+        let canonicalOrder = ["Beginner", "Intermediate", "Advanced"]
+
+        return Array(Set(allExercises.map(\.difficulty))).sorted { lhs, rhs in
+            let lhsRank = canonicalOrder.firstIndex(of: lhs) ?? canonicalOrder.count
+            let rhsRank = canonicalOrder.firstIndex(of: rhs) ?? canonicalOrder.count
+
+            guard lhsRank == rhsRank else {
+                return lhsRank < rhsRank
+            }
+
+            return lhs < rhs
+        }
     }
 
     private var hasActiveFilters: Bool {
@@ -50,7 +65,7 @@ struct ExerciseLibraryView: View {
                 return false
             }
 
-            if showFavoritesOnly, !favoriteExercisesStore.isFavorite(exercise.id) {
+            if showFavoritesOnly, !favoriteExercisesStore.isFavorite(exercise) {
                 return false
             }
 
@@ -163,17 +178,17 @@ struct ExerciseLibraryView: View {
             }
 
             IconButton(
-                systemImage: favoriteExercisesStore.isFavorite(exercise.id)
+                systemImage: favoriteExercisesStore.isFavorite(exercise)
                     ? "star.fill"
                     : "star",
-                accessibilityLabel: favoriteExercisesStore.isFavorite(exercise.id)
+                accessibilityLabel: favoriteExercisesStore.isFavorite(exercise)
                     ? "Remove \(exercise.name) from favorites"
                     : "Add \(exercise.name) to favorites",
-                color: favoriteExercisesStore.isFavorite(exercise.id)
-                    ? .yellow
+                color: favoriteExercisesStore.isFavorite(exercise)
+                    ? AppTheme.accent
                     : AppTheme.tertiaryText
             ) {
-                favoriteExercisesStore.toggleFavorite(exercise.id)
+                favoriteExercisesStore.toggleFavorite(exercise)
             }
         }
     }

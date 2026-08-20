@@ -44,6 +44,12 @@ F3 — Home
 - [x] Today's Progress — new "Today" card between the hero and the
       lifetime Overview stats: workouts and sets logged today, counting
       an active workout that started today alongside completed logs.
+      **Known limitation:** an active session is counted toward "today"
+      by when it *started*, not when each set was logged — a workout
+      started at 11:50pm whose sets get logged after midnight won't
+      count toward the new day until it's finished. Fixing this properly
+      needs a per-`LoggedSet` timestamp, which doesn't exist yet;
+      flagged rather than fixed since it's a narrow edge case.
 - [x] Recovery — Home now surfaces the most severe recovery warning (if
       any), with a count of additional warnings and a link into
       Analytics. Hidden entirely when there are none.
@@ -51,10 +57,21 @@ F3 — Home
       current calendar week plus a 7-day strip showing which days had
       a workout.
 - [x] PR Highlights — new "New Personal Records" card, shown when a set
-      logged today ties/beats an all-time personal record.
+      logged today genuinely beats (not ties) the prior best for that
+      exercise — reuses `WorkoutSessionEngine.newPersonalRecords`, the
+      same comparison the Finish Summary screen uses, so the two can't
+      disagree.
 - [x] Next Workout — new "Next Up" card suggesting the
       least-recently-performed template, with a one-tap start button.
-      Hidden while a workout is already active.
+      Hidden while a workout is already active. **Known limitation:**
+      matches workout history to a template by name
+      (`WorkoutLog.workoutName == template.name`) — renaming a template
+      orphans its prior history from the match, making a
+      just-performed-then-renamed template look never-performed (most
+      overdue). Fixing this needs a `templateID` captured on `WorkoutLog`
+      at finish time, threaded through `Workout` itself, which doesn't
+      currently carry one; flagged rather than fixed since it's a narrow
+      edge case (renaming a template right after using it).
 
 F4 — Workout
 

@@ -252,26 +252,32 @@ struct DashboardView: View {
 
     // MARK: - PR Highlights
 
-    /// Current all-time personal records that were set by a set logged
-    /// *today* — i.e. genuinely new, not just the standing best. Compares
-    /// each all-time record against today's logged sets for the same
-    /// exercise rather than requiring a date on `PersonalRecord` itself.
+    /// Personal records genuinely set *today* — reuses the exact same
+    /// comparison `WorkoutFinishSummaryView` uses, computed fresh from
+    /// `logStore.logs` for each of today's logs against everything
+    /// strictly before it (so two workouts today compare correctly
+    /// against each other, not just against history before today).
+    ///
+    /// Deliberately not read from `AnalyticsCache`: that cache recomputes
+    /// on a 300ms debounce, so it can be stale for a few hundred
+    /// milliseconds after finishing a workout. Reimplementing the
+    /// comparison here previously also compared today's sets against the
+    /// *current* standing best rather than the best *before* today's log,
+    /// which reports a repeated (tied, not beaten) old PR as new — using
+    /// the shared helper avoids duplicating that logic a second, slightly
+    /// different way.
     private var newPersonalRecordsToday: [PersonalRecord] {
-        let todaysSets: [(key: String, set: LoggedSet)] = todaysLogs.flatMap { log in
-            log.completedExercises.flatMap { exercise -> [(key: String, set: LoggedSet)] in
-                let key = exercise.exerciseID?.uuidString ?? exercise.exerciseName
-                return exercise.sets.map { (key, $0) }
-            }
-        }
+        let sortedLogs = logStore.logs.sorted { $0.date < $1.date }
 
-        return analyticsCache.personalRecords.filter { record in
-            let recordKey = record.exerciseID?.uuidString ?? record.exerciseName
-
-            return todaysSets.contains {
-                $0.key == recordKey
-                    && $0.set.weight == record.weightPounds
-                    && $0.set.reps == record.reps
+        return sortedLogs.enumerated().flatMap { index, log -> [PersonalRecord] in
+            guard Calendar.current.isDateInToday(log.date) else {
+                return []
             }
+
+            return WorkoutSessionEngine.newPersonalRecords(
+                in: log,
+                priorLogs: Array(sortedLogs[..<index])
+            )
         }
     }
 
@@ -290,7 +296,7 @@ struct DashboardView: View {
                         ) { index, record in
                             HStack(spacing: AppTheme.Spacing.md) {
                                 Image(systemName: "trophy.fill")
-                                    .foregroundStyle(.yellow)
+                                    .foregroundStyle(AppTheme.accent)
                                     .accessibilityHidden(true)
 
                                 VStack(alignment: .leading, spacing: 2) {
