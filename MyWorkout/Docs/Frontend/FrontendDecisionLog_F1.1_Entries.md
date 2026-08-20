@@ -1,6 +1,6 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.5  
+**Version:** 1.6  
 **Date:** 2026-08-19  
 **Status:** Approved
 
@@ -469,3 +469,42 @@ FDL-013's Home redesign).
   review. None of this was implemented as part of this decision — see
   `FrontendRoadmap_F1.0.md` for the itemized list and prioritize from
   there.
+
+---
+
+## FDL-018 — F3-F7 implemented and device-verified
+
+**Decision**
+Implement every sub-goal FDL-017 identified as missing across F3-F7 —
+Today's Progress, Recovery, Weekly Summary, PR Highlights, and Next
+Workout on Home (F3); a Finish Summary screen with Workout Insights
+(F4); rich exercise cards, filters, favorites, and related exercises in
+the Library (F5); Volume Trend and Consistency in Analytics (F6); an
+About screen in Profile (F7) — then verify all of it on the physical
+device rather than treating a successful build as sufficient.
+
+**Reason**
+A `xcodebuild` success only confirms the code compiles; several of these
+features involve interaction patterns (a favorite-star button sitting
+beside, not inside, a `NavigationLink`'s label; a full-screen cover
+replacing an immediate dismiss on workout finish; filter state actually
+narrowing a grouped list) that can only be confirmed correct by actually
+tapping through them. A temporary `PendingDeviceTests.md` tracked exactly
+what to check per feature while the device was unreachable; every item
+passed once it was reconnected, and that file has been deleted per its
+own note to do so once everything was checked off.
+
+**Consequences**
+- F3 through F7 are now checked "device-tested" on
+  `FrontendRoadmap_F1.0.md`, not just "implemented" — the roadmap's own
+  standing rule (checked only once actually landed and working, not
+  merely compiled) now applies at the sub-goal level introduced by
+  FDL-017, not just the phase level.
+- New domain surface added along the way: `FavoriteExercisesStore`
+  (Domain/Exercise/Stores), and two new personal-record/volume
+  computations on `WorkoutSessionEngine` deliberately independent of
+  `AnalyticsCache` (which recomputes on a 300ms debounce and would show
+  stale data if read immediately after finishing a workout).
+- Only F8 (Premium Polish) remains on the roadmap. It's intentionally
+  still last — a final polish/audit pass reads best against a feature
+  set that's actually finished, which F3-F7 now are.

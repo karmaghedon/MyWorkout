@@ -37,8 +37,7 @@ done — see `ComponentLibrary_F1.0.md` and `DesignSystem_F1.0.md`.
 
 F3 — Home
 
-☑ (all sub-goals implemented; not yet device-tested — see
-`PendingDeviceTests.md`)
+☑ device-tested
 
 - [x] Welcome — greeting header, time-of-day aware.
 - [x] Resume Workout — stateful hero card (start / resume).
@@ -52,16 +51,14 @@ F3 — Home
       current calendar week plus a 7-day strip showing which days had
       a workout.
 - [x] PR Highlights — new "New Personal Records" card, shown when a set
-      logged today ties/beats an all-time personal record. Not yet
-      device-tested — see `PendingDeviceTests.md`.
+      logged today ties/beats an all-time personal record.
 - [x] Next Workout — new "Next Up" card suggesting the
       least-recently-performed template, with a one-tap start button.
-      Hidden while a workout is already active. Not yet device-tested.
+      Hidden while a workout is already active.
 
 F4 — Workout
 
-☑ (all sub-goals implemented; not yet device-tested — see
-`PendingDeviceTests.md`)
+☑ device-tested
 
 - [x] Template Cards — `StartWorkoutView`'s template rows (`WorkoutCard`).
 - [x] Workout Dashboard — `StartWorkoutView` serves as the hub; templates
@@ -80,8 +77,7 @@ F4 — Workout
 
 F5 — Library
 
-☑ (all sub-goals implemented; not yet device-tested — see
-`PendingDeviceTests.md`)
+☑ device-tested
 
 - [x] Rich Exercise Cards — `ExerciseRowView` redesigned with an
       equipment icon badge and muscle/equipment/difficulty `Chip`s
@@ -102,8 +98,7 @@ F5 — Library
 
 F6 — Progress
 
-☑ (Future Body Metrics excluded — deferred elsewhere; not yet
-device-tested — see `PendingDeviceTests.md`)
+☑ device-tested (Future Body Metrics excluded — deferred elsewhere)
 
 - [x] Strength Trends — `StrengthTrendView`.
 - [x] Volume Trends — new `VolumeTrendSection`: weekly total volume
@@ -119,8 +114,7 @@ device-tested — see `PendingDeviceTests.md`)
 
 F7 — Profile
 
-☑ (all sub-goals implemented; not yet device-tested — see
-`PendingDeviceTests.md`)
+☑ device-tested
 
 - [x] Settings — `ProfileHubView` → `SettingsView`.
 - [x] Equipment — `ProfileHubView` → `EquipmentInventoryView`.
