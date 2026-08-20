@@ -27,6 +27,35 @@ final class WorkoutTemplateStoreTests: XCTestCase {
         XCTAssertEqual(sut.templates.first?.name, "Push Day")
     }
 
+    /// Regression test: `WorkoutTemplateStore.refreshed(_:)` re-resolves
+    /// every saved exercise against the current built-in definition to
+    /// stay in sync with `SeedData` changes — but naively swapping in
+    /// that whole fresh `Exercise` value used to silently wipe
+    /// `targetSets`/`targetWeightPounds` back to their global defaults
+    /// (3 / nil) on every save, since those are per-template overrides
+    /// that don't exist on the built-in definition itself. Uses "Bench
+    /// Press" specifically because it's a real `SeedData` entry, so
+    /// `builtInRegistry.exercise(id:name:)` actually resolves it (an
+    /// ad-hoc test name with no SeedData match would return nil and
+    /// bypass the refresh path entirely, defeating the point of this
+    /// test).
+    func test_add_preservesTargetSetsAndWeightOverrideForBuiltInExercise() {
+        var exercise = createSampleExercise(name: "Bench Press")
+        exercise.targetSets = 5
+        exercise.targetWeightPounds = 135
+
+        let template = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [exercise]
+        )
+
+        sut.add(template)
+
+        let savedExercise = sut.templates.first?.exercises.first
+        XCTAssertEqual(savedExercise?.targetSets, 5)
+        XCTAssertEqual(savedExercise?.targetWeightPounds, 135)
+    }
+
     func test_add_multipleTemplatesAreStored() {
         sut.add(createSampleTemplate(name: "Push"))
         sut.add(createSampleTemplate(name: "Pull"))
@@ -62,6 +91,27 @@ final class WorkoutTemplateStoreTests: XCTestCase {
 
         XCTAssertEqual(sut.templates.count, 1)
         XCTAssertEqual(sut.templates.first?.name, "Updated")
+    }
+
+    func test_update_preservesTargetSetsAndWeightOverrideForBuiltInExercise() {
+        let exercise = createSampleExercise(name: "Bench Press")
+        let original = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [exercise]
+        )
+        sut.add(original)
+
+        var updatedExercise = sut.templates.first!.exercises.first!
+        updatedExercise.targetSets = 4
+        updatedExercise.targetWeightPounds = 185
+
+        var updated = sut.templates.first!
+        updated.exercises = [updatedExercise]
+        sut.update(updated)
+
+        let savedExercise = sut.templates.first?.exercises.first
+        XCTAssertEqual(savedExercise?.targetSets, 4)
+        XCTAssertEqual(savedExercise?.targetWeightPounds, 185)
     }
 
     func test_update_doesNothingWhenTemplateNotFound() {
