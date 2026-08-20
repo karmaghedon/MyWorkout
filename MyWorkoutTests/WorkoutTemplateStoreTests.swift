@@ -180,6 +180,100 @@ final class WorkoutTemplateStoreTests: XCTestCase {
         XCTAssertEqual(sut.templates.count, 0)
     }
 
+    // MARK: - Sync Starting Weights
+
+    func test_syncStartingWeights_updatesMatchingExerciseToLastLoggedSetWeight() {
+        let exercise = createSampleExercise(name: "Bench Press")
+        let template = WorkoutTemplate(name: "Push Day", exercises: [exercise])
+        sut.add(template)
+
+        let savedExercise = sut.templates.first!.exercises.first!
+
+        let log = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: savedExercise.id,
+                    exerciseName: savedExercise.name,
+                    sets: [
+                        LoggedSet(setNumber: 1, weight: 135, reps: 8),
+                        LoggedSet(setNumber: 2, weight: 145, reps: 6)
+                    ],
+                    notes: ""
+                )
+            ]
+        )
+
+        sut.syncStartingWeights(from: log)
+
+        XCTAssertEqual(
+            sut.templates.first?.exercises.first?.targetWeightPounds,
+            145
+        )
+    }
+
+    func test_syncStartingWeights_ignoresTemplatesWithDifferentName() {
+        let exercise = createSampleExercise(name: "Bench Press")
+        let template = WorkoutTemplate(name: "Push Day", exercises: [exercise])
+        sut.add(template)
+
+        let savedExercise = sut.templates.first!.exercises.first!
+
+        let log = WorkoutLog(
+            workoutName: "Pull Day",
+            date: Date(),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: savedExercise.id,
+                    exerciseName: savedExercise.name,
+                    sets: [LoggedSet(setNumber: 1, weight: 200, reps: 5)],
+                    notes: ""
+                )
+            ]
+        )
+
+        sut.syncStartingWeights(from: log)
+
+        XCTAssertNil(
+            sut.templates.first?.exercises.first?.targetWeightPounds
+        )
+    }
+
+    func test_syncStartingWeights_leavesExercisesNotInLogUntouched() {
+        let benchPress = createSampleExercise(name: "Bench Press")
+        let frontSquat = createSampleExercise(name: "Front Squat")
+
+        let template = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [benchPress, frontSquat]
+        )
+        sut.add(template)
+
+        let savedBench = sut.templates.first!.exercises[0]
+
+        let log = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: savedBench.id,
+                    exerciseName: savedBench.name,
+                    sets: [LoggedSet(setNumber: 1, weight: 155, reps: 8)],
+                    notes: ""
+                )
+            ]
+        )
+
+        sut.syncStartingWeights(from: log)
+
+        XCTAssertEqual(
+            sut.templates.first?.exercises[0].targetWeightPounds,
+            155
+        )
+        XCTAssertNil(sut.templates.first?.exercises[1].targetWeightPounds)
+    }
+
     // MARK: - Helper Methods
 
     private func createSampleTemplate(name: String) -> WorkoutTemplate {

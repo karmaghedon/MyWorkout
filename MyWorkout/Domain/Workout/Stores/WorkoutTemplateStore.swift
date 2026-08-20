@@ -99,6 +99,84 @@ final class WorkoutTemplateStore: ObservableObject {
         save()
     }
 
+    /// Updates each matching template's per-exercise starting weight
+    /// (`Exercise.targetWeightPounds`) to the last set actually logged for
+    /// that exercise in a just-finished workout — so reopening "Edit
+    /// Template" later shows where the user has actually progressed to,
+    /// instead of whatever value the template was created or last hand-
+    /// edited with. This is purely informational: `WorkoutSessionEngine
+    /// .initialState` already ignores `targetWeightPounds` once real
+    /// logged history exists for an exercise (progression drives the
+    /// weight then, not the template) — this only keeps the *displayed*
+    /// template value honest.
+    ///
+    /// Matches the template by `WorkoutLog.workoutName == template.name`,
+    /// the same name-based match `DashboardView`'s "Next Workout" card
+    /// already uses — and inherits the same known limitation: renaming a
+    /// template after workouts were logged under its old name orphans
+    /// this sync too, same as it orphans that card's match.
+    func syncStartingWeights(from log: WorkoutLog) {
+        var didUpdate = false
+
+        for templateIndex in templates.indices
+        where templates[templateIndex].name == log.workoutName {
+
+            for exerciseIndex in
+                templates[templateIndex].exercises.indices {
+
+                let exercise =
+                    templates[templateIndex]
+                        .exercises[exerciseIndex]
+
+                guard let lastSet = completedExercise(
+                    for: exercise,
+                    in: log
+                )?.sets.last else {
+                    continue
+                }
+
+                guard templates[templateIndex]
+                        .exercises[exerciseIndex]
+                        .targetWeightPounds != lastSet.weight else {
+                    continue
+                }
+
+                templates[templateIndex]
+                    .exercises[exerciseIndex]
+                    .targetWeightPounds = lastSet.weight
+
+                didUpdate = true
+            }
+        }
+
+        guard didUpdate else {
+            return
+        }
+
+        save()
+    }
+
+    /// Matches by `Exercise.id` first (stable for both built-in and
+    /// custom exercises), falling back to normalized name for the rare
+    /// case an id doesn't resolve — same defensive two-step lookup
+    /// `ExerciseRegistry.exercise(id:name:)` already uses elsewhere.
+    private func completedExercise(
+        for exercise: Exercise,
+        in log: WorkoutLog
+    ) -> CompletedExercise? {
+        if let match = log.completedExercises.first(
+            where: { $0.exerciseID == exercise.id }
+        ) {
+            return match
+        }
+
+        let normalizedName = ExerciseNameValidator.normalize(exercise.name)
+
+        return log.completedExercises.first {
+            ExerciseNameValidator.normalize($0.exerciseName) == normalizedName
+        }
+    }
+
     // MARK: - Persistence Errors
 
     func clearPersistenceError() {

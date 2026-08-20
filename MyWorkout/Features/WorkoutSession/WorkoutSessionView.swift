@@ -9,6 +9,7 @@ struct WorkoutSessionView: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var settingsStore: UserSettingsStore
     @EnvironmentObject var activeWorkoutStore: ActiveWorkoutStore
+    @EnvironmentObject var templateStore: WorkoutTemplateStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showFinishSummary = false
@@ -180,6 +181,7 @@ struct WorkoutSessionView: View {
         )
 
         logStore.add(log)
+        templateStore.syncStartingWeights(from: log)
         activeWorkoutStore.finish()
 
         completedWorkout = CompletedWorkout(
