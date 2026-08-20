@@ -26,6 +26,15 @@ struct Exercise: Identifiable, Codable {
     /// `targetSets` in different templates with no extra keying needed.
     var targetSets: Int = 3
 
+    /// A per-template starting weight override, in canonical pounds. `nil`
+    /// (the default) means "no override" — `WorkoutSessionEngine.initialState`
+    /// falls back to its existing behavior (progression history if any,
+    /// otherwise the equipment-derived default) exactly as it did before
+    /// this field existed. Only used when there's no prior performance for
+    /// the exercise yet; once real history exists, progression drives the
+    /// weight, not the template.
+    var targetWeightPounds: Double?
+
     var usesBarbell: Bool {
         equipment.usesBarbell
     }
@@ -45,7 +54,8 @@ struct Exercise: Identifiable, Codable {
         progressionRule: ProgressionRule,
         exerciseType: ExerciseType,
         progressionStrategy: ProgressionStrategy,
-        targetSets: Int = 3
+        targetSets: Int = 3,
+        targetWeightPounds: Double? = nil
     ) {
         self.id = id
         self.name = name
@@ -62,6 +72,7 @@ struct Exercise: Identifiable, Codable {
         self.exerciseType = exerciseType
         self.progressionStrategy = progressionStrategy
         self.targetSets = targetSets
+        self.targetWeightPounds = targetWeightPounds
     }
 
     // MARK: - Codable
@@ -80,6 +91,7 @@ struct Exercise: Identifiable, Codable {
         case tips, commonMistakes, warnings
         case progressionRule, exerciseType, progressionStrategy
         case targetSets
+        case targetWeightPounds
     }
 
     init(from decoder: Decoder) throws {
@@ -101,6 +113,7 @@ struct Exercise: Identifiable, Codable {
         progressionStrategy = try container.decode(ProgressionStrategy.self, forKey: .progressionStrategy)
 
         targetSets = try container.decodeIfPresent(Int.self, forKey: .targetSets) ?? 3
+        targetWeightPounds = try container.decodeIfPresent(Double.self, forKey: .targetWeightPounds)
     }
 
     func encode(
@@ -128,5 +141,6 @@ struct Exercise: Identifiable, Codable {
             forKey: .progressionStrategy
         )
         try container.encode(targetSets, forKey: .targetSets)
+        try container.encodeIfPresent(targetWeightPounds, forKey: .targetWeightPounds)
     }
 }

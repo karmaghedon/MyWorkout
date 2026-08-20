@@ -3,6 +3,8 @@ import SwiftUI
 struct TemplateEditorView: View {
     @EnvironmentObject private var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
+    @EnvironmentObject private var settingsStore: UserSettingsStore
+    @EnvironmentObject private var equipmentStore: EquipmentInventoryStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var editableTemplate: WorkoutTemplate
@@ -79,6 +81,15 @@ struct TemplateEditorView: View {
                     )
                     .font(AppTheme.Typography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
+
+                    Stepper(
+                        "\(formatWeight(weightBinding(for: $exercise).wrappedValue)) \(weightUnit)",
+                        value: weightBinding(for: $exercise),
+                        in: 0...500,
+                        step: weightStep
+                    )
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
                 }
             }
             .onMove(perform: moveExercises)
@@ -88,6 +99,51 @@ struct TemplateEditorView: View {
         } footer: {
             Text("Tap Edit to reorder or remove exercises.")
         }
+    }
+
+    // MARK: - Weight Boundary
+
+    private var weightUnit: String {
+        settingsStore.settings.unitSystem.rawValue
+    }
+
+    private var weightStep: Double {
+        WeightConversion.displayStep(
+            fromStoredPounds: 5,
+            unitSystem: settingsStore.settings.unitSystem
+        )
+    }
+
+    private func displayWeight(_ storedPounds: Double) -> Double {
+        WeightConversion.displayWeight(
+            fromStoredPounds: storedPounds,
+            unitSystem: settingsStore.settings.unitSystem
+        )
+    }
+
+    private func defaultWeightPounds(for exercise: Exercise) -> Double {
+        WorkoutSessionEngine.defaultStartingWeight(
+            for: exercise,
+            equipmentInventory: equipmentStore.inventory
+        )
+    }
+
+    private func weightBinding(for exercise: Binding<Exercise>) -> Binding<Double> {
+        Binding(
+            get: {
+                displayWeight(
+                    exercise.wrappedValue.targetWeightPounds
+                        ?? defaultWeightPounds(for: exercise.wrappedValue)
+                )
+            },
+            set: { displayedWeight in
+                exercise.wrappedValue.targetWeightPounds =
+                    WeightConversion.storedPounds(
+                        fromDisplayedWeight: displayedWeight,
+                        unitSystem: settingsStore.settings.unitSystem
+                    )
+            }
+        )
     }
 
     // MARK: - Bottom Action

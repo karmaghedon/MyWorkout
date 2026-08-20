@@ -151,7 +151,7 @@ enum WorkoutSessionEngine {
 
         return ExerciseSessionState(
             targetReps: 10,
-            workingWeightPounds: defaultStartingWeight(
+            workingWeightPounds: exercise.targetWeightPounds ?? defaultStartingWeight(
                 for: exercise,
                 equipmentInventory: equipmentInventory
             ),

@@ -9,7 +9,8 @@ final class WorkoutSessionEngineTests: XCTestCase {
         name: String = "Bench Press",
         equipment: ExerciseEquipment = .barbell,
         exerciseType: ExerciseType = .compound,
-        strategy: ProgressionStrategy = .doubleProgression
+        strategy: ProgressionStrategy = .doubleProgression,
+        targetWeightPounds: Double? = nil
     ) -> Exercise {
         Exercise(
             name: name,
@@ -24,7 +25,8 @@ final class WorkoutSessionEngineTests: XCTestCase {
                 stallLimit: 3
             ),
             exerciseType: exerciseType,
-            progressionStrategy: strategy
+            progressionStrategy: strategy,
+            targetWeightPounds: targetWeightPounds
         )
     }
 
@@ -229,6 +231,53 @@ final class WorkoutSessionEngineTests: XCTestCase {
         XCTAssertEqual(state.workingWeightPounds, 105)
         XCTAssertEqual(state.targetReps, 12)
         XCTAssertEqual(state.suggestionMessage, "Increase next time")
+    }
+
+    func test_initialState_noHistory_usesTemplateTargetWeightOverDefault() {
+        let ex = exercise(
+            equipment: .barbell,
+            exerciseType: .compound,
+            targetWeightPounds: 135
+        )
+
+        let state = WorkoutSessionEngine.initialState(
+            for: ex,
+            latestPerformance: nil,
+            previousPerformances: [],
+            equipmentInventory: inventory(barbellWeight: 45)
+        )
+
+        XCTAssertEqual(state.workingWeightPounds, 135)
+    }
+
+    func test_initialState_withHistory_ignoresTemplateTargetWeight() {
+        let ex = exercise(
+            equipment: .barbell,
+            exerciseType: .compound,
+            strategy: .doubleProgression,
+            targetWeightPounds: 225
+        )
+
+        let latest = CompletedExercise(
+            exerciseName: "Bench Press",
+            sets: [
+                LoggedSet(setNumber: 1, weight: 100, reps: 12),
+                LoggedSet(setNumber: 2, weight: 100, reps: 12),
+                LoggedSet(setNumber: 3, weight: 100, reps: 12)
+            ],
+            notes: ""
+        )
+
+        let state = WorkoutSessionEngine.initialState(
+            for: ex,
+            latestPerformance: latest,
+            previousPerformances: [],
+            equipmentInventory: inventory(barbellWeight: 45)
+        )
+
+        // Real progression history takes priority over the template's
+        // one-time starting weight — 105 (progressed from 100), not 225.
+        XCTAssertEqual(state.workingWeightPounds, 105)
     }
 
     // MARK: - newPersonalRecords

@@ -3,12 +3,16 @@ import SwiftUI
 struct CreateWorkoutTemplateView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
+    @EnvironmentObject private var settingsStore: UserSettingsStore
+    @EnvironmentObject private var equipmentStore: EquipmentInventoryStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var templateName = ""
     @State private var selectedExerciseIDs: Set<UUID> = []
     @State private var selectedEquipment: ExerciseEquipment?
+    @State private var searchText = ""
     @State private var targetSetsByExerciseID: [UUID: Int] = [:]
+    @State private var targetWeightByExerciseID: [UUID: Double] = [:]
 
     private var exercises: [Exercise] {
         ExerciseRegistry(
@@ -29,13 +33,25 @@ struct CreateWorkoutTemplateView: View {
     }
 
     private var filteredExercises: [Exercise] {
-        guard let selectedEquipment else {
-            return exercises
+        var result = exercises
+
+        if let selectedEquipment {
+            result = result.filter {
+                $0.equipment == selectedEquipment
+            }
         }
 
-        return exercises.filter {
-            $0.equipment == selectedEquipment
+        let trimmedSearch = searchText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        if !trimmedSearch.isEmpty {
+            result = result.filter {
+                $0.name.localizedCaseInsensitiveContains(trimmedSearch)
+            }
         }
+
+        return result
     }
 
     private var selectedExercises: [Exercise] {
@@ -103,6 +119,10 @@ struct CreateWorkoutTemplateView: View {
                     isSelected ? "Selected" : ""
                 )
             }
+            .searchable(
+                text: $searchText,
+                prompt: "Search exercises"
+            )
 
             if !selectedExercises.isEmpty {
                 configureSetsSection
@@ -121,23 +141,86 @@ struct CreateWorkoutTemplateView: View {
     }
 
     private var configureSetsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("SETS PER EXERCISE")
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Text("SETS & STARTING WEIGHT")
                 .font(AppTheme.Typography.eyebrow)
                 .foregroundStyle(AppTheme.secondaryText)
 
             ForEach(selectedExercises) { exercise in
-                Stepper(
-                    "\(exercise.name): \(targetSetsByExerciseID[exercise.id] ?? 3) sets",
-                    value: Binding(
-                        get: { targetSetsByExerciseID[exercise.id] ?? 3 },
-                        set: { targetSetsByExerciseID[exercise.id] = $0 }
-                    ),
-                    in: 1...10
-                )
-                .font(AppTheme.Typography.caption)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(exercise.name)
+                        .font(AppTheme.Typography.label)
+
+                    Stepper(
+                        "\(targetSetsByExerciseID[exercise.id] ?? 3) sets",
+                        value: Binding(
+                            get: { targetSetsByExerciseID[exercise.id] ?? 3 },
+                            set: { targetSetsByExerciseID[exercise.id] = $0 }
+                        ),
+                        in: 1...10
+                    )
+                    .font(AppTheme.Typography.caption)
+
+                    Stepper(
+                        "\(formatWeight(weightBinding(for: exercise).wrappedValue)) \(weightUnit)",
+                        value: weightBinding(for: exercise),
+                        in: 0...500,
+                        step: weightStep
+                    )
+                    .font(AppTheme.Typography.caption)
+                }
+                .padding(.bottom, AppTheme.Spacing.xs)
             }
         }
+    }
+
+    // MARK: - Weight Boundary
+
+    private var weightUnit: String {
+        settingsStore.settings.unitSystem.rawValue
+    }
+
+    private var weightStep: Double {
+        WeightConversion.displayStep(
+            fromStoredPounds: 5,
+            unitSystem: settingsStore.settings.unitSystem
+        )
+    }
+
+    private func displayWeight(_ storedPounds: Double) -> Double {
+        WeightConversion.displayWeight(
+            fromStoredPounds: storedPounds,
+            unitSystem: settingsStore.settings.unitSystem
+        )
+    }
+
+    private func defaultWeightPounds(for exercise: Exercise) -> Double {
+        WorkoutSessionEngine.defaultStartingWeight(
+            for: exercise,
+            equipmentInventory: equipmentStore.inventory
+        )
+    }
+
+    /// Displayed-unit binding backed by `targetWeightByExerciseID`
+    /// (canonical pounds). Reads fall back to the exercise's normal
+    /// equipment-derived default until the user actually moves the
+    /// stepper, at which point `saveTemplate` picks up a real override.
+    private func weightBinding(for exercise: Exercise) -> Binding<Double> {
+        Binding(
+            get: {
+                displayWeight(
+                    targetWeightByExerciseID[exercise.id]
+                        ?? defaultWeightPounds(for: exercise)
+                )
+            },
+            set: { displayedWeight in
+                targetWeightByExerciseID[exercise.id] =
+                    WeightConversion.storedPounds(
+                        fromDisplayedWeight: displayedWeight,
+                        unitSystem: settingsStore.settings.unitSystem
+                    )
+            }
+        )
     }
 
     private func toggle(_ exercise: Exercise) {
@@ -156,6 +239,7 @@ struct CreateWorkoutTemplateView: View {
         let exercisesWithSetCounts = selectedExercises.map { exercise -> Exercise in
             var configured = exercise
             configured.targetSets = targetSetsByExerciseID[exercise.id] ?? 3
+            configured.targetWeightPounds = targetWeightByExerciseID[exercise.id]
             return configured
         }
 

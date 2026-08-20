@@ -6,11 +6,14 @@ struct TemplateExercisePickerView: View {
     let exercises: [Exercise]
     let onSelect: (Exercise) -> Void
 
+    @State private var searchText = ""
+
     var body: some View {
         VStack(
             alignment: .leading,
             spacing: AppTheme.Spacing.sm
         ) {
+            searchField
             equipmentPicker
 
             if filteredExercises.isEmpty {
@@ -20,6 +23,34 @@ struct TemplateExercisePickerView: View {
             }
         }
         .padding(.vertical, AppTheme.Spacing.sm)
+    }
+
+    private var searchField: some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(AppTheme.secondaryText)
+                .accessibilityHidden(true)
+
+            TextField("Search exercises", text: $searchText)
+                .textFieldStyle(.plain)
+
+            if !searchText.isEmpty {
+                IconButton(
+                    systemImage: "xmark.circle.fill",
+                    accessibilityLabel: "Clear search",
+                    size: 16,
+                    color: AppTheme.secondaryText
+                ) {
+                    searchText = ""
+                }
+            }
+        }
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
+                .fill(AppTheme.subtleFill)
+        )
     }
 
     private var equipmentPicker: some View {
@@ -70,12 +101,24 @@ struct TemplateExercisePickerView: View {
     }
 
     private var filteredExercises: [Exercise] {
-        guard let selectedEquipment else {
-            return exercises
+        var result = exercises
+
+        if let selectedEquipment {
+            result = result.filter {
+                $0.equipment == selectedEquipment
+            }
         }
 
-        return exercises.filter {
-            $0.equipment == selectedEquipment
+        let trimmedSearch = searchText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        if !trimmedSearch.isEmpty {
+            result = result.filter {
+                $0.name.localizedCaseInsensitiveContains(trimmedSearch)
+            }
         }
+
+        return result
     }
 }
