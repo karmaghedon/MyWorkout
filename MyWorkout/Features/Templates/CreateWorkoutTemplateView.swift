@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// Mirrors `TemplateEditorView`'s structure deliberately — a `Form` with
+/// an expandable, searchable `TemplateExercisePickerView` to add
+/// exercises and a reorderable list of what's been picked so far, each
+/// row carrying its own sets/weight steppers. The previous version used a
+/// non-scrolling `VStack` with a plain `List` and a second, separate
+/// configuration section below it; on a full exercise list that pushed
+/// the sets/weight steppers off-screen since nothing above the Save
+/// button could actually scroll.
 struct CreateWorkoutTemplateView: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
@@ -8,168 +16,127 @@ struct CreateWorkoutTemplateView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var templateName = ""
-    @State private var selectedExerciseIDs: Set<UUID> = []
+    @State private var selectedExercises: [Exercise] = []
     @State private var selectedEquipment: ExerciseEquipment?
-    @State private var searchText = ""
-    @State private var targetSetsByExerciseID: [UUID: Int] = [:]
-    @State private var targetWeightByExerciseID: [UUID: Double] = [:]
+    @State private var showingAddExercises = false
 
-    private var exercises: [Exercise] {
-        ExerciseRegistry(
-            sources: [
-                BuiltInExerciseSource(),
-                CustomExerciseSource(
-                    exercises: customExerciseStore.activeExercises
+    var body: some View {
+        Form {
+            templateNameSection
+            addExercisesSection
+            selectedExercisesSection
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .dismissKeyboardOnTap()
+        .navigationTitle("Create Template")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                EditButton()
+
+                Button("Save") {
+                    saveTemplate()
+                }
+                .fontWeight(.semibold)
+                .disabled(!canSave)
+            }
+        }
+    }
+
+    // MARK: - Sections
+
+    private var templateNameSection: some View {
+        Section {
+            ValidatedNameField(
+                title: "Template name",
+                text: $templateName
+            )
+        }
+    }
+
+    private var addExercisesSection: some View {
+        Section {
+            Button {
+                showingAddExercises.toggle()
+            } label: {
+                Label(
+                    showingAddExercises
+                        ? "Hide Exercises"
+                        : "Add Exercises",
+                    systemImage: showingAddExercises
+                        ? "minus.circle"
+                        : "plus.circle"
                 )
-            ]
-        ).exercises
-    }
+            }
 
-    private var equipmentOptions: [ExerciseEquipment] {
-        Array(
-            Set(exercises.map(\.equipment))
-        )
-        .sorted()
-    }
-
-    private var filteredExercises: [Exercise] {
-        var result = exercises
-
-        if let selectedEquipment {
-            result = result.filter {
-                $0.equipment == selectedEquipment
+            if showingAddExercises {
+                TemplateExercisePickerView(
+                    selectedEquipment: $selectedEquipment,
+                    exercises: availableExercises,
+                    onSelect: addExercise
+                )
             }
         }
+    }
 
-        let trimmedSearch = searchText.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-
-        if !trimmedSearch.isEmpty {
-            result = result.filter {
-                $0.name.localizedCaseInsensitiveContains(trimmedSearch)
+    private var selectedExercisesSection: some View {
+        Section {
+            if selectedExercises.isEmpty {
+                Text("No exercises added yet.")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
             }
-        }
 
-        return result
+            ForEach($selectedExercises) { $exercise in
+                VStack(alignment: .leading, spacing: 4) {
+                    ExerciseRowView(exercise: exercise)
+
+                    Stepper(
+                        "\(exercise.targetSets) sets",
+                        value: $exercise.targetSets,
+                        in: 1...10
+                    )
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+
+                    Stepper(
+                        "\(formatWeight(weightBinding(for: $exercise).wrappedValue)) \(weightUnit)",
+                        value: weightBinding(for: $exercise),
+                        in: 0...500,
+                        step: weightStep
+                    )
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+                }
+            }
+            .onMove(perform: moveExercises)
+            .onDelete(perform: deleteExercises)
+        } header: {
+            Text("Exercises")
+        } footer: {
+            Text("Tap Edit to reorder or remove exercises.")
+        }
     }
 
-    private var selectedExercises: [Exercise] {
-        exercises.filter {
-            selectedExerciseIDs.contains($0.id)
-        }
-    }
+    // MARK: - Derived State
 
     private var canSave: Bool {
         templateName.isValidName
             && !selectedExercises.isEmpty
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            ValidatedNameField(
-                title: "Template name",
-                text: $templateName
-            )
-            .textFieldStyle(.roundedBorder)
-
-            Picker(
-                "Equipment",
-                selection: $selectedEquipment
-            ) {
-                Text("All")
-                    .tag(ExerciseEquipment?.none)
-
-                ForEach(equipmentOptions) { equipment in
-                    Text(equipment.displayName)
-                        .tag(Optional(equipment))
-                }
-            }
-            .pickerStyle(.menu)
-
-            List(filteredExercises) { exercise in
-                let isSelected = selectedExerciseIDs.contains(
-                    exercise.id
+    private var availableExercises: [Exercise] {
+        let registry = ExerciseRegistry(
+            sources: [
+                BuiltInExerciseSource(),
+                CustomExerciseSource(
+                    exercises: customExerciseStore.activeExercises
                 )
+            ]
+        )
 
-                Button {
-                    toggle(exercise)
-                } label: {
-                    HStack {
-                        ExerciseRowView(
-                            exercise: exercise
-                        )
-
-                        Spacer()
-
-                        if isSelected {
-                            Image(
-                                systemName: "checkmark.circle.fill"
-                            )
-                            .accessibilityHidden(true)
-                        }
-                    }
-                    .padding(.vertical, 6)
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(
-                    isSelected ? [.isSelected] : []
-                )
-                .accessibilityValue(
-                    isSelected ? "Selected" : ""
-                )
-            }
-            .searchable(
-                text: $searchText,
-                prompt: "Search exercises"
-            )
-
-            if !selectedExercises.isEmpty {
-                configureSetsSection
-            }
-
-            PrimaryButton(
-                title: "Save Template",
-                systemImage: "checkmark",
-                isEnabled: canSave,
-                action: saveTemplate
-            )
-        }
-        .padding()
-        .dismissKeyboardOnTap()
-        .navigationTitle("Create Template")
-    }
-
-    private var configureSetsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("SETS & STARTING WEIGHT")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(AppTheme.secondaryText)
-
-            ForEach(selectedExercises) { exercise in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(exercise.name)
-                        .font(AppTheme.Typography.label)
-
-                    Stepper(
-                        "\(targetSetsByExerciseID[exercise.id] ?? 3) sets",
-                        value: Binding(
-                            get: { targetSetsByExerciseID[exercise.id] ?? 3 },
-                            set: { targetSetsByExerciseID[exercise.id] = $0 }
-                        ),
-                        in: 1...10
-                    )
-                    .font(AppTheme.Typography.caption)
-
-                    Stepper(
-                        "\(formatWeight(weightBinding(for: exercise).wrappedValue)) \(weightUnit)",
-                        value: weightBinding(for: exercise),
-                        in: 0...500,
-                        step: weightStep
-                    )
-                    .font(AppTheme.Typography.caption)
-                }
-                .padding(.bottom, AppTheme.Spacing.xs)
+        return registry.exercises.filter { exercise in
+            !selectedExercises.contains {
+                $0.id == exercise.id
             }
         }
     }
@@ -201,20 +168,16 @@ struct CreateWorkoutTemplateView: View {
         )
     }
 
-    /// Displayed-unit binding backed by `targetWeightByExerciseID`
-    /// (canonical pounds). Reads fall back to the exercise's normal
-    /// equipment-derived default until the user actually moves the
-    /// stepper, at which point `saveTemplate` picks up a real override.
-    private func weightBinding(for exercise: Exercise) -> Binding<Double> {
+    private func weightBinding(for exercise: Binding<Exercise>) -> Binding<Double> {
         Binding(
             get: {
                 displayWeight(
-                    targetWeightByExerciseID[exercise.id]
-                        ?? defaultWeightPounds(for: exercise)
+                    exercise.wrappedValue.targetWeightPounds
+                        ?? defaultWeightPounds(for: exercise.wrappedValue)
                 )
             },
             set: { displayedWeight in
-                targetWeightByExerciseID[exercise.id] =
+                exercise.wrappedValue.targetWeightPounds =
                     WeightConversion.storedPounds(
                         fromDisplayedWeight: displayedWeight,
                         unitSystem: settingsStore.settings.unitSystem
@@ -223,29 +186,38 @@ struct CreateWorkoutTemplateView: View {
         )
     }
 
-    private func toggle(_ exercise: Exercise) {
-        if selectedExerciseIDs.contains(exercise.id) {
-            selectedExerciseIDs.remove(exercise.id)
-        } else {
-            selectedExerciseIDs.insert(exercise.id)
-        }
+    // MARK: - Exercise Actions
+
+    private func addExercise(_ exercise: Exercise) {
+        selectedExercises.append(exercise)
+        selectedEquipment = nil
+        showingAddExercises = false
     }
+
+    private func moveExercises(
+        from source: IndexSet,
+        to destination: Int
+    ) {
+        selectedExercises.move(
+            fromOffsets: source,
+            toOffset: destination
+        )
+    }
+
+    private func deleteExercises(at offsets: IndexSet) {
+        selectedExercises.remove(atOffsets: offsets)
+    }
+
+    // MARK: - Template Actions
 
     private func saveTemplate() {
         guard canSave else {
             return
         }
 
-        let exercisesWithSetCounts = selectedExercises.map { exercise -> Exercise in
-            var configured = exercise
-            configured.targetSets = targetSetsByExerciseID[exercise.id] ?? 3
-            configured.targetWeightPounds = targetWeightByExerciseID[exercise.id]
-            return configured
-        }
-
         let template = WorkoutTemplate(
             name: templateName.normalizedName,
-            exercises: exercisesWithSetCounts
+            exercises: selectedExercises
         )
 
         templateStore.add(template)
