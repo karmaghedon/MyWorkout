@@ -9,12 +9,15 @@ final class UserSettingsStore: ObservableObject {
     private static let currentSchemaVersion = 1
 
     private let key = "user_settings"
+    private let userDefaults: UserDefaults
 
     /// Prevents unreadable settings from being overwritten.
     private var isPersistenceWritable = true
 
-    init() {
-        guard let data = UserDefaults.standard.data(
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+
+        guard let data = userDefaults.data(
             forKey: key
         ) else {
             settings = .defaults
@@ -148,7 +151,7 @@ final class UserSettingsStore: ObservableObject {
                 envelope
             )
 
-            UserDefaults.standard.set(
+            userDefaults.set(
                 data,
                 forKey: key
             )
@@ -241,6 +244,15 @@ final class UserSettingsStore: ObservableObject {
         )
     }
 
+    /// Case-insensitive on purpose: this only has to recognize the data as
+    /// *shaped like* an envelope, not successfully decode it. Matching
+    /// exact-case `"schemaVersion"`/`"payload"` would let anything with
+    /// slightly different key casing (e.g. `"Payload"`) fall through to
+    /// the tolerant legacy path below and silently wipe real settings —
+    /// the same failure mode this whole function exists to prevent. The
+    /// strict `PersistedEnvelope` decode a few lines up still enforces
+    /// exact key casing; a genuine mismatch throws there and is preserved
+    /// by the caller's `catch`, rather than vanishing here.
     private static func isEnvelopeShaped(_ data: Data) -> Bool {
         guard let object = try? JSONSerialization.jsonObject(
             with: data
@@ -248,8 +260,10 @@ final class UserSettingsStore: ObservableObject {
             return false
         }
 
-        return object["schemaVersion"] != nil
-            && object["payload"] != nil
+        let keys = Set(object.keys.map { $0.lowercased() })
+
+        return keys.contains("schemaversion")
+            && keys.contains("payload")
     }
 }
 

@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 struct SeedData {
@@ -1062,6 +1063,7 @@ struct SeedData {
         progressionStrategy: ProgressionStrategy = .doubleProgression
     ) -> Exercise {
         Exercise(
+            id: stableID(for: name),
             name: name,
             muscleGroup: muscleGroup,
             equipment: equipment,
@@ -1084,5 +1086,24 @@ struct SeedData {
             exerciseType: exerciseType,
             progressionStrategy: progressionStrategy
         )
+    }
+
+    /// A built-in exercise's `id` must be stable across app launches —
+    /// unlike custom exercises, there's no persisted UUID to draw from
+    /// here, so `Exercise.init`'s default random `UUID()` would fire a
+    /// fresh id every process. That silently fragmented each built-in
+    /// exercise's PR/favorite history every relaunch (FDL-019). Deriving
+    /// the id from the exercise's fixed, code-defined name keeps it
+    /// identical from launch to launch without persisting anything.
+    private static func stableID(for name: String) -> UUID {
+        let digest = SHA256.hash(data: Data(name.utf8))
+        let bytes = Array(digest.prefix(16))
+
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3],
+            bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11],
+            bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
     }
 }

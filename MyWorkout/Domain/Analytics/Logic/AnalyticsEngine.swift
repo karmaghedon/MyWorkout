@@ -96,21 +96,15 @@ struct AnalyticsEngine {
 
         for log in logs {
             for completedExercise in log.completedExercises {
-                // Built-in exercises get a fresh random `id` every app
-                // launch (`SeedData` never passes one explicitly, so
-                // `Exercise.init`'s default `UUID()` fires each process).
-                // A `CompletedExercise.exerciseID` captured in one launch
-                // essentially never matches the `id` a later launch's
-                // registry assigns the same named exercise, so grouping
-                // by ID fragments one exercise's history into a separate
-                // "exercise" per launch. Group by normalized name instead
-                // — stable across launches for built-ins, and custom
-                // exercise names are already validated unique at creation
-                // (`ExerciseNameValidator`), so this is a safe shared key
-                // for both.
-                let key = ExerciseNameValidator.normalize(
-                    completedExercise.exerciseName
-                )
+                // `Exercise.id` is stable across launches for both custom
+                // exercises (persisted) and built-ins (now a deterministic
+                // hash of the name, see `SeedData.stableID`), and grouping
+                // by id — rather than name — keeps a renamed custom
+                // exercise's history attached to it instead of orphaning it
+                // under the old name (FDL-019/FDL-0XX).
+                let key =
+                    completedExercise.exerciseID?.uuidString
+                    ?? completedExercise.exerciseName
 
                 for set in completedExercise.sets {
                     guard let currentBest =

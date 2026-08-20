@@ -4,20 +4,17 @@ import Foundation
 /// Low-stakes preference data — unlike workout logs/templates/settings,
 /// losing this isn't a data-loss concern worth the full corruption-
 /// protection treatment those stores use, so this stays intentionally
-/// simple: a single `Set<String>` in UserDefaults, no envelope/migration.
+/// simple: a single `Set<UUID>` in UserDefaults, no envelope/migration.
 ///
-/// Keyed by normalized exercise name, not `Exercise.id`. Built-in
-/// exercises get a fresh random `id` every app launch (`SeedData` never
-/// passes one explicitly), so persisting favorites by ID would silently
-/// lose every built-in favorite on relaunch — the persisted UUID would
-/// never match any current exercise's `id` again. Normalized name is
-/// stable across launches and, per `ExerciseNameValidator`, already
-/// guaranteed unique across built-in and custom exercises alike.
+/// Keyed by `Exercise.id`, which is stable across launches for both
+/// custom exercises (persisted) and built-ins (a deterministic hash of
+/// the name, see `SeedData.stableID`) — and, unlike a name-based key,
+/// survives a custom exercise being renamed.
 @MainActor
 final class FavoriteExercisesStore: ObservableObject {
-    @Published private(set) var favoriteExerciseKeys: Set<String> = []
+    @Published private(set) var favoriteExerciseIDs: Set<UUID> = []
 
-    private let key = "favorite_exercise_keys"
+    private let key = "favorite_exercise_ids"
     private let userDefaults: UserDefaults
 
     init(userDefaults: UserDefaults = .standard) {
@@ -26,18 +23,14 @@ final class FavoriteExercisesStore: ObservableObject {
     }
 
     func isFavorite(_ exercise: Exercise) -> Bool {
-        favoriteExerciseKeys.contains(
-            ExerciseNameValidator.normalize(exercise.name)
-        )
+        favoriteExerciseIDs.contains(exercise.id)
     }
 
     func toggleFavorite(_ exercise: Exercise) {
-        let normalizedName = ExerciseNameValidator.normalize(exercise.name)
-
-        if favoriteExerciseKeys.contains(normalizedName) {
-            favoriteExerciseKeys.remove(normalizedName)
+        if favoriteExerciseIDs.contains(exercise.id) {
+            favoriteExerciseIDs.remove(exercise.id)
         } else {
-            favoriteExerciseKeys.insert(normalizedName)
+            favoriteExerciseIDs.insert(exercise.id)
         }
 
         save()
@@ -45,15 +38,15 @@ final class FavoriteExercisesStore: ObservableObject {
 
     private func load() {
         guard let data = userDefaults.data(forKey: key),
-              let keys = try? JSONDecoder().decode(Set<String>.self, from: data) else {
+              let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data) else {
             return
         }
 
-        favoriteExerciseKeys = keys
+        favoriteExerciseIDs = ids
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(favoriteExerciseKeys) else {
+        guard let data = try? JSONEncoder().encode(favoriteExerciseIDs) else {
             return
         }
 

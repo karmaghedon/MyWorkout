@@ -230,4 +230,95 @@ final class WorkoutSessionEngineTests: XCTestCase {
         XCTAssertEqual(state.targetReps, 12)
         XCTAssertEqual(state.suggestionMessage, "Increase next time")
     }
+
+    // MARK: - newPersonalRecords
+
+    func test_newPersonalRecords_heavierSet_isReportedAsNewRecord() {
+        let exerciseID = UUID()
+
+        let priorLog = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(timeIntervalSinceNow: -86_400),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: exerciseID,
+                    exerciseName: "Bench Press",
+                    sets: [LoggedSet(setNumber: 1, weight: 100, reps: 8)],
+                    notes: ""
+                )
+            ]
+        )
+
+        let newLog = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: exerciseID,
+                    exerciseName: "Bench Press",
+                    sets: [LoggedSet(setNumber: 1, weight: 105, reps: 8)],
+                    notes: ""
+                )
+            ]
+        )
+
+        let records = WorkoutSessionEngine.newPersonalRecords(
+            in: newLog,
+            priorLogs: [priorLog]
+        )
+
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(records.first?.weightPounds, 105)
+    }
+
+    /// Regression test for the identity-keying bug fixed alongside this
+    /// test: grouping by `exerciseName` instead of the exercise's stable
+    /// `id` would silently lose the connection between a custom exercise's
+    /// history and itself the moment the exercise was renamed, since the
+    /// name captured on each historical `CompletedExercise` never changes
+    /// but the live exercise's name does. Keying by `exerciseID` — stable
+    /// across a rename — must keep the old PR visible as the bar to beat
+    /// even though the exercise's current name differs from the one on
+    /// the historical log entry.
+    func test_newPersonalRecords_afterExerciseRename_stillComparesAgainstPriorBestByID() {
+        let exerciseID = UUID()
+
+        let priorLog = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(timeIntervalSinceNow: -86_400),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: exerciseID,
+                    exerciseName: "My Curl",
+                    sets: [LoggedSet(setNumber: 1, weight: 20, reps: 10)],
+                    notes: ""
+                )
+            ]
+        )
+
+        // The exercise was renamed after the prior log was written, but
+        // `exerciseID` on the new log's entry is still the same stable id.
+        let matchingWeightAfterRename = WorkoutLog(
+            workoutName: "Push Day",
+            date: Date(),
+            completedExercises: [
+                CompletedExercise(
+                    exerciseID: exerciseID,
+                    exerciseName: "My Bicep Curl",
+                    sets: [LoggedSet(setNumber: 1, weight: 20, reps: 10)],
+                    notes: ""
+                )
+            ]
+        )
+
+        let records = WorkoutSessionEngine.newPersonalRecords(
+            in: matchingWeightAfterRename,
+            priorLogs: [priorLog]
+        )
+
+        // Tying the prior best (not beating it) must NOT be reported as a
+        // new record — this only holds if the prior log was actually found
+        // and compared against, i.e. the rename didn't orphan the history.
+        XCTAssertTrue(records.isEmpty)
+    }
 }
