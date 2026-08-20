@@ -870,38 +870,46 @@ final class ActiveWorkoutStoreTests:
         let store = ActiveWorkoutStore(persistence: persistence)
         let exerciseID = UUID()
 
-        store.toggleWarmupComplete(45, for: exerciseID)
+        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
 
         XCTAssertTrue(
             store.exerciseStates[exerciseID]?
-                .completedWarmupWeights
-                .contains(45) ?? false
+                .completedWarmupKeys
+                .contains(ExerciseSessionState.warmupKey(weight: 45, reps: 10)) ?? false
         )
 
-        store.toggleWarmupComplete(45, for: exerciseID)
+        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
 
         XCTAssertFalse(
             store.exerciseStates[exerciseID]?
-                .completedWarmupWeights
-                .contains(45) ?? true
+                .completedWarmupKeys
+                .contains(ExerciseSessionState.warmupKey(weight: 45, reps: 10)) ?? true
         )
     }
 
-    func testToggleWarmupCompleteOnlyAffectsToggledWeight() {
+    /// Regression test: `WarmupEngine`'s barbell ramp starts with two sets
+    /// at the same empty-bar weight (10 reps, then 8) — a weight-only key
+    /// would mark both complete from a single tap. Confirms toggling the
+    /// 10-rep set at 45 doesn't also complete the 8-rep set at the same
+    /// weight, and that a genuinely different weight stays independent too.
+    func testToggleWarmupCompleteOnlyAffectsToggledWeightAndRepsPair() {
         let persistence = MockActiveWorkoutPersistence()
         let store = ActiveWorkoutStore(persistence: persistence)
         let exerciseID = UUID()
 
-        store.toggleWarmupComplete(45, for: exerciseID)
-        store.toggleWarmupComplete(95, for: exerciseID)
-        store.toggleWarmupComplete(95, for: exerciseID)
+        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
+        store.toggleWarmupComplete(weight: 95, reps: 5, for: exerciseID)
+        store.toggleWarmupComplete(weight: 95, reps: 5, for: exerciseID)
 
         let completed =
             store.exerciseStates[exerciseID]?
-                .completedWarmupWeights
+                .completedWarmupKeys
                 ?? []
 
-        XCTAssertEqual(completed, [45])
+        XCTAssertEqual(completed, [ExerciseSessionState.warmupKey(weight: 45, reps: 10)])
+        XCTAssertFalse(
+            completed.contains(ExerciseSessionState.warmupKey(weight: 45, reps: 8))
+        )
     }
 
     // MARK: - Extra Working Sets

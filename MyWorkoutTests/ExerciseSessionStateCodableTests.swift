@@ -1,7 +1,7 @@
 import XCTest
 @testable import MyWorkout
 
-/// `completedWarmupWeights` and `extraWorkingSets` were added after every
+/// `completedWarmupKeys` and `extraWorkingSets` were added after every
 /// active-workout snapshot on a real device was already persisted without
 /// them. Confirms both default correctly (`[]` and `0`) when decoding a
 /// payload that predates the fields, instead of throwing.
@@ -12,7 +12,9 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
             targetReps: 8,
             workingWeightPounds: 135,
             notes: "Test notes",
-            completedWarmupWeights: [45, 95],
+            completedWarmupKeys: [
+                ExerciseSessionState.warmupKey(weight: 45, reps: 10)
+            ],
             extraWorkingSets: 2
         )
 
@@ -21,7 +23,7 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
         var payload = try XCTUnwrap(
             try JSONSerialization.jsonObject(with: encoded) as? [String: Any]
         )
-        payload.removeValue(forKey: "completedWarmupWeights")
+        payload.removeValue(forKey: "completedWarmupKeys")
         payload.removeValue(forKey: "extraWorkingSets")
 
         let strippedData = try JSONSerialization.data(withJSONObject: payload)
@@ -31,7 +33,7 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
             from: strippedData
         )
 
-        XCTAssertEqual(decoded.completedWarmupWeights, [])
+        XCTAssertEqual(decoded.completedWarmupKeys, [])
         XCTAssertEqual(decoded.extraWorkingSets, 0)
         XCTAssertEqual(decoded.targetReps, 8)
         XCTAssertEqual(decoded.notes, "Test notes")
@@ -39,7 +41,10 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
 
     func testDecodingPayloadWithNewFieldsPreservesValues() throws {
         let state = ExerciseSessionState(
-            completedWarmupWeights: [45, 95],
+            completedWarmupKeys: [
+                ExerciseSessionState.warmupKey(weight: 45, reps: 10),
+                ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+            ],
             extraWorkingSets: 2
         )
 
@@ -49,7 +54,25 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
             from: encoded
         )
 
-        XCTAssertEqual(decoded.completedWarmupWeights, [45, 95])
+        XCTAssertEqual(
+            decoded.completedWarmupKeys,
+            [
+                ExerciseSessionState.warmupKey(weight: 45, reps: 10),
+                ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+            ]
+        )
         XCTAssertEqual(decoded.extraWorkingSets, 2)
+    }
+
+    /// The whole point of switching from a weight-only key to
+    /// weight+reps: two warm-up sets at the same weight but different
+    /// reps must produce distinct keys, or completing one would silently
+    /// complete the other too (see `WarmupEngine`'s barbell ramp, which
+    /// starts with two sets at the empty-bar weight).
+    func testWarmupKeyDistinguishesSameWeightDifferentReps() {
+        let tenRepKey = ExerciseSessionState.warmupKey(weight: 45, reps: 10)
+        let eightRepKey = ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+
+        XCTAssertNotEqual(tenRepKey, eightRepKey)
     }
 }

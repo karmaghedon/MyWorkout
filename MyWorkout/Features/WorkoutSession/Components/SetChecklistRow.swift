@@ -12,6 +12,13 @@ struct SetChecklistRow: View {
     let isNext: Bool
     let onToggle: (() -> Void)?
 
+    /// When present, the title/subtitle area becomes tappable (with a
+    /// pencil hint) to reveal an inline weight/reps editor instead of the
+    /// row only ever being tappable to complete it. Only the next
+    /// (unlogged) working-set row passes this — warm-ups and already-
+    /// logged sets don't offer an edit affordance.
+    let onEdit: (() -> Void)?
+
     var body: some View {
         HStack(spacing: AppTheme.Spacing.md) {
             Button {
@@ -41,15 +48,21 @@ struct SetChecklistRow: View {
             .disabled(onToggle == nil)
             .accessibilityLabel(isComplete ? "Completed: \(title)" : "Mark complete: \(title)")
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(AppTheme.Typography.label)
+            if let onEdit {
+                Button(action: onEdit) {
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        titleAndSubtitle
 
-                if let subtitle {
-                    Text(subtitle)
-                        .font(AppTheme.Typography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
+                        Image(systemName: "pencil.circle")
+                            .font(.system(size: 14))
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Edit \(title)")
+                .accessibilityHint("Adjust weight and reps before logging")
+            } else {
+                titleAndSubtitle
             }
 
             Spacer(minLength: 0)
@@ -73,5 +86,18 @@ struct SetChecklistRow: View {
                   )
                 : AnyView(Color.clear)
         )
+    }
+
+    private var titleAndSubtitle: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(AppTheme.Typography.label)
+
+            if let subtitle {
+                Text(subtitle)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
     }
 }

@@ -138,8 +138,8 @@ struct WorkoutSessionView: View {
             onDeleteSet: { setID, exercise in
                 activeWorkoutStore.deleteSet(setID: setID, for: exercise.id)
             },
-            onToggleWarmup: { exercise, weight in
-                activeWorkoutStore.toggleWarmupComplete(weight, for: exercise.id)
+            onToggleWarmup: { exercise, weight, reps in
+                activeWorkoutStore.toggleWarmupComplete(weight: weight, reps: reps, for: exercise.id)
                 Haptics.setLogged()
                 // Deliberately no rest timer here — warm-ups never trigger
                 // rest, checked or unchecked.

@@ -155,13 +155,14 @@ final class ActiveWorkoutStore: ObservableObject {
         )
     }
 
-    func toggleWarmupComplete(_ weight: Double, for exerciseID: UUID) {
+    func toggleWarmupComplete(weight: Double, reps: Int, for exerciseID: UUID) {
         var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+        let key = ExerciseSessionState.warmupKey(weight: weight, reps: reps)
 
-        if state.completedWarmupWeights.contains(weight) {
-            state.completedWarmupWeights.remove(weight)
+        if state.completedWarmupKeys.contains(key) {
+            state.completedWarmupKeys.remove(key)
         } else {
-            state.completedWarmupWeights.insert(weight)
+            state.completedWarmupKeys.insert(key)
         }
 
         exerciseStates[exerciseID] = state

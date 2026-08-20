@@ -15,7 +15,7 @@ struct WorkoutExerciseListView: View {
     let onLogSet: (Exercise) -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
-    let onToggleWarmup: (Exercise, Double) -> Void
+    let onToggleWarmup: (Exercise, Double, Int) -> Void
     let onAddSet: (Exercise) -> Void
 
     var body: some View {
@@ -47,6 +47,7 @@ struct WorkoutExerciseListView: View {
                     exercise: exercise,
                     state: stateForExercise(exercise.id),
                     previousSets: previousSetsForExercise(exercise),
+                    weightStep: weightStepForExercise(exercise),
                     equipmentInventory: equipmentInventory,
                     isResting: isResting,
                     restSecondsRemaining: restSecondsRemaining,
@@ -58,8 +59,8 @@ struct WorkoutExerciseListView: View {
                     onDeleteSet: { setID in
                         onDeleteSet(setID, exercise)
                     },
-                    onToggleWarmup: { weight in
-                        onToggleWarmup(exercise, weight)
+                    onToggleWarmup: { weight, reps in
+                        onToggleWarmup(exercise, weight, reps)
                     },
                     onAddSet: {
                         onAddSet(exercise)

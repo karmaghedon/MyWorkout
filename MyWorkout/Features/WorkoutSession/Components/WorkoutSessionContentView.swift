@@ -18,7 +18,7 @@ struct WorkoutSessionContentView: View {
     let onLogSet: (Exercise) -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
-    let onToggleWarmup: (Exercise, Double) -> Void
+    let onToggleWarmup: (Exercise, Double, Int) -> Void
     let onAddSet: (Exercise) -> Void
 
     let onFinish: () -> Void

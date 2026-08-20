@@ -9,6 +9,7 @@ struct ChecklistExerciseSessionCardView: View {
     let exercise: Exercise
     @Binding var state: ExerciseSessionState
     let previousSets: [LoggedSet]
+    let weightStep: Int
     let equipmentInventory: EquipmentInventory
 
     let isResting: Bool
@@ -18,10 +19,16 @@ struct ChecklistExerciseSessionCardView: View {
     let onLogSet: () -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID) -> Void
-    let onToggleWarmup: (Double) -> Void
+    let onToggleWarmup: (Double, Int) -> Void
     let onAddSet: () -> Void
 
     @EnvironmentObject var settingsStore: UserSettingsStore
+
+    /// Whether the inline weight/reps editor is showing on the next
+    /// (unlogged) working-set row — the Checklist layout otherwise has no
+    /// way to deviate from the preset weight before logging, unlike
+    /// Classic's always-visible steppers.
+    @State private var isEditingNextSet = false
 
     private var unitSystem: UnitSystem {
         settingsStore.settings.unitSystem
@@ -95,9 +102,12 @@ struct ChecklistExerciseSessionCardView: View {
                     title: "\(formatWeight(displayWeight(warmup.weight))) \(weightUnit) × \(warmup.reps)",
                     subtitle: nil,
                     plateText: plateText(for: warmup.weight),
-                    isComplete: state.completedWarmupWeights.contains(warmup.weight),
+                    isComplete: state.completedWarmupKeys.contains(
+                        ExerciseSessionState.warmupKey(weight: warmup.weight, reps: warmup.reps)
+                    ),
                     isNext: false,
-                    onToggle: { onToggleWarmup(warmup.weight) }
+                    onToggle: { onToggleWarmup(warmup.weight, warmup.reps) },
+                    onEdit: nil
                 )
             }
         }
@@ -128,7 +138,8 @@ struct ChecklistExerciseSessionCardView: View {
                         plateText: plateText(for: set.weight),
                         isComplete: true,
                         isNext: false,
-                        onToggle: { onDeleteSet(set.id) }
+                        onToggle: { onDeleteSet(set.id) },
+                        onEdit: nil
                     )
                 } else if index == state.loggedSets.count {
                     SetChecklistRow(
@@ -137,8 +148,16 @@ struct ChecklistExerciseSessionCardView: View {
                         plateText: plateText(for: state.workingWeightPounds),
                         isComplete: false,
                         isNext: true,
-                        onToggle: onLogSet
+                        onToggle: {
+                            isEditingNextSet = false
+                            onLogSet()
+                        },
+                        onEdit: { isEditingNextSet.toggle() }
                     )
+
+                    if isEditingNextSet {
+                        nextSetEditor
+                    }
                 }
             }
 
@@ -152,6 +171,31 @@ struct ChecklistExerciseSessionCardView: View {
         }
     }
 
+    /// Inline weight/reps steppers for the next working set — reuses the
+    /// exact controls Classic's `CurrentSetCardView` uses, so the two
+    /// layouts stay in sync on how weight gets adjusted rather than
+    /// inventing a second input pattern.
+    private var nextSetEditor: some View {
+        HStack(spacing: AppTheme.Spacing.md) {
+            DoubleBigStepperControl(
+                title: "Weight",
+                value: weightDisplayBinding,
+                range: 0...500,
+                step: displayWeightStep,
+                suffix: weightUnit
+            )
+
+            BigStepperControl(
+                title: "Reps",
+                value: $state.targetReps,
+                range: 1...50,
+                step: 1,
+                suffix: nil
+            )
+        }
+        .padding(.top, AppTheme.Spacing.xs)
+    }
+
     private func plateText(for weight: Double) -> String? {
         guard exercise.usesBarbell else { return nil }
 
@@ -163,6 +207,33 @@ struct ChecklistExerciseSessionCardView: View {
     private func displayWeight(_ storedPounds: Double) -> Double {
         WeightConversion.displayWeight(
             fromStoredPounds: storedPounds,
+            unitSystem: unitSystem
+        )
+    }
+
+    // MARK: - Weight Boundary
+
+    /// The session state always stores pounds. This binding converts
+    /// between canonical stored pounds and the unit currently selected by
+    /// the user — same pattern as `ExerciseSessionCardView`'s.
+    private var weightDisplayBinding: Binding<Double> {
+        Binding(
+            get: {
+                displayWeight(state.workingWeightPounds)
+            },
+            set: { displayedWeight in
+                state.workingWeightPounds = WeightConversion.storedPounds(
+                    fromDisplayedWeight: displayedWeight,
+                    unitSystem: unitSystem
+                )
+            }
+        )
+    }
+
+    /// The incoming step is expressed in canonical pounds.
+    private var displayWeightStep: Double {
+        WeightConversion.displayStep(
+            fromStoredPounds: Double(weightStep),
             unitSystem: unitSystem
         )
     }
