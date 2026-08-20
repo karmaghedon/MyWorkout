@@ -27,7 +27,6 @@ struct CreateWorkoutTemplateView: View {
             selectedExercisesSection
         }
         .scrollDismissesKeyboard(.interactively)
-        .dismissKeyboardOnTap()
         .navigationTitle("Create Template")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
