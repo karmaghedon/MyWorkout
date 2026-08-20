@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutExerciseListView: View {
     let exercises: [Exercise]
+    let layout: WorkoutSessionLayout
     let stateForExercise: (UUID) -> Binding<ExerciseSessionState>
     let previousSetsForExercise: (Exercise) -> [LoggedSet]
     let weightStepForExercise: (Exercise) -> Int
@@ -14,26 +15,57 @@ struct WorkoutExerciseListView: View {
     let onLogSet: (Exercise) -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
+    let onToggleWarmup: (Exercise, Double) -> Void
+    let onAddSet: (Exercise) -> Void
 
     var body: some View {
         ForEach(exercises) { exercise in
-            ExerciseSessionCardView(
-                exercise: exercise,
-                state: stateForExercise(exercise.id),
-                previousSets: previousSetsForExercise(exercise),
-                weightStep: weightStepForExercise(exercise),
-                equipmentInventory: equipmentInventory,
-                isResting: activeRestExerciseID == exercise.id && restSecondsRemaining > 0,
-                restSecondsRemaining: restSecondsRemaining,
-                restTotalSeconds: restTotalSeconds,
-                onLogSet: {
-                    onLogSet(exercise)
-                },
-                onStopRest: onStopRest,
-                onDeleteSet: { setID in
-                    onDeleteSet(setID, exercise)
-                }
-            )
+            let isResting = activeRestExerciseID == exercise.id && restSecondsRemaining > 0
+
+            switch layout {
+            case .classic:
+                ExerciseSessionCardView(
+                    exercise: exercise,
+                    state: stateForExercise(exercise.id),
+                    previousSets: previousSetsForExercise(exercise),
+                    weightStep: weightStepForExercise(exercise),
+                    equipmentInventory: equipmentInventory,
+                    isResting: isResting,
+                    restSecondsRemaining: restSecondsRemaining,
+                    restTotalSeconds: restTotalSeconds,
+                    onLogSet: {
+                        onLogSet(exercise)
+                    },
+                    onStopRest: onStopRest,
+                    onDeleteSet: { setID in
+                        onDeleteSet(setID, exercise)
+                    }
+                )
+
+            case .checklist:
+                ChecklistExerciseSessionCardView(
+                    exercise: exercise,
+                    state: stateForExercise(exercise.id),
+                    previousSets: previousSetsForExercise(exercise),
+                    equipmentInventory: equipmentInventory,
+                    isResting: isResting,
+                    restSecondsRemaining: restSecondsRemaining,
+                    restTotalSeconds: restTotalSeconds,
+                    onLogSet: {
+                        onLogSet(exercise)
+                    },
+                    onStopRest: onStopRest,
+                    onDeleteSet: { setID in
+                        onDeleteSet(setID, exercise)
+                    },
+                    onToggleWarmup: { weight in
+                        onToggleWarmup(exercise, weight)
+                    },
+                    onAddSet: {
+                        onAddSet(exercise)
+                    }
+                )
+            }
         }
     }
 }

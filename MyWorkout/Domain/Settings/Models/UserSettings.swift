@@ -57,6 +57,32 @@ enum AppearanceMode:
     }
 }
 
+/// Which layout `WorkoutSessionView` renders: the original stepper-based
+/// card (`classic`) or the newer warm-up/working-set checklist
+/// (`checklist`). Foundation-only, same reasoning as `AppearanceMode`.
+enum WorkoutSessionLayout:
+    String,
+    Codable,
+    CaseIterable,
+    Identifiable {
+
+    case classic
+    case checklist
+
+    var id: String {
+        rawValue
+    }
+
+    var displayName: String {
+        switch self {
+        case .classic:
+            "Classic"
+        case .checklist:
+            "Checklist"
+        }
+    }
+}
+
 struct UserSettings: Codable {
     var unitSystem: UnitSystem
     var compoundRestSeconds: Int
@@ -66,6 +92,7 @@ struct UserSettings: Codable {
     var compoundIncrement: Int
     var isolationIncrement: Int
     var appearanceMode: AppearanceMode
+    var workoutSessionLayout: WorkoutSessionLayout
 
     static let defaults = UserSettings(
         unitSystem: .pounds,
@@ -75,7 +102,8 @@ struct UserSettings: Codable {
         oneRepMaxFormula: .epley,
         compoundIncrement: 5,
         isolationIncrement: 5,
-        appearanceMode: .system
+        appearanceMode: .system,
+        workoutSessionLayout: .classic
     )
 
     var weightUnitLabel: String {
@@ -111,6 +139,7 @@ struct UserSettings: Codable {
         case compoundIncrement
         case isolationIncrement
         case appearanceMode
+        case workoutSessionLayout
     }
 
     init(
@@ -121,7 +150,8 @@ struct UserSettings: Codable {
         oneRepMaxFormula: OneRepMaxFormula,
         compoundIncrement: Int,
         isolationIncrement: Int,
-        appearanceMode: AppearanceMode
+        appearanceMode: AppearanceMode,
+        workoutSessionLayout: WorkoutSessionLayout
     ) {
         self.unitSystem = unitSystem
         self.compoundRestSeconds = compoundRestSeconds
@@ -131,6 +161,7 @@ struct UserSettings: Codable {
         self.compoundIncrement = compoundIncrement
         self.isolationIncrement = isolationIncrement
         self.appearanceMode = appearanceMode
+        self.workoutSessionLayout = workoutSessionLayout
     }
 
     init(from decoder: Decoder) throws {
@@ -179,5 +210,10 @@ struct UserSettings: Codable {
             AppearanceMode.self,
             forKey: .appearanceMode
         ) ?? defaults.appearanceMode
+
+        workoutSessionLayout = try container.decodeIfPresent(
+            WorkoutSessionLayout.self,
+            forKey: .workoutSessionLayout
+        ) ?? defaults.workoutSessionLayout
     }
 }

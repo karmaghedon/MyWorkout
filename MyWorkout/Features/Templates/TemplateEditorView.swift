@@ -68,8 +68,18 @@ struct TemplateEditorView: View {
 
     private var selectedExercisesSection: some View {
         Section {
-            ForEach(editableTemplate.exercises) { exercise in
-                ExerciseRowView(exercise: exercise)
+            ForEach($editableTemplate.exercises) { $exercise in
+                VStack(alignment: .leading, spacing: 4) {
+                    ExerciseRowView(exercise: exercise)
+
+                    Stepper(
+                        "\(exercise.targetSets) sets",
+                        value: $exercise.targetSets,
+                        in: 1...10
+                    )
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+                }
             }
             .onMove(perform: moveExercises)
             .onDelete(perform: deleteExercises)

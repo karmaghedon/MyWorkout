@@ -109,6 +109,7 @@ struct WorkoutSessionView: View {
     private func workoutContent(_ workout: Workout) -> some View {
         WorkoutSessionContentView(
             workout: workout,
+            layout: settingsStore.settings.workoutSessionLayout,
             elapsedTime: activeWorkoutStore.formattedElapsedTime,
             stateForExercise: { exerciseID in
                 activeWorkoutStore.binding(for: exerciseID)
@@ -136,6 +137,16 @@ struct WorkoutSessionView: View {
             },
             onDeleteSet: { setID, exercise in
                 activeWorkoutStore.deleteSet(setID: setID, for: exercise.id)
+            },
+            onToggleWarmup: { exercise, weight in
+                activeWorkoutStore.toggleWarmupComplete(weight, for: exercise.id)
+                Haptics.setLogged()
+                // Deliberately no rest timer here — warm-ups never trigger
+                // rest, checked or unchecked.
+            },
+            onAddSet: { exercise in
+                activeWorkoutStore.addExtraSet(for: exercise.id)
+                Haptics.setLogged()
             },
             onFinish: {
                 showFinishSummary = true

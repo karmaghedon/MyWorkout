@@ -863,6 +863,80 @@ final class ActiveWorkoutStoreTests:
         )
     }
 
+    // MARK: - Warm-up Checklist
+
+    func testToggleWarmupCompleteTwiceReturnsToOriginalState() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+        let exerciseID = UUID()
+
+        store.toggleWarmupComplete(45, for: exerciseID)
+
+        XCTAssertTrue(
+            store.exerciseStates[exerciseID]?
+                .completedWarmupWeights
+                .contains(45) ?? false
+        )
+
+        store.toggleWarmupComplete(45, for: exerciseID)
+
+        XCTAssertFalse(
+            store.exerciseStates[exerciseID]?
+                .completedWarmupWeights
+                .contains(45) ?? true
+        )
+    }
+
+    func testToggleWarmupCompleteOnlyAffectsToggledWeight() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+        let exerciseID = UUID()
+
+        store.toggleWarmupComplete(45, for: exerciseID)
+        store.toggleWarmupComplete(95, for: exerciseID)
+        store.toggleWarmupComplete(95, for: exerciseID)
+
+        let completed =
+            store.exerciseStates[exerciseID]?
+                .completedWarmupWeights
+                ?? []
+
+        XCTAssertEqual(completed, [45])
+    }
+
+    // MARK: - Extra Working Sets
+
+    func testAddExtraSetIncrementsOnlyTargetedExercise() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+        let exerciseID = UUID()
+        let otherExerciseID = UUID()
+
+        store.addExtraSet(for: exerciseID)
+
+        XCTAssertEqual(
+            store.exerciseStates[exerciseID]?.extraWorkingSets,
+            1
+        )
+
+        XCTAssertNil(store.exerciseStates[otherExerciseID])
+    }
+
+    func testAddExtraSetAccumulatesAcrossRepeatedCalls() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+        let exerciseID = UUID()
+
+        store.addExtraSet(for: exerciseID)
+        store.addExtraSet(for: exerciseID)
+        store.addExtraSet(for: exerciseID)
+
+        XCTAssertEqual(
+            store.exerciseStates[exerciseID]?.extraWorkingSets,
+            3
+        )
+    }
+
     // MARK: - Helpers
 
     private func waitForMainActorUpdates()

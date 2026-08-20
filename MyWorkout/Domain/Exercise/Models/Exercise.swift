@@ -19,6 +19,13 @@ struct Exercise: Identifiable, Codable {
     let exerciseType: ExerciseType
     let progressionStrategy: ProgressionStrategy
 
+    /// How many working sets a session should show for this exercise by
+    /// default. Configured once per template (`CreateWorkoutTemplateView`,
+    /// `TemplateEditorView`) — since `WorkoutTemplate.exercises` holds
+    /// value copies of `Exercise`, the same exercise can carry a different
+    /// `targetSets` in different templates with no extra keying needed.
+    var targetSets: Int = 3
+
     var usesBarbell: Bool {
         equipment.usesBarbell
     }
@@ -37,7 +44,8 @@ struct Exercise: Identifiable, Codable {
         warnings: [String] = [],
         progressionRule: ProgressionRule,
         exerciseType: ExerciseType,
-        progressionStrategy: ProgressionStrategy
+        progressionStrategy: ProgressionStrategy,
+        targetSets: Int = 3
     ) {
         self.id = id
         self.name = name
@@ -53,6 +61,46 @@ struct Exercise: Identifiable, Codable {
         self.progressionRule = progressionRule
         self.exerciseType = exerciseType
         self.progressionStrategy = progressionStrategy
+        self.targetSets = targetSets
+    }
+
+    // MARK: - Codable
+
+    /// Hand-written on both sides: `targetSets` is a new field, and every
+    /// `Exercise` already persisted on a device (inside a saved
+    /// `WorkoutTemplate`, a custom exercise, an in-progress workout
+    /// snapshot, an exported backup) predates it. A synthesized decoder
+    /// would require the key on every decode and throw on all of that
+    /// existing data on first launch after this shipped — `decodeIfPresent
+    /// ?? 3` avoids that, the same pattern already used elsewhere in this
+    /// codebase (e.g. `ExerciseSessionState.init(from:)`).
+    private enum CodingKeys: String, CodingKey {
+        case id, name, muscleGroup, equipment, instructions
+        case primaryMuscles, secondaryMuscles, difficulty
+        case tips, commonMistakes, warnings
+        case progressionRule, exerciseType, progressionStrategy
+        case targetSets
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        muscleGroup = try container.decode(MuscleGroup.self, forKey: .muscleGroup)
+        equipment = try container.decode(ExerciseEquipment.self, forKey: .equipment)
+        instructions = try container.decode(String.self, forKey: .instructions)
+        primaryMuscles = try container.decode([String].self, forKey: .primaryMuscles)
+        secondaryMuscles = try container.decode([String].self, forKey: .secondaryMuscles)
+        difficulty = try container.decode(String.self, forKey: .difficulty)
+        tips = try container.decode([String].self, forKey: .tips)
+        commonMistakes = try container.decode([String].self, forKey: .commonMistakes)
+        warnings = try container.decode([String].self, forKey: .warnings)
+        progressionRule = try container.decode(ProgressionRule.self, forKey: .progressionRule)
+        exerciseType = try container.decode(ExerciseType.self, forKey: .exerciseType)
+        progressionStrategy = try container.decode(ProgressionStrategy.self, forKey: .progressionStrategy)
+
+        targetSets = try container.decodeIfPresent(Int.self, forKey: .targetSets) ?? 3
     }
 
     func encode(
@@ -79,5 +127,6 @@ struct Exercise: Identifiable, Codable {
             progressionStrategy,
             forKey: .progressionStrategy
         )
+        try container.encode(targetSets, forKey: .targetSets)
     }
 }

@@ -120,7 +120,9 @@ final class UserSettingsStore: ObservableObject {
                     min(settings.isolationIncrement, 25)
                 ),
             appearanceMode:
-                settings.appearanceMode
+                settings.appearanceMode,
+            workoutSessionLayout:
+                settings.workoutSessionLayout
         )
     }
 

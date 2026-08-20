@@ -14,12 +14,31 @@ struct ExerciseSessionState: Codable {
     var suggestionMessage: String? = nil
     var notes: String = ""
 
+    /// Warm-up rows the user has checked off in the Checklist layout, keyed
+    /// by weight rather than `WarmupSet.id` — that id is a fresh `UUID()`
+    /// on every call to `WarmupEngine.generateWarmups(...)`, which runs
+    /// fresh on every render since `warmups` is a computed property, not
+    /// stored. An id-keyed set would never match between renders. Weight
+    /// is deterministic for a given working weight, and if the user
+    /// changes their working weight mid-warm-up, stale completions for
+    /// weights that no longer appear simply stop mattering.
+    var completedWarmupWeights: Set<Double> = []
+
+    /// Extra working sets added mid-session via the Checklist layout's
+    /// "Add Set" button, on top of `Exercise.targetSets`. Deliberately
+    /// session-scoped, not template-scoped: tapping it is a one-off
+    /// "I felt like doing one more today," not a request to redefine the
+    /// template for next time.
+    var extraWorkingSets: Int = 0
+
     enum CodingKeys: String, CodingKey {
         case targetReps = "reps"
         case workingWeightPounds = "weight"
         case loggedSets
         case suggestionMessage
         case notes
+        case completedWarmupWeights
+        case extraWorkingSets
     }
 
     init(
@@ -27,13 +46,17 @@ struct ExerciseSessionState: Codable {
         workingWeightPounds: Double = 0,
         loggedSets: [LoggedSet] = [],
         suggestionMessage: String? = nil,
-        notes: String = ""
+        notes: String = "",
+        completedWarmupWeights: Set<Double> = [],
+        extraWorkingSets: Int = 0
     ) {
         self.targetReps = targetReps
         self.workingWeightPounds = workingWeightPounds
         self.loggedSets = loggedSets
         self.suggestionMessage = suggestionMessage
         self.notes = notes
+        self.completedWarmupWeights = completedWarmupWeights
+        self.extraWorkingSets = extraWorkingSets
     }
 
     init(from decoder: Decoder) throws {
@@ -72,5 +95,15 @@ struct ExerciseSessionState: Codable {
         } else {
             workingWeightPounds = 0
         }
+
+        completedWarmupWeights = try container.decodeIfPresent(
+            Set<Double>.self,
+            forKey: .completedWarmupWeights
+        ) ?? []
+
+        extraWorkingSets = try container.decodeIfPresent(
+            Int.self,
+            forKey: .extraWorkingSets
+        ) ?? 0
     }
 }

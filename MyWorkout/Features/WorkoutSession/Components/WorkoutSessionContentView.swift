@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutSessionContentView: View {
     let workout: Workout
+    let layout: WorkoutSessionLayout
 
     let elapsedTime: String
 
@@ -17,37 +18,44 @@ struct WorkoutSessionContentView: View {
     let onLogSet: (Exercise) -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
+    let onToggleWarmup: (Exercise, Double) -> Void
+    let onAddSet: (Exercise) -> Void
 
     let onFinish: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: AppTheme.Spacing.lg) {
-                WorkoutTimerCardView(
-                    elapsedTime: elapsedTime
-                )
+            LazyVStack(spacing: AppTheme.Spacing.lg, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    WorkoutExerciseListView(
+                        exercises: workout.exercises,
+                        layout: layout,
+                        stateForExercise: stateForExercise,
+                        previousSetsForExercise: previousSetsForExercise,
+                        weightStepForExercise: weightStepForExercise,
+                        equipmentInventory: equipmentInventory,
+                        activeRestExerciseID: activeRestExerciseID,
+                        restSecondsRemaining: restSecondsRemaining,
+                        restTotalSeconds: restTotalSeconds,
+                        onLogSet: onLogSet,
+                        onStopRest: onStopRest,
+                        onDeleteSet: onDeleteSet,
+                        onToggleWarmup: onToggleWarmup,
+                        onAddSet: onAddSet
+                    )
+                    .padding(.horizontal, AppTheme.Spacing.lg)
 
-                WorkoutExerciseListView(
-                    exercises: workout.exercises,
-                    stateForExercise: stateForExercise,
-                    previousSetsForExercise: previousSetsForExercise,
-                    weightStepForExercise: weightStepForExercise,
-                    equipmentInventory: equipmentInventory,
-                    activeRestExerciseID: activeRestExerciseID,
-                    restSecondsRemaining: restSecondsRemaining,
-                    restTotalSeconds: restTotalSeconds,
-                    onLogSet: onLogSet,
-                    onStopRest: onStopRest,
-                    onDeleteSet: onDeleteSet
-                )
-
-                WorkoutSessionActionsView(
-                    onFinish: onFinish,
-                    onCancel: onCancel
-                )
+                    WorkoutSessionActionsView(
+                        onFinish: onFinish,
+                        onCancel: onCancel
+                    )
+                    .padding(.horizontal, AppTheme.Spacing.lg)
+                } header: {
+                    CompactWorkoutTimerBar(elapsedTime: elapsedTime)
+                }
             }
-            .padding(AppTheme.Spacing.lg)
+            .padding(.bottom, AppTheme.Spacing.lg)
             .animation(.default, value: activeRestExerciseID)
         }
     }

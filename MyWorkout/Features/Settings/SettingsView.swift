@@ -17,6 +17,17 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Workout Session") {
+                Picker("Layout", selection: $settingsStore.settings.workoutSessionLayout) {
+                    ForEach(WorkoutSessionLayout.allCases) { layout in
+                        Text(layout.displayName).tag(layout)
+                    }
+                }
+                .onChange(of: settingsStore.settings.workoutSessionLayout) { _, _ in
+                    settingsStore.save()
+                }
+            }
+
             Section("Units") {
                 Picker("Weight Unit", selection: $settingsStore.settings.unitSystem) {
                     ForEach(UnitSystem.allCases) { unit in

@@ -155,6 +155,24 @@ final class ActiveWorkoutStore: ObservableObject {
         )
     }
 
+    func toggleWarmupComplete(_ weight: Double, for exerciseID: UUID) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+
+        if state.completedWarmupWeights.contains(weight) {
+            state.completedWarmupWeights.remove(weight)
+        } else {
+            state.completedWarmupWeights.insert(weight)
+        }
+
+        exerciseStates[exerciseID] = state
+    }
+
+    func addExtraSet(for exerciseID: UUID) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+        state.extraWorkingSets += 1
+        exerciseStates[exerciseID] = state
+    }
+
     func initializeExerciseStates(
         for workout: Workout,
         logStore: WorkoutLogStore,

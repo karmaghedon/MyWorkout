@@ -16,7 +16,8 @@ final class RestTimerRuleTests: XCTestCase {
             oneRepMaxFormula: .epley,
             compoundIncrement: 5,
             isolationIncrement: 5,
-            appearanceMode: .system
+            appearanceMode: .system,
+            workoutSessionLayout: .classic
         )
     }
 

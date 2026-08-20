@@ -8,6 +8,7 @@ struct CreateWorkoutTemplateView: View {
     @State private var templateName = ""
     @State private var selectedExerciseIDs: Set<UUID> = []
     @State private var selectedEquipment: ExerciseEquipment?
+    @State private var targetSetsByExerciseID: [UUID: Int] = [:]
 
     private var exercises: [Exercise] {
         ExerciseRegistry(
@@ -103,6 +104,10 @@ struct CreateWorkoutTemplateView: View {
                 )
             }
 
+            if !selectedExercises.isEmpty {
+                configureSetsSection
+            }
+
             PrimaryButton(
                 title: "Save Template",
                 systemImage: "checkmark",
@@ -113,6 +118,26 @@ struct CreateWorkoutTemplateView: View {
         .padding()
         .dismissKeyboardOnTap()
         .navigationTitle("Create Template")
+    }
+
+    private var configureSetsSection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text("SETS PER EXERCISE")
+                .font(AppTheme.Typography.eyebrow)
+                .foregroundStyle(AppTheme.secondaryText)
+
+            ForEach(selectedExercises) { exercise in
+                Stepper(
+                    "\(exercise.name): \(targetSetsByExerciseID[exercise.id] ?? 3) sets",
+                    value: Binding(
+                        get: { targetSetsByExerciseID[exercise.id] ?? 3 },
+                        set: { targetSetsByExerciseID[exercise.id] = $0 }
+                    ),
+                    in: 1...10
+                )
+                .font(AppTheme.Typography.caption)
+            }
+        }
     }
 
     private func toggle(_ exercise: Exercise) {
@@ -128,9 +153,15 @@ struct CreateWorkoutTemplateView: View {
             return
         }
 
+        let exercisesWithSetCounts = selectedExercises.map { exercise -> Exercise in
+            var configured = exercise
+            configured.targetSets = targetSetsByExerciseID[exercise.id] ?? 3
+            return configured
+        }
+
         let template = WorkoutTemplate(
             name: templateName.normalizedName,
-            exercises: selectedExercises
+            exercises: exercisesWithSetCounts
         )
 
         templateStore.add(template)
