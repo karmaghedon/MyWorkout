@@ -161,6 +161,7 @@
 		F5B8EAF1300D4B7400CF5449 /* CustomExerciseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF0300D4B7400CF5449 /* CustomExerciseRow.swift */; };
 		F5B8EAF3300D4BA800CF5449 /* DashboardStoreErrorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF2300D4BA800CF5449 /* DashboardStoreErrorsView.swift */; };
 		F5B8EAF6300D545C00CF5449 /* TemplateExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAF5300D545C00CF5449 /* TemplateExercisePickerView.swift */; };
+		38E20E22454E9144CB6C64BF /* TemplateExercisesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4B632589A00EEDD61D8746 /* TemplateExercisesSection.swift */; };
 		F5B8EB05300D9E2D00CF5449 /* NavigationArchitecture_F1.1.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB04300D9E2C00CF5449 /* NavigationArchitecture_F1.1.md */; };
 		F5B8EB07300D9E3800CF5449 /* ScreenInventory_F1.1.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB06300D9E3800CF5449 /* ScreenInventory_F1.1.md */; };
 		F5B8EB09300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md in Resources */ = {isa = PBXBuildFile; fileRef = F5B8EB08300D9E4100CF5449 /* FrontendDecisionLog_F1.1_Entries.md */; };
@@ -426,6 +427,7 @@
 		F5B8EAF0300D4B7400CF5449 /* CustomExerciseRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomExerciseRow.swift; sourceTree = "<group>"; };
 		F5B8EAF2300D4BA800CF5449 /* DashboardStoreErrorsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardStoreErrorsView.swift; sourceTree = "<group>"; };
 		F5B8EAF5300D545C00CF5449 /* TemplateExercisePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateExercisePickerView.swift; sourceTree = "<group>"; };
+		2A4B632589A00EEDD61D8746 /* TemplateExercisesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateExercisesSection.swift; sourceTree = "<group>"; };
 		F5B8EAF8300D987B00CF5449 /* ProductVision_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ProductVision_F1.0.md; sourceTree = "<group>"; };
 		F5B8EAF9300D98A900CF5449 /* FrontendArchitecture_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FrontendArchitecture_F1.0.md; sourceTree = "<group>"; };
 		F5B8EAFA300D98C700CF5449 /* DesignSystem_F1.0.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DesignSystem_F1.0.md; sourceTree = "<group>"; };
@@ -1236,6 +1238,7 @@
 			isa = PBXGroup;
 			children = (
 				F5B8EAF5300D545C00CF5449 /* TemplateExercisePickerView.swift */,
+				2A4B632589A00EEDD61D8746 /* TemplateExercisesSection.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1532,6 +1535,7 @@
 				F5BF304A2FF9E6E800AB5AD9 /* ExerciseTipsView.swift in Sources */,
 				F54004D72FF0CFBA0079CC05 /* HistoryView.swift in Sources */,
 				F5B8EAF6300D545C00CF5449 /* TemplateExercisePickerView.swift in Sources */,
+				38E20E22454E9144CB6C64BF /* TemplateExercisesSection.swift in Sources */,
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				F54B80B83006F6F400615DA0 /* ExerciseSource.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,

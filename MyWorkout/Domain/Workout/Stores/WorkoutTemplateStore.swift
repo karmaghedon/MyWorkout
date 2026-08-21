@@ -344,6 +344,7 @@ final class WorkoutTemplateStore: ObservableObject {
 
                 refreshedExercise.targetSets = savedExercise.targetSets
                 refreshedExercise.targetWeightPounds = savedExercise.targetWeightPounds
+                refreshedExercise.supersetGroupID = savedExercise.supersetGroupID
 
                 return refreshedExercise
             }

@@ -35,6 +35,16 @@ struct Exercise: Identifiable, Codable {
     /// weight, not the template.
     var targetWeightPounds: Double?
 
+    /// Groups this exercise with others sharing the same id into a
+    /// superset/circuit — perform them back-to-back with no rest between
+    /// members, resting only after the last member of the group. `nil`
+    /// (the default) means "not grouped," unchanged single-exercise
+    /// behavior. Per-template, same as `targetSets`/`targetWeightPounds`:
+    /// `WorkoutTemplate.exercises` holds value copies, so the same
+    /// exercise can be grouped differently (or not at all) across
+    /// different templates.
+    var supersetGroupID: UUID?
+
     var usesBarbell: Bool {
         equipment.usesBarbell
     }
@@ -55,7 +65,8 @@ struct Exercise: Identifiable, Codable {
         exerciseType: ExerciseType,
         progressionStrategy: ProgressionStrategy,
         targetSets: Int = 3,
-        targetWeightPounds: Double? = nil
+        targetWeightPounds: Double? = nil,
+        supersetGroupID: UUID? = nil
     ) {
         self.id = id
         self.name = name
@@ -73,6 +84,7 @@ struct Exercise: Identifiable, Codable {
         self.progressionStrategy = progressionStrategy
         self.targetSets = targetSets
         self.targetWeightPounds = targetWeightPounds
+        self.supersetGroupID = supersetGroupID
     }
 
     // MARK: - Codable
@@ -92,6 +104,7 @@ struct Exercise: Identifiable, Codable {
         case progressionRule, exerciseType, progressionStrategy
         case targetSets
         case targetWeightPounds
+        case supersetGroupID
     }
 
     init(from decoder: Decoder) throws {
@@ -114,6 +127,7 @@ struct Exercise: Identifiable, Codable {
 
         targetSets = try container.decodeIfPresent(Int.self, forKey: .targetSets) ?? 3
         targetWeightPounds = try container.decodeIfPresent(Double.self, forKey: .targetWeightPounds)
+        supersetGroupID = try container.decodeIfPresent(UUID.self, forKey: .supersetGroupID)
     }
 
     func encode(
@@ -142,5 +156,6 @@ struct Exercise: Identifiable, Codable {
         )
         try container.encode(targetSets, forKey: .targetSets)
         try container.encodeIfPresent(targetWeightPounds, forKey: .targetWeightPounds)
+        try container.encodeIfPresent(supersetGroupID, forKey: .supersetGroupID)
     }
 }

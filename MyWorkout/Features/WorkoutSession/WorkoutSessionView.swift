@@ -128,10 +128,15 @@ struct WorkoutSessionView: View {
             onLogSet: { exercise in
                 activeWorkoutStore.logSet(for: exercise.id)
                 Haptics.setLogged()
-                activeWorkoutStore.startRestTimer(
-                    for: exercise,
-                    settings: settingsStore.settings
-                )
+
+                // Superset members don't rest between each other — only
+                // the last exercise in the group triggers the timer.
+                if WorkoutSessionEngine.shouldStartRest(after: exercise, in: workout) {
+                    activeWorkoutStore.startRestTimer(
+                        for: exercise,
+                        settings: settingsStore.settings
+                    )
+                }
             },
             onStopRest: {
                 activeWorkoutStore.stopRestTimer()

@@ -3,8 +3,6 @@ import SwiftUI
 struct TemplateEditorView: View {
     @EnvironmentObject private var templateStore: WorkoutTemplateStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
-    @EnvironmentObject private var settingsStore: UserSettingsStore
-    @EnvironmentObject private var equipmentStore: EquipmentInventoryStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var editableTemplate: WorkoutTemplate
@@ -20,7 +18,7 @@ struct TemplateEditorView: View {
             Form {
                 templateNameSection
                 addExercisesSection
-                selectedExercisesSection
+                TemplateExercisesSection(exercises: $editableTemplate.exercises)
             }
             .scrollDismissesKeyboard(.interactively)
 
@@ -66,84 +64,6 @@ struct TemplateEditorView: View {
                 )
             }
         }
-    }
-
-    private var selectedExercisesSection: some View {
-        Section {
-            ForEach($editableTemplate.exercises) { $exercise in
-                VStack(alignment: .leading, spacing: 4) {
-                    ExerciseRowView(exercise: exercise)
-
-                    Stepper(
-                        "\(exercise.targetSets) sets",
-                        value: $exercise.targetSets,
-                        in: 1...10
-                    )
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
-
-                    Stepper(
-                        "\(formatWeight(weightBinding(for: $exercise).wrappedValue)) \(weightUnit)",
-                        value: weightBinding(for: $exercise),
-                        in: 0...500,
-                        step: weightStep
-                    )
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
-                }
-            }
-            .onMove(perform: moveExercises)
-            .onDelete(perform: deleteExercises)
-        } header: {
-            Text("Exercises")
-        } footer: {
-            Text("Tap Edit to reorder or remove exercises.")
-        }
-    }
-
-    // MARK: - Weight Boundary
-
-    private var weightUnit: String {
-        settingsStore.settings.unitSystem.rawValue
-    }
-
-    private var weightStep: Double {
-        WeightConversion.displayStep(
-            fromStoredPounds: 5,
-            unitSystem: settingsStore.settings.unitSystem
-        )
-    }
-
-    private func displayWeight(_ storedPounds: Double) -> Double {
-        WeightConversion.displayWeight(
-            fromStoredPounds: storedPounds,
-            unitSystem: settingsStore.settings.unitSystem
-        )
-    }
-
-    private func defaultWeightPounds(for exercise: Exercise) -> Double {
-        WorkoutSessionEngine.defaultStartingWeight(
-            for: exercise,
-            equipmentInventory: equipmentStore.inventory
-        )
-    }
-
-    private func weightBinding(for exercise: Binding<Exercise>) -> Binding<Double> {
-        Binding(
-            get: {
-                displayWeight(
-                    exercise.wrappedValue.targetWeightPounds
-                        ?? defaultWeightPounds(for: exercise.wrappedValue)
-                )
-            },
-            set: { displayedWeight in
-                exercise.wrappedValue.targetWeightPounds =
-                    WeightConversion.storedPounds(
-                        fromDisplayedWeight: displayedWeight,
-                        unitSystem: settingsStore.settings.unitSystem
-                    )
-            }
-        )
     }
 
     // MARK: - Bottom Action
@@ -211,20 +131,6 @@ struct TemplateEditorView: View {
         editableTemplate.exercises.append(exercise)
         selectedEquipment = nil
         showingAddExercises = false
-    }
-
-    private func moveExercises(
-        from source: IndexSet,
-        to destination: Int
-    ) {
-        editableTemplate.exercises.move(
-            fromOffsets: source,
-            toOffset: destination
-        )
-    }
-
-    private func deleteExercises(at offsets: IndexSet) {
-        editableTemplate.exercises.remove(atOffsets: offsets)
     }
 
     // MARK: - Template Actions

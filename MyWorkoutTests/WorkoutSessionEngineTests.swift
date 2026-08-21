@@ -280,6 +280,89 @@ final class WorkoutSessionEngineTests: XCTestCase {
         XCTAssertEqual(state.workingWeightPounds, 105)
     }
 
+    // MARK: - shouldStartRest (supersets)
+
+    func test_shouldStartRest_ungroupedExercise_alwaysStartsRest() {
+        let ex = exercise(name: "Bench Press")
+        let workout = Workout(name: "Push", exercises: [ex])
+
+        XCTAssertTrue(
+            WorkoutSessionEngine.shouldStartRest(after: ex, in: workout)
+        )
+    }
+
+    func test_shouldStartRest_notLastInGroup_doesNotStartRest() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let workout = Workout(name: "Push", exercises: [first, second])
+
+        XCTAssertFalse(
+            WorkoutSessionEngine.shouldStartRest(after: first, in: workout)
+        )
+    }
+
+    func test_shouldStartRest_lastInGroup_startsRest() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let workout = Workout(name: "Push", exercises: [first, second])
+
+        XCTAssertTrue(
+            WorkoutSessionEngine.shouldStartRest(after: second, in: workout)
+        )
+    }
+
+    func test_shouldStartRest_threeExerciseGroup_onlyLastStartsRest() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        var third = exercise(name: "Face Pull")
+        third.supersetGroupID = groupID
+
+        let workout = Workout(name: "Push", exercises: [first, second, third])
+
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: first, in: workout))
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout))
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout))
+    }
+
+    func test_shouldStartRest_unrelatedGroupsDoNotInterfere() {
+        let groupA = UUID()
+        let groupB = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupA
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupB
+
+        var third = exercise(name: "Face Pull")
+        third.supersetGroupID = groupB
+
+        let workout = Workout(name: "Push", exercises: [first, second, third])
+
+        // first is the only (and therefore last) member of groupA.
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: first, in: workout))
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout))
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout))
+    }
+
     // MARK: - newPersonalRecords
 
     func test_newPersonalRecords_heavierSet_isReportedAsNewRecord() {

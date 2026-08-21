@@ -20,6 +20,36 @@ enum WorkoutSessionEngine {
         )
     }
 
+    /// Whether logging a set for `exercise` should start the rest timer.
+    ///
+    /// Ungrouped exercises always rest after every set — unchanged
+    /// behavior. A superset/circuit (exercises sharing a
+    /// `supersetGroupID`) is meant to be performed back-to-back with no
+    /// rest between members, resting only once the *last* member (by the
+    /// workout's exercise order) has logged its set for that round. Using
+    /// list position rather than a live "current round" tracker keeps
+    /// this a simple, stateless per-set rule: whichever grouped exercise
+    /// appears last in `workout.exercises` is always the one that
+    /// triggers rest, regardless of what order the user actually works
+    /// through the group's exercises in.
+    static func shouldStartRest(
+        after exercise: Exercise,
+        in workout: Workout
+    ) -> Bool {
+        guard let groupID = exercise.supersetGroupID else {
+            return true
+        }
+
+        guard let lastGroupMemberID = workout.exercises
+            .filter({ $0.supersetGroupID == groupID })
+            .last?.id
+        else {
+            return true
+        }
+
+        return exercise.id == lastGroupMemberID
+    }
+
     static func defaultStartingWeight(
         for exercise: Exercise,
         equipmentInventory: EquipmentInventory

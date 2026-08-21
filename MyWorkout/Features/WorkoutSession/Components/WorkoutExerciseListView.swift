@@ -22,51 +22,75 @@ struct WorkoutExerciseListView: View {
         ForEach(exercises) { exercise in
             let isResting = activeRestExerciseID == exercise.id && restSecondsRemaining > 0
 
-            switch layout {
-            case .classic:
-                ExerciseSessionCardView(
-                    exercise: exercise,
-                    state: stateForExercise(exercise.id),
-                    previousSets: previousSetsForExercise(exercise),
-                    weightStep: weightStepForExercise(exercise),
-                    equipmentInventory: equipmentInventory,
-                    isResting: isResting,
-                    restSecondsRemaining: restSecondsRemaining,
-                    restTotalSeconds: restTotalSeconds,
-                    onLogSet: {
-                        onLogSet(exercise)
-                    },
-                    onStopRest: onStopRest,
-                    onDeleteSet: { setID in
-                        onDeleteSet(setID, exercise)
-                    }
-                )
+            Group {
+                switch layout {
+                case .classic:
+                    ExerciseSessionCardView(
+                        exercise: exercise,
+                        state: stateForExercise(exercise.id),
+                        previousSets: previousSetsForExercise(exercise),
+                        weightStep: weightStepForExercise(exercise),
+                        equipmentInventory: equipmentInventory,
+                        isResting: isResting,
+                        restSecondsRemaining: restSecondsRemaining,
+                        restTotalSeconds: restTotalSeconds,
+                        onLogSet: {
+                            onLogSet(exercise)
+                        },
+                        onStopRest: onStopRest,
+                        onDeleteSet: { setID in
+                            onDeleteSet(setID, exercise)
+                        }
+                    )
 
-            case .checklist:
-                ChecklistExerciseSessionCardView(
-                    exercise: exercise,
-                    state: stateForExercise(exercise.id),
-                    previousSets: previousSetsForExercise(exercise),
-                    weightStep: weightStepForExercise(exercise),
-                    equipmentInventory: equipmentInventory,
-                    isResting: isResting,
-                    restSecondsRemaining: restSecondsRemaining,
-                    restTotalSeconds: restTotalSeconds,
-                    onLogSet: {
-                        onLogSet(exercise)
-                    },
-                    onStopRest: onStopRest,
-                    onDeleteSet: { setID in
-                        onDeleteSet(setID, exercise)
-                    },
-                    onToggleWarmup: { weight, reps in
-                        onToggleWarmup(exercise, weight, reps)
-                    },
-                    onAddSet: {
-                        onAddSet(exercise)
-                    }
-                )
+                case .checklist:
+                    ChecklistExerciseSessionCardView(
+                        exercise: exercise,
+                        state: stateForExercise(exercise.id),
+                        previousSets: previousSetsForExercise(exercise),
+                        weightStep: weightStepForExercise(exercise),
+                        equipmentInventory: equipmentInventory,
+                        isResting: isResting,
+                        restSecondsRemaining: restSecondsRemaining,
+                        restTotalSeconds: restTotalSeconds,
+                        onLogSet: {
+                            onLogSet(exercise)
+                        },
+                        onStopRest: onStopRest,
+                        onDeleteSet: { setID in
+                            onDeleteSet(setID, exercise)
+                        },
+                        onToggleWarmup: { weight, reps in
+                            onToggleWarmup(exercise, weight, reps)
+                        },
+                        onAddSet: {
+                            onAddSet(exercise)
+                        }
+                    )
+                }
             }
+            .superset(exercise.supersetGroupID)
+        }
+    }
+}
+
+private extension View {
+    /// Visual indicator that this exercise card is part of a superset —
+    /// a colored leading bar, matching the same treatment
+    /// `TemplateExercisesSection` uses so the grouping reads consistently
+    /// between editing a template and actually running the workout.
+    @ViewBuilder
+    func superset(_ groupID: UUID?) -> some View {
+        if groupID != nil {
+            self
+                .padding(.leading, AppTheme.Spacing.sm)
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(AppTheme.accent)
+                        .frame(width: 3)
+                }
+        } else {
+            self
         }
     }
 }
