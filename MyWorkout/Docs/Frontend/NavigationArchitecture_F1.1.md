@@ -15,6 +15,10 @@ FDL-016). Everything else below — tab ownership, push/sheet/cover/alert
 rules, the active-workout contract — reflects the shipped app, not just
 the plan.
 
+**Addendum (2026-08-21):** §3's `AppShellView` gained an explicit
+keyboard-avoidance rule for its custom tab bar — see §11, added after a
+real on-device bug (FDL-027).
+
 ## 1. Purpose
 
 This document defines the top-level navigation model for MyWorkout before the native app shell is implemented. It is the source of truth for tab ownership, push navigation, modal presentation, active-workout behavior, and route placement.
@@ -245,7 +249,37 @@ The next implementation step should introduce only:
 
 Do not introduce the custom tab appearance, feature-specific route enums, visual redesign, or Home content redesign in the same commit.
 
-## 10. Acceptance Criteria
+## 10. App Shell Chrome Behavior
+
+`AppShellView`'s custom tab bar (`MyWorkoutTabBar`) is attached via
+`.safeAreaInset(edge: .bottom)` on the root `TabView`, not the system
+tab bar (`.toolbar(.hidden, for: .tabBar)` hides that). Any bottom
+chrome attached this way participates in keyboard-driven safe-area
+changes by default — when a text field elsewhere in the app becomes
+first responder, SwiftUI's automatic keyboard avoidance can push a
+`safeAreaInset` view up along with the keyboard instead of leaving it
+pinned at the screen's true bottom edge.
+
+**Rule:** app-shell chrome (the tab bar, and any future persistent
+bottom/top chrome added the same way) must not move when the keyboard
+appears — it should behave like a native tab bar, staying in place or
+going behind the keyboard, never sliding into the middle of the screen
+on top of whatever's being edited.
+
+**How this is enforced:** `.ignoresSafeArea(.keyboard, edges: .bottom)`
+is applied to `AppShellView()` itself, at the `WindowGroup` level in
+`MyWorkoutApp.swift` — above the entire view hierarchy. This placement
+matters and was not the first thing tried: applying the same modifier
+to the `TabView` inside `AppShellView`'s own body, and separately to
+`MyWorkoutTabBar` inside the `safeAreaInset` closure, were both tried
+and confirmed on-device to *not* work (see FDL-027 for the full
+account). Whatever was actually driving the shift sat above both of
+those points. If a future custom-chrome addition shows the same
+symptom, don't assume a locally-scoped `ignoresSafeArea` is sufficient
+— verify on a physical device, and try the app-root placement first
+given this precedent.
+
+## 11. Acceptance Criteria
 
 - Every existing screen has a documented owner.
 - The five primary destinations are stable.
