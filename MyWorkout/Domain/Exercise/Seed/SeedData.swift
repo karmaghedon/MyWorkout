@@ -254,12 +254,25 @@ struct SeedData {
             muscleGroup: .biceps,
             equipment: .dumbbell,
             instructions: """
-            1. Hold dumbbells with palms facing each other.
-            2. Keep elbows close.
-            3. Curl without swinging.
-            4. Lower slowly.
+            1. Stand tall holding a dumbbell in each hand, palms facing your thighs (neutral grip).
+            2. Keep your elbows pinned to your sides throughout the movement.
+            3. Curl the dumbbells up toward your shoulders without twisting your wrists.
+            4. Squeeze at the top, then lower under control until your elbows are fully extended.
             5. Stop if forearm pain appears.
             """,
+            primaryMuscles: ["Biceps"],
+            secondaryMuscles: ["Brachialis", "Brachioradialis", "Forearms"],
+            difficulty: "Beginner",
+            tips: [
+                "Choose a weight you can control for 12-15 reps rather than one that forces you to swing it up.",
+                "Anchor your elbows at your sides and keep them still until the set is done.",
+                "Keep your core braced so your torso doesn't rock to help lift the weight."
+            ],
+            commonMistakes: [
+                "Using too much weight, which shortens the range of motion and turns the rep into momentum instead of muscle.",
+                "Letting the elbows drift forward or backward instead of staying fixed at the sides.",
+                "Shrugging the shoulders up toward the ears during the lift."
+            ],
             minReps: 10,
             maxReps: 15,
             exerciseType: .isolation,
