@@ -57,6 +57,7 @@ struct AppShellView: View {
             }
         }
         .toolbar(.hidden, for: .tabBar)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             MyWorkoutTabBar(
                 selection: selectedTab,
