@@ -152,6 +152,36 @@ adopts that same fully-optional-with-defaults shape for its legacy decode
 target, it needs the same explicit shape check `UserSettingsStore` uses,
 not just a bare `try?`.
 
+### A hazard in trusting caller-supplied order for a "replace everything" operation
+
+`WorkoutLogStore.logs` carries an invariant that isn't expressed in its
+type: newest-first order. `add(_:)` maintains it by always inserting at
+index 0, and several call sites elsewhere in the app
+(`logStore.logs.first`, `.prefix(3)`, `lastPerformances`,
+`suggestedStartingSet`) read the array assuming that order without
+re-sorting themselves — cheap and fine, as long as nothing ever violates
+the invariant.
+
+`replaceAll(with:)` — the method a backup restore uses — used to just
+assign `logs = newLogs`, trusting whatever order the caller handed it.
+In practice, an import built from a chronologically-ordered source (a
+CSV export converted to `WorkoutLog` JSON, oldest-first) landed in that
+same oldest-first order after import, and `lastPerformances` took its
+results straight from array position — so the app suggested an
+exercise's *first-ever* recorded weight instead of its most recent one.
+The bug was invisible in code review: every individual piece (`add`,
+`lastPerformances`, `replaceAll`) was correct in isolation, and the
+violated assumption only existed as a comment-level convention, not
+anything the type system or a guard clause enforced.
+
+The fix: both `replaceAll` and `load()` now sort by date descending
+before publishing, so the invariant holds regardless of the order the
+underlying data arrives in. The general lesson for any future
+"published collection with an implicit order contract" — enforce the
+order at the one or two places data can enter the collection in bulk
+(`replaceAll`, `load`), not by trusting every future caller (or import
+format) to already supply it correctly.
+
 ## Error exposure
 
 Persistence-capable stores expose:

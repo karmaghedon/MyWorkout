@@ -1,7 +1,7 @@
 # Frontend Decision Log — F1.1 Entries
 
-**Version:** 1.8  
-**Date:** 2026-08-20  
+**Version:** 1.9  
+**Date:** 2026-08-21  
 **Status:** Approved
 
 ## FDL-001 — Five durable destinations
@@ -647,3 +647,284 @@ same `decodeIfPresent ?? default` treatment, covered by
   environment's CoreSimulator can't stand in). Build and
   build-for-testing both succeed. Flagged on `FrontendRoadmap_F1.0.md`
   pending a device pass.
+
+---
+
+## FDL-021 — Template exercise search, per-exercise starting weight, and the Create Template Form rebuild
+
+**Decision**
+Add a search field (alongside the existing equipment filter) to both
+exercise pickers used when building a template —
+`CreateWorkoutTemplateView`'s inline list and `TemplateExercisePickerView`
+(used by `TemplateEditorView`'s "Add Exercises"). Add a per-template
+starting-weight override, `Exercise.targetWeightPounds` (`nil` by
+default), configurable via a weight stepper next to the existing sets
+stepper. Rebuilt `CreateWorkoutTemplateView` from a non-scrolling
+`VStack` + plain `List` onto the same `Form`-based structure
+`TemplateEditorView` already used.
+
+**Reason**
+The equipment-only filter made picking one exercise out of the library
+slow once it grew past the original 17 seed exercises to 40+. The
+starting-weight override was requested directly — someone building a
+template already knows roughly what weight they use for each exercise
+and had no way to record it. Once that weight stepper existed as a
+*second* per-exercise control (alongside the sets stepper),
+`CreateWorkoutTemplateView`'s original `VStack`+`List` layout broke:
+nothing above the Save button could scroll, so on a template with
+several exercises the new control could be pushed off-screen entirely —
+reported as "the weight isn't working." The fix was structural, not
+cosmetic: match `TemplateEditorView`'s `Form`, which scrolls end to end.
+
+That rebuild surfaced a second bug: the old `VStack` version carried
+`.dismissKeyboardOnTap()` (a screen-wide
+`simultaneousGesture(TapGesture())`), left over from before the screen
+had a `Form` to dismiss its own keyboard against. Once it became a
+`Form`, that gesture competed with taps on plain `Button` rows that
+aren't native `List` rows — both the "Add Exercises" toggle and
+`TemplateExercisePickerView`'s exercise rows — reported as "Add
+Exercises doesn't work." Removed; `Form` already dismisses the keyboard
+on scroll via `.scrollDismissesKeyboard(.interactively)`, which
+`TemplateEditorView` relies on for the same reason and never needed the
+extra modifier.
+
+**Consequences**
+- `Exercise.targetWeightPounds` only matters the very first time an
+  exercise is performed — `WorkoutSessionEngine.initialState` already
+  prefers real progression history once it exists. See FDL-024 for the
+  companion piece that keeps the template's displayed value honest
+  after that point.
+- `CreateWorkoutTemplateView` and `TemplateEditorView` became
+  structurally identical `Form`-based screens, which made their
+  duplication itself worth closing off — see FDL-026's
+  `TemplateExercisesSection` extraction.
+
+---
+
+## FDL-022 — Fix: WorkoutTemplateStore.refreshed silently discarding per-template overrides
+
+**Decision**
+`WorkoutTemplateStore.refreshed(_:)` — called by every mutating store
+method (`add`, `update`, `duplicate`, `replaceAll`, and initial load) —
+now copies `targetSets`, `targetWeightPounds`, and `supersetGroupID`
+(FDL-026) from the saved exercise onto the freshly-looked-up built-in
+definition, instead of returning that fresh lookup wholesale.
+
+**Reason**
+`refreshed` exists to keep a template's exercises in sync with
+`SeedData` changes (instructions, muscle group, progression rule, and so
+on) by re-resolving each saved exercise against the current built-in
+definition by id, falling back to name. The freshly-resolved built-in
+`Exercise` always carries the *global* defaults for the per-template
+override fields (3 sets, no weight override) — swapping it in wholesale
+meant every save silently reset whatever had actually been configured
+for that template. Reported directly: a custom starting weight set
+during template creation reverted to the 45lb equipment default
+immediately, before the template was even reopened.
+
+**Consequences**
+- Any future per-template override field on `Exercise` needs the same
+  explicit carry-over line added to `refreshed`, or it will suffer the
+  same silent-reset bug the moment it ships.
+- Covered by two new regression tests
+  (`test_add_preservesTargetSetsAndWeightOverrideForBuiltInExercise`,
+  `test_update_preservesTargetSetsAndWeightOverrideForBuiltInExercise`)
+  using "Bench Press" specifically because it's a real `SeedData` entry
+  — an ad-hoc test name would never hit the refresh path at all, and the
+  test would pass for the wrong reason.
+
+---
+
+## FDL-023 — Checklist layout corrections: warm-up key collision, no way to adjust weight before logging
+
+**Decision**
+Two fixes to the Checklist layout introduced in FDL-020:
+
+1. Warm-up completion is now keyed by weight *and* reps
+   (`ExerciseSessionState.completedWarmupKeys: Set<String>`, via
+   `ExerciseSessionState.warmupKey(weight:reps:)`), not weight alone.
+2. The next (unlogged) working-set row in
+   `ChecklistExerciseSessionCardView` gets a pencil-icon edit affordance
+   (`SetChecklistRow.onEdit`) that reveals the same
+   `DoubleBigStepperControl`/`BigStepperControl` the Classic layout
+   already uses, inline, before logging.
+
+**Reason**
+`WarmupEngine`'s barbell ramp always starts with two sets at the same
+empty-bar weight (10 reps, then 8 reps) — with completion keyed by
+weight alone, checking either row toggled the same `Set` entry, so both
+showed complete or incomplete together. Reported directly: "tapping the
+warmup checks all the warmup sets at once."
+
+The missing weight editor was a known, deliberate gap from FDL-020
+("fine to ship without this first") — the Checklist layout's next-set
+row could only be tapped to log at the preset weight, with no way to
+deviate, unlike Classic's always-visible steppers. Reported directly
+once someone needed to actually adjust it mid-session.
+
+**Consequences**
+- The weight+reps composite key keeps the same "stale completions stop
+  mattering if working weight changes" property the weight-only key
+  had — a changed working weight recomputes the whole warm-up list, so
+  old keys simply stop matching anything.
+- The pencil-icon affordance reuses Classic's exact stepper components
+  rather than inventing a second weight-input pattern, matching
+  FDL-020's own stated intent for this exact gap.
+
+---
+
+## FDL-024 — Sync template starting weight from each finished workout
+
+**Decision**
+`WorkoutTemplateStore.syncStartingWeights(from log:)`, called after
+every finished workout, updates each matching template's per-exercise
+`targetWeightPounds` to the last set actually logged for that exercise
+in the just-finished session.
+
+**Reason**
+`Exercise.targetWeightPounds` only ever affects the very first time an
+exercise is performed (FDL-021) — once real logged history exists,
+`WorkoutSessionEngine.initialState` uses progression suggestion instead,
+ignoring the template's stored value entirely. That value never got
+updated to reflect that, though — reopening "Edit Template" weeks into
+progressing on it still showed whatever weight it was created (or last
+hand-edited) with, reading as stale even though it had no effect on
+what a session actually started at.
+
+**Consequences**
+- Purely a display-honesty fix — it changes what
+  `Exercise.targetWeightPounds` *shows*, never what a session's working
+  weight actually starts at, which was already correct via progression
+  history.
+- Matches templates by `WorkoutLog.workoutName == template.name`, the
+  same name-based match `DashboardView`'s "Next Workout" card already
+  uses, and inherits its same known limitation (renaming a template
+  between starting and finishing a workout orphans the match).
+- Exercises within a matched template are matched by `Exercise.id`
+  first, falling back to normalized name — the same defensive two-step
+  lookup `ExerciseRegistry.exercise(id:name:)` already uses.
+
+---
+
+## FDL-025 — Fix: WorkoutLogStore didn't enforce its own newest-first ordering invariant
+
+**Decision**
+`WorkoutLogStore.replaceAll(with:)` and `.load()` now sort by date
+descending before publishing, instead of trusting whatever order they
+were handed.
+
+**Reason**
+`logs` is a load-bearing invariant across the app: `add(_:)` maintains
+newest-first order by always inserting at index 0, and many call sites
+(`logStore.logs.first`, `.prefix(3)`, `lastPerformances`,
+`suggestedStartingSet`) read the array assuming that order without
+re-sorting themselves. `replaceAll` — the path a backup restore uses —
+never enforced it, just took whatever order it was given.
+
+This surfaced as a real, user-reported bug: a backup built by converting
+a chronological CSV export (oldest-first) into `WorkoutLog` JSON landed
+in that same oldest-first order after import. `lastPerformances` took
+its results straight from array order, so
+`WorkoutSessionEngine.initialState` suggested a session's *first-ever*
+(lightest) recorded weight for an exercise instead of the most recent
+one — e.g. Front Squat showing its February starting weight instead of
+August's, even though the template's own `targetWeightPounds` (FDL-021)
+had been correct the entire time. Root-caused by pulling the actual
+on-device templates and logs via `devicectl device copy from` and
+tracing the exact array order, rather than guessing.
+
+**Consequences**
+- The fix lives at the store, not the import path — any future source
+  of bulk log data (a different import format, a future sync feature)
+  inherits correct ordering automatically instead of needing its own
+  defensive sort.
+- Covered by two new regression tests
+  (`testReplaceAllNormalizesOutOfOrderInputToNewestFirst`,
+  `testInitializationNormalizesOutOfOrderPersistedLogs`) that hand the
+  store oldest-first input and assert it comes out newest-first.
+
+---
+
+## FDL-026 — Superset/circuit grouping for workout templates
+
+**Decision**
+`Exercise.supersetGroupID: UUID?` (`nil` by default, a per-template
+override — same pattern as `targetSets`/`targetWeightPounds`) groups 2+
+exercises in a template to be performed back-to-back with no rest
+between members, resting only after the last member (by the workout's
+exercise order) logs a set. Grouping is created and managed in template
+creation and editing via a new shared `TemplateExercisesSection`
+component's "Group" mode: select 2+ exercises, tap "Create Superset";
+grouped rows show a colored leading bar and an "Ungroup" action, and the
+same bar renders on the session screen's cards too.
+
+**Reason**
+Requested directly, after researching how Strong and Hevy implement the
+same concept: group exercises, perform them back-to-back, rest at the
+group boundary rather than after every exercise.
+`WorkoutSessionEngine.shouldStartRest(after:in:)` is a deliberately
+stateless per-set rule (whichever grouped exercise is last in the
+workout's exercise order always triggers rest) rather than a live
+"current round" tracker — simpler to reason about and test, at the cost
+of not enforcing strict round-robin alternation between group members
+(sets can still be logged in any order; the rule only decides whether
+that particular log action starts a rest timer).
+
+**Consequences**
+- The `TemplateExercisesSection` extraction replaces what was
+  previously duplicated between `CreateWorkoutTemplateView` and
+  `TemplateEditorView` (sets/weight steppers, reorder, delete) — closes
+  off the drift-between-two-screens risk that caused the FDL-021 "Add
+  Exercises" bug, not just adds the grouping UI.
+- Grouping mode swaps each row to a plain, non-interactive selectable
+  `Button` (checkmark + name) rather than overlaying a tap gesture on
+  the normal row, which also hosts the sets/weight `Stepper`s — the
+  exact class of gesture conflict fixed in FDL-021.
+- `WorkoutTemplateStore.refreshed` (FDL-022) carries `supersetGroupID`
+  over on every save, same as the other two per-template override
+  fields.
+- Not enforced: contiguity after reordering (a group's members can end
+  up non-adjacent in the list; the rest-timer behavior still works
+  correctly, only the "connected block" visual reads as separate tinted
+  rows instead of one seamless bar), and merge semantics when
+  regrouping an already-grouped exercise (it simply moves to the new
+  group, potentially leaving its old group with one remaining member,
+  which then behaves exactly like an ungrouped exercise).
+
+---
+
+## FDL-027 — Fix: custom tab bar pushed up by the keyboard
+
+**Decision**
+`.ignoresSafeArea(.keyboard, edges: .bottom)` applied to
+`AppShellView()` itself at the `WindowGroup` level in
+`MyWorkoutApp.swift` — above the entire view hierarchy, not inside
+`AppShellView`'s own body.
+
+**Reason**
+`MyWorkoutTabBar` is attached via `.safeAreaInset(edge: .bottom)` on the
+root `TabView`, which by default participates in keyboard-driven safe
+area changes. Reported directly: entering a plate/dumbbell weight or
+quantity in Equipment brought up the numeric keyboard, and the tab bar
+slid up with it, landing on top of the field actually being edited.
+
+Two narrower fixes were tried and confirmed — on-device, by direct user
+report, not assumed — to *not* work before this one: the same modifier
+applied to the `TabView` itself, and applied to `MyWorkoutTabBar` inside
+the `safeAreaInset` closure. Neither intercepted whatever was actually
+driving the shift; some part of the avoidance was happening above the
+level either fix could reach. Applying it at the `WindowGroup` level,
+wrapping `AppShellView()` from the outside, is what actually held the
+tab bar in place.
+
+**Consequences**
+- A future screen that needs its own keyboard-avoiding scroll behavior
+  (a `ScrollView`/`Form` with a field near the bottom) still gets it —
+  `ignoresSafeArea(.keyboard)` at the app root only stops the *tab bar
+  chrome* from reacting to the keyboard, not each screen's own content.
+- Lesson for future custom-chrome-via-`safeAreaInset` work: the fix
+  point for "this chrome shouldn't move with the keyboard" is not
+  necessarily where the `safeAreaInset` itself is declared — two
+  locally-scoped attempts here both looked reasonable and both failed
+  on-device; verify visually rather than assuming a modifier placement
+  is sufficient.

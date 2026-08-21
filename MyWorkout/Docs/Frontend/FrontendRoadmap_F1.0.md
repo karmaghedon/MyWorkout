@@ -1,5 +1,5 @@
-Version: 2.0
-Last Updated: 2026-08-19
+Version: 2.1
+Last Updated: 2026-08-21
 Status: Active
 
 Phases are checked off as their work lands on `remodeling`, not when
@@ -164,11 +164,13 @@ F8 — Premium Polish
 
 Additional Work — Workout Session Redesign
 
-☐ implemented, not yet device-tested
+☑ device-tested
 
 Outside the Blueprint's original 8 phases — a separate, later initiative
 covering the Workout session screen specifically. See FDL-020 for the
-full decision record.
+full decision record, and FDL-023 for two on-device-reported corrections
+(warm-up rows checking together, no way to adjust weight before
+logging — both fixed).
 
 - [x] Settings toggle (`WorkoutSessionLayout`: Classic / Checklist,
       defaults to Classic) under Settings → Workout Session.
@@ -180,5 +182,50 @@ full decision record.
 - [x] Template-defined working-set count (`Exercise.targetSets`,
       configurable 1–10 per exercise in template creation/editing) plus
       a session-time "Add Set" affordance.
-- [ ] Device-tested — not yet; the physical device wasn't reachable when
-      this landed. Build and build-for-testing both succeed.
+
+Additional Work — Template Editing: Search, Starting Weight, Supersets
+
+☑ device-tested
+
+A second, later initiative on top of the one above — Create/Edit
+Template and the exercises they build. See FDL-021, FDL-022, FDL-024,
+and FDL-026 for the full decision records.
+
+- [x] Search field on both exercise pickers (`CreateWorkoutTemplateView`,
+      `TemplateExercisePickerView`), alongside the existing equipment
+      filter.
+- [x] Per-exercise starting-weight override (`Exercise.targetWeightPounds`)
+      configurable in template creation/editing, only used the first
+      time an exercise is performed — progression history takes over
+      after that.
+- [x] `WorkoutTemplateStore.syncStartingWeights(from:)` keeps that
+      displayed value honest after real history exists, updating it to
+      the last logged set after every finished workout.
+- [x] Superset/circuit grouping (`Exercise.supersetGroupID`) — group 2+
+      exercises via a "Group" mode in the shared `TemplateExercisesSection`
+      component; grouped exercises rest only after the group's last
+      member logs a set (`WorkoutSessionEngine.shouldStartRest`).
+- [x] `CreateWorkoutTemplateView` rebuilt onto `TemplateEditorView`'s
+      `Form`-based structure, and both screens now share
+      `TemplateExercisesSection` instead of duplicating the
+      sets/weight/grouping UI — closes off the drift-between-two-screens
+      risk that caused two of this phase's own bugs (FDL-021).
+
+Additional Work — Data Integrity & Platform Fixes
+
+Fixed, not a feature — grouped here since none of these map to a single
+Blueprint phase. See FDL-022, FDL-025, and FDL-027.
+
+- [x] `WorkoutTemplateStore.refreshed` no longer silently discards a
+      template's `targetSets`/`targetWeightPounds`/`supersetGroupID` on
+      every save (FDL-022).
+- [x] `WorkoutLogStore` now enforces its own newest-first ordering
+      invariant in `replaceAll`/`load` instead of trusting caller order
+      — a real bug that made the app suggest a long-past first-ever
+      weight instead of the most recent one after a chronologically-
+      ordered backup import (FDL-025).
+- [x] Custom tab bar no longer gets pushed up by the keyboard, covering
+      whatever field was being edited (FDL-027).
+- [x] App launch icon — `AppIcon.appiconset` previously had only unused
+      macOS-idiom entries with no backing image; replaced with the
+      modern single-size iOS format.

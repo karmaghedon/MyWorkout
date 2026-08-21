@@ -1,5 +1,5 @@
-Version: 2.2
-Last Updated: 2026-08-20
+Version: 2.3
+Last Updated: 2026-08-21
 Status: Active
 
 # MyWorkout Component Library
@@ -242,7 +242,15 @@ rather than deleted.
 One checklist row — checkbox, title/subtitle, optional plate `Chip` —
 shared by both warm-up and working-set rows in the Checklist layout.
 Guarantees a 44×44 touch target around its visually smaller (26×26)
-checkbox circle, matching `IconButton`'s convention.
+checkbox circle, matching `IconButton`'s convention. Warm-up completion
+is keyed by weight+reps together, not weight alone — `WarmupEngine`'s
+barbell ramp starts with two sets at the same empty-bar weight, and a
+weight-only key made checking either one check both (FDL-023). The
+optional `onEdit` closure makes the title/subtitle area itself tappable
+(with a pencil-icon hint) to reveal an inline weight/reps editor — only
+passed for the next (unlogged) working-set row, so the Checklist layout
+can deviate from the preset weight before logging instead of being
+locked to whatever the template/progression suggested (FDL-023).
 
 ### ChecklistExerciseSessionCardView
 Checklist-layout sibling of `ExerciseSessionCardView` — renders warm-up
@@ -250,3 +258,26 @@ and working sets as `SetChecklistRow`s instead of a single stepper.
 Selected per exercise card by the `WorkoutSessionLayout` setting
 (`WorkoutExerciseListView` branches between this and
 `ExerciseSessionCardView`).
+
+## Template components (FDL-021, FDL-026)
+
+Live in `Features/Templates/` and `Features/Templates/Components/`.
+
+### TemplateExercisesSection
+Shared by `CreateWorkoutTemplateView` and `TemplateEditorView` — the
+"selected exercises" list: sets/weight steppers, reorder, delete, and
+superset grouping. Extracted after these two screens drifted out of
+sync once (one carried a stray gesture modifier the other didn't,
+breaking "Add Exercises" — FDL-021), so there's one place to get this
+right instead of two to keep in sync. A "Group" mode swaps rows to a
+plain, non-interactive selectable `Button` (checkmark + name) rather
+than overlaying a tap gesture on the normal row, which also hosts the
+sets/weight `Stepper`s — a parent-level tap gesture competing with
+nested buttons is exactly the class of bug that broke "Add Exercises"
+in the first place. Grouped rows get a colored leading bar + "Ungroup"
+action.
+
+### TemplateExercisePickerView (updated)
+Pre-existing component (equipment-filtered exercise picker used by
+`TemplateEditorView`'s "Add Exercises"); gained a search field alongside
+the equipment filter (FDL-021).
