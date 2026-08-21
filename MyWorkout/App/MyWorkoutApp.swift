@@ -14,6 +14,7 @@ struct MyWorkoutApp: App {
     var body: some Scene {
         WindowGroup {
             AppShellView()
+                .ignoresSafeArea(.keyboard, edges: .bottom)
                 .environmentObject(logStore)
                 .environmentObject(templateStore)
                 .environmentObject(equipmentStore)

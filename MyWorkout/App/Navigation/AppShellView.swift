@@ -64,7 +64,6 @@ struct AppShellView: View {
                     workoutTabPresentation,
                 onSelect: handleTabSelection
             )
-            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .onChange(
             of: activeWorkoutStore.hasActiveWorkout
