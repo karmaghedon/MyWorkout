@@ -177,6 +177,94 @@ final class WorkoutLogStoreTests: XCTestCase {
         )
     }
 
+    /// Regression test: a real-world backup import (e.g. a chronological
+    /// CSV export converted to WorkoutLog JSON) can hand replaceAll an
+    /// oldest-first array. Every other consumer of `logs` — including
+    /// `lastPerformances`/`suggestedStartingSet`, which drive the working
+    /// weight `WorkoutSessionEngine.initialState` shows at the start of a
+    /// session — assumes newest-first without re-sorting themselves, so
+    /// an unsorted import silently made the app suggest weight from the
+    /// *oldest* matching set instead of the most recent one.
+    func testReplaceAllNormalizesOutOfOrderInputToNewestFirst()
+        async {
+
+        let oldestFirst = [
+            WorkoutLogTestFactory.make(
+                name: "Oldest",
+                daysAgo: 5
+            ),
+            WorkoutLogTestFactory.make(
+                name: "Middle",
+                daysAgo: 3
+            ),
+            WorkoutLogTestFactory.make(
+                name: "Newest",
+                daysAgo: 1
+            )
+        ]
+
+        let repository = MockWorkoutLogRepository()
+
+        let saveExpectation = expectation(
+            description: "Replacement saved"
+        )
+
+        repository.setOnSave {
+            saveExpectation.fulfill()
+        }
+
+        let store = WorkoutLogStore(
+            repository: repository
+        )
+
+        store.replaceAll(
+            with: oldestFirst
+        )
+
+        await fulfillment(
+            of: [saveExpectation],
+            timeout: 1
+        )
+
+        XCTAssertEqual(
+            store.logs.map(\.workoutName),
+            [
+                "Newest",
+                "Middle",
+                "Oldest"
+            ]
+        )
+    }
+
+    func testInitializationNormalizesOutOfOrderPersistedLogs() {
+        let oldestFirst = [
+            WorkoutLogTestFactory.make(
+                name: "Oldest",
+                daysAgo: 3
+            ),
+            WorkoutLogTestFactory.make(
+                name: "Newest",
+                daysAgo: 1
+            )
+        ]
+
+        let repository = MockWorkoutLogRepository(
+            loadResult: .success(oldestFirst)
+        )
+
+        let store = WorkoutLogStore(
+            repository: repository
+        )
+
+        XCTAssertEqual(
+            store.logs.map(\.workoutName),
+            [
+                "Newest",
+                "Oldest"
+            ]
+        )
+    }
+
     // MARK: - Save Failures
 
     func testSaveFailureKeepsPublishedLogAndExposesSavingError()

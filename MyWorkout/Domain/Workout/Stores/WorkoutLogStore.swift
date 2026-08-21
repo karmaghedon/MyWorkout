@@ -31,10 +31,21 @@ final class WorkoutLogStore: ObservableObject {
         save()
     }
 
+    /// `logs` is a load-bearing invariant across the app — `add(_:)`
+    /// maintains it by always inserting at index 0, and dozens of call
+    /// sites (`logStore.logs.first`, `.prefix(3)`, `lastPerformances`,
+    /// `suggestedStartingSet`) read the array assuming newest-first order
+    /// without re-sorting themselves. `replaceAll` is the one path that
+    /// accepts a caller-supplied order wholesale (backup restore), so it
+    /// has to enforce the invariant explicitly rather than trust the
+    /// input — a backup built from a source that wasn't already
+    /// newest-first (e.g. a chronological CSV export) would otherwise
+    /// silently make every "latest performance" lookup return the
+    /// *oldest* matching set instead.
     func replaceAll(
         with newLogs: [WorkoutLog]
     ) {
-        logs = newLogs
+        logs = newLogs.sorted { $0.date > $1.date }
         save()
     }
 
@@ -157,7 +168,11 @@ final class WorkoutLogStore: ObservableObject {
 
     private func load() {
         do {
+            // Defensive re-sort, same reasoning as `replaceAll` — normalizes
+            // any on-disk file that predates that fix (or was otherwise
+            // written out of order) back to the newest-first invariant.
             logs = try repository.load()
+                .sorted { $0.date > $1.date }
             isPersistenceWritable = true
 
             clearPersistenceError(
