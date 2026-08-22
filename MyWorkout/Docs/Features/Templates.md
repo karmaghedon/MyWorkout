@@ -41,19 +41,23 @@ Templates define reusable exercise sequences for starting workouts.
 - group 2+ exercises into a superset/circuit (`Exercise.supersetGroupID`)
   so they rest only after the group's last member, not after every
   exercise
+- configure a per-exercise progression rep range
+  (`Exercise.progressionRule.minReps`/`maxReps`) so the weight-increase
+  suggestion matches how that exercise is actually trained (e.g.
+  straight sets of 8) instead of always assuming the global default
 
 ## Exercise refresh
 
 Loaded or imported templates are refreshed through an exercise registry so built-in exercise definitions can evolve without duplicating lookup behavior throughout the UI.
 
-Refresh preserves the three per-template override fields
-(`targetSets`, `targetWeightPounds`, `supersetGroupID`) from the saved
-exercise rather than replacing it wholesale with the freshly-resolved
-built-in definition — that definition always carries the *global*
-defaults for those fields, so a naive swap silently discarded whatever
-had actually been configured for the template on every save. Any new
-per-template override field added in the future needs the same explicit
-carry-over.
+Refresh preserves the four per-template override fields
+(`targetSets`, `targetWeightPounds`, `supersetGroupID`,
+`progressionRule`) from the saved exercise rather than replacing it
+wholesale with the freshly-resolved built-in definition — that
+definition always carries the *global* defaults for those fields, so a
+naive swap silently discarded whatever had actually been configured for
+the template on every save. Any new per-template override field added
+in the future needs the same explicit carry-over.
 
 ## Starting weight sync
 
@@ -92,6 +96,7 @@ Original Copy 3
 - add/update/delete
 - duplicate naming
 - replace-all
-- exercise refresh (including that per-template overrides survive it)
+- exercise refresh (including that all four per-template overrides
+  survive it)
 - persistence failure protection
 - starting-weight sync from a finished workout

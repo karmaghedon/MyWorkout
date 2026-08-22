@@ -1,18 +1,33 @@
 import SwiftUI
 
 struct ExerciseSessionHeaderView: View {
-    let exerciseName: String
+    let exercise: Exercise
     let exerciseType: String
     let progressionStrategy: String
     let nextSetNumber: Int
 
+    @State private var showsExerciseDetail = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             HStack(alignment: .firstTextBaseline) {
-                Text(exerciseName)
-                    .font(AppTheme.Typography.screenTitle)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .layoutPriority(1)
+                Button {
+                    showsExerciseDetail = true
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.xs) {
+                        Text(exercise.name)
+                            .font(AppTheme.Typography.screenTitle)
+                            .foregroundStyle(Color.primary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .layoutPriority(1)
+
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 15))
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(exercise.name), view exercise info")
 
                 Spacer(minLength: AppTheme.Spacing.md)
 
@@ -31,6 +46,11 @@ struct ExerciseSessionHeaderView: View {
             }
             .font(AppTheme.Typography.caption)
             .foregroundStyle(.secondary)
+        }
+        .sheet(isPresented: $showsExerciseDetail) {
+            NavigationStack {
+                ExerciseDetailView(exercise: exercise, showsDoneButton: true)
+            }
         }
     }
 }

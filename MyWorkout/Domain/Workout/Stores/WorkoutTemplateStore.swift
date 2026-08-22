@@ -317,15 +317,16 @@ final class WorkoutTemplateStore: ObservableObject {
     /// Re-resolves each saved exercise against the current built-in
     /// definition (by id, falling back to name) so a template stays in
     /// sync with any changes to `SeedData` after it was created —
-    /// instructions, muscle group, progression rule, and so on.
+    /// instructions, muscle group, and so on.
     ///
-    /// `targetSets`/`targetWeightPounds` are per-*template* overrides
-    /// (see `Exercise.swift`), not part of the built-in exercise's own
+    /// `targetSets`/`targetWeightPounds`/`supersetGroupID`/
+    /// `progressionRule` are per-*template* overrides (see
+    /// `Exercise.swift`), not part of the built-in exercise's own
     /// identity, so they have to survive this refresh explicitly: the
     /// freshly-looked-up built-in `Exercise` always carries the global
-    /// defaults (3 sets, no weight override), and naively swapping in
-    /// that whole value would silently discard whatever the user
-    /// configured for this template every time it's saved or loaded.
+    /// defaults, and naively swapping in that whole value would silently
+    /// discard whatever the user configured for this template every time
+    /// it's saved or loaded.
     private func refreshed(
         _ template: WorkoutTemplate
     ) -> WorkoutTemplate {
@@ -345,6 +346,7 @@ final class WorkoutTemplateStore: ObservableObject {
                 refreshedExercise.targetSets = savedExercise.targetSets
                 refreshedExercise.targetWeightPounds = savedExercise.targetWeightPounds
                 refreshedExercise.supersetGroupID = savedExercise.supersetGroupID
+                refreshedExercise.progressionRule = savedExercise.progressionRule
 
                 return refreshedExercise
             }

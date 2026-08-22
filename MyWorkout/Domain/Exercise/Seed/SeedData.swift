@@ -57,6 +57,19 @@ struct SeedData {
         ),
 
         exercise(
+            "Incline Bench Press (Barbell)",
+            muscleGroup: .chest,
+            equipment: .barbell,
+            instructions: """
+            1. Set bench to a low or moderate incline.
+            2. Un-rack the bar with a shoulder-width or slightly wider grip.
+            3. Lower the bar under control to the upper chest.
+            4. Keep shoulder blades pulled back and elbows tucked slightly.
+            5. Press up until arms are extended without locking out hard.
+            """
+        ),
+
+        exercise(
             "Incline Row",
             muscleGroup: .back,
             equipment: .dumbbell,

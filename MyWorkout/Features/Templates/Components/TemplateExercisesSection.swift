@@ -110,6 +110,22 @@ struct TemplateExercisesSection: View {
             )
             .font(AppTheme.Typography.caption)
             .foregroundStyle(AppTheme.secondaryText)
+
+            Stepper(
+                "Increase weight after: \(exercise.wrappedValue.progressionRule.maxReps) reps",
+                value: maxRepsBinding(for: exercise),
+                in: 1...50
+            )
+            .font(AppTheme.Typography.caption)
+            .foregroundStyle(AppTheme.secondaryText)
+
+            Stepper(
+                "Minimum: \(exercise.wrappedValue.progressionRule.minReps) reps",
+                value: minRepsBinding(for: exercise),
+                in: 1...50
+            )
+            .font(AppTheme.Typography.caption)
+            .foregroundStyle(AppTheme.secondaryText)
         }
         .padding(.leading, exercise.wrappedValue.supersetGroupID != nil ? AppTheme.Spacing.sm : 0)
         .overlay(alignment: .leading) {
@@ -180,6 +196,35 @@ struct TemplateExercisesSection: View {
                         fromDisplayedWeight: displayedWeight,
                         unitSystem: settingsStore.settings.unitSystem
                     )
+            }
+        )
+    }
+
+    /// The rep count that, once every set hits it, triggers a suggested
+    /// weight increase — clamped to never drop below `minReps` so the
+    /// range can't invert.
+    private func maxRepsBinding(for exercise: Binding<Exercise>) -> Binding<Int> {
+        Binding(
+            get: { exercise.wrappedValue.progressionRule.maxReps },
+            set: { newValue in
+                exercise.wrappedValue.progressionRule.maxReps = max(
+                    newValue,
+                    exercise.wrappedValue.progressionRule.minReps
+                )
+            }
+        )
+    }
+
+    /// The floor rep count a set must still clear to avoid a suggested
+    /// deload — clamped to never exceed `maxReps`.
+    private func minRepsBinding(for exercise: Binding<Exercise>) -> Binding<Int> {
+        Binding(
+            get: { exercise.wrappedValue.progressionRule.minReps },
+            set: { newValue in
+                exercise.wrappedValue.progressionRule.minReps = min(
+                    newValue,
+                    exercise.wrappedValue.progressionRule.maxReps
+                )
             }
         )
     }

@@ -174,6 +174,87 @@ final class ActiveWorkoutStore: ObservableObject {
         exerciseStates[exerciseID] = state
     }
 
+    /// Undoes one tap of `addExtraSet` — e.g. an accidental tap of "Add
+    /// Set". Floored at 0 rather than going negative; harmless no-op if
+    /// there's nothing extra to remove (the button that calls this is
+    /// hidden in that case anyway).
+    func removeExtraSet(for exerciseID: UUID) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+        state.extraWorkingSets = max(0, state.extraWorkingSets - 1)
+        exerciseStates[exerciseID] = state
+    }
+
+    /// Edits one warm-up set's weight/reps in place, by position rather
+    /// than by `WarmupSet.id`. Auto-generated warm-ups (`customWarmups ==
+    /// nil`) get a fresh random id every time `warmups` is recomputed —
+    /// the view's row and this call each evaluate that computed property
+    /// separately, so an id captured by the row would never match the id
+    /// in `currentWarmups` by the time this runs. The position is stable
+    /// across those separate evaluations because `WarmupEngine.generateWarmups`
+    /// is a pure function of the working weight: same input, same
+    /// weight/reps in the same order, every time — only the ids differ.
+    /// `currentWarmups` is whatever the view is currently displaying —
+    /// either that auto-generated ramp or a prior edit — so the very
+    /// first edit turns the whole list into an explicit `customWarmups`
+    /// override (see its doc comment) rather than just this one set.
+    func updateWarmupSet(
+        at index: Int,
+        weight: Double,
+        reps: Int,
+        currentWarmups: [WarmupSet],
+        for exerciseID: UUID
+    ) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+
+        var warmups = currentWarmups
+        guard warmups.indices.contains(index) else {
+            return
+        }
+
+        warmups[index].weight = weight
+        warmups[index].reps = reps
+
+        state.customWarmups = warmups
+        exerciseStates[exerciseID] = state
+    }
+
+    /// Appends a new warm-up set, seeded with the last warm-up's
+    /// weight/reps (or a light default if there isn't one yet) so it's a
+    /// reasonable starting point to then edit rather than starting at 0.
+    func addWarmupSet(currentWarmups: [WarmupSet], for exerciseID: UUID) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+
+        let last = currentWarmups.last
+        let newWarmup = WarmupSet(
+            weight: last?.weight ?? 45,
+            reps: last?.reps ?? 10
+        )
+
+        state.customWarmups = currentWarmups + [newWarmup]
+        exerciseStates[exerciseID] = state
+    }
+
+    /// Removes one warm-up set by position — e.g. an accidental tap of
+    /// "Add Warm-up Set," or a set from the auto-generated ramp the user
+    /// doesn't want this session. Same position-not-id reasoning as
+    /// `updateWarmupSet`: `currentWarmups` is whatever the view is
+    /// currently showing, re-evaluated fresh at call time, so it's safe
+    /// to index into directly even though its ids may differ from
+    /// whatever the tapped row's `WarmupSet` had.
+    func removeWarmupSet(at index: Int, currentWarmups: [WarmupSet], for exerciseID: UUID) {
+        var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
+
+        var warmups = currentWarmups
+        guard warmups.indices.contains(index) else {
+            return
+        }
+
+        warmups.remove(at: index)
+
+        state.customWarmups = warmups
+        exerciseStates[exerciseID] = state
+    }
+
     func initializeExerciseStates(
         for workout: Workout,
         logStore: WorkoutLogStore,

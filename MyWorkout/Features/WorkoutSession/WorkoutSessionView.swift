@@ -150,9 +150,27 @@ struct WorkoutSessionView: View {
                 // Deliberately no rest timer here — warm-ups never trigger
                 // rest, checked or unchecked.
             },
+            onUpdateWarmupSet: { exercise, index, weight, reps, currentWarmups in
+                activeWorkoutStore.updateWarmupSet(
+                    at: index,
+                    weight: weight,
+                    reps: reps,
+                    currentWarmups: currentWarmups,
+                    for: exercise.id
+                )
+            },
+            onAddWarmupSet: { exercise, currentWarmups in
+                activeWorkoutStore.addWarmupSet(currentWarmups: currentWarmups, for: exercise.id)
+            },
+            onRemoveWarmupSet: { exercise, index, currentWarmups in
+                activeWorkoutStore.removeWarmupSet(at: index, currentWarmups: currentWarmups, for: exercise.id)
+            },
             onAddSet: { exercise in
                 activeWorkoutStore.addExtraSet(for: exercise.id)
                 Haptics.setLogged()
+            },
+            onRemoveSet: { exercise in
+                activeWorkoutStore.removeExtraSet(for: exercise.id)
             },
             onFinish: {
                 showFinishSummary = true

@@ -1,5 +1,5 @@
-Version: 2.1
-Last Updated: 2026-08-21
+Version: 2.2
+Last Updated: 2026-08-22
 Status: Active
 
 Phases are checked off as their work lands on `remodeling`, not when
@@ -229,3 +229,38 @@ Blueprint phase. See FDL-022, FDL-025, and FDL-027.
 - [x] App launch icon — `AppIcon.appiconset` previously had only unused
       macOS-idiom entries with no backing image; replaced with the
       modern single-size iOS format.
+
+Additional Work — Workout Session Feedback Round
+
+☑ device-tested
+
+A third initiative on the Workout session screen, from a single batch
+of feedback gathered from actually using the app during a real workout.
+See FDL-028 through FDL-033 for the full decision records.
+
+- [x] Progression rep range (`ProgressionRule.minReps`/`maxReps`)
+      configurable per template, alongside the existing
+      `targetSets`/`targetWeightPounds`/`supersetGroupID` overrides
+      (FDL-028).
+- [x] New "Incline Bench Press (Barbell)" exercise, added rather than
+      converting the existing dumbbell one, to keep its 33 logged
+      sessions' history untouched (FDL-029).
+- [x] Superset/circuit members no longer show a warm-up section on
+      either layout (FDL-030).
+- [x] Checklist layout's rest timer moved from trailing the whole card
+      to inline, between the set that triggered it and whatever comes
+      next (FDL-030).
+- [x] Warm-up sets are editable (weight/reps), addable, and removable
+      per session, without touching the template (FDL-031).
+- [x] Working sets gained a matching "Remove Set" for an accidental
+      "Add Set" tap, shown only once there's something visibly extra to
+      remove (FDL-031).
+- [x] Exercise info button on session cards — opens the same
+      `ExerciseDetailView` the Exercise Library uses, in a sheet
+      (FDL-032).
+- [x] Compact plate graphic (`BarbellPlateView`) replaces the
+      Checklist layout's plain-text plate breakdown (FDL-033).
+- [x] Checklist layout's next working set uses always-visible,
+      directly-tappable numeric fields instead of a pencil-reveal
+      stepper, with the cursor pinned to the end regardless of tap
+      position (FDL-033).

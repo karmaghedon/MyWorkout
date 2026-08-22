@@ -33,7 +33,11 @@ warnings) populated — the original 17 predate that convention and
 mostly leave those fields empty. `Hammer Curl` was later backfilled
 with the same fuller detail as a one-off correction, but the rest of
 the original 17 remain untouched; filling them in the same way is
-open, low-risk future work, not a bug.
+open, low-risk future work, not a bug. A 43rd exercise, "Incline Bench
+Press (Barbell)," was added alongside the existing dumbbell-equipped
+"Incline Bench Press" rather than converting it, to keep that existing
+exercise's logged history untouched (see FDL-029 in the frontend
+decision log).
 
 ## Capabilities
 

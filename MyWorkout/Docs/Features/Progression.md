@@ -22,6 +22,13 @@ A rule defines values such as:
 - deload amount
 - stall limit
 
+`ProgressionRule` (and `Exercise.progressionRule`) are mutable and
+configurable per *template* — same value-copy override pattern as
+`targetSets`/`targetWeightPounds`/`supersetGroupID` in
+`Docs/Features/Templates.md` — so a template can match how its owner
+actually trains (e.g. straight sets of 8) rather than always working up
+to the global default `maxReps` before a weight increase is suggested.
+
 ## Input
 
 Progression uses:

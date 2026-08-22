@@ -15,7 +15,12 @@ struct Exercise: Identifiable, Codable {
     let commonMistakes: [String]
     let warnings: [String]
 
-    let progressionRule: ProgressionRule
+    /// Not `let`: `minReps`/`maxReps` are configurable per template (same
+    /// value-copy override pattern as `targetSets`/`targetWeightPounds`/
+    /// `supersetGroupID`) so a template can match how its owner actually
+    /// trains — e.g. straight sets of 8 rather than always working up to
+    /// 10 reps before the app suggests a weight increase.
+    var progressionRule: ProgressionRule
     let exerciseType: ExerciseType
     let progressionStrategy: ProgressionStrategy
 

@@ -2,12 +2,13 @@ import SwiftUI
 
 /// One row in the Checklist layout — used for both warm-up sets and
 /// working sets, since visually they're identical: a checkbox, a
-/// title/subtitle, and an optional plate chip. Reuses `Chip` rather than
-/// inventing new chip styling.
+/// title/subtitle, and an optional compact plate graphic
+/// (`BarbellPlateView`) in place of a lengthy "45 + 25 + 5 lb/side" string.
 struct SetChecklistRow: View {
     let title: String
     let subtitle: String?
-    let plateText: String?
+    let plateLoading: PlateLoading?
+    let unitSystem: UnitSystem
     let isComplete: Bool
     let isNext: Bool
     let onToggle: (() -> Void)?
@@ -67,13 +68,8 @@ struct SetChecklistRow: View {
 
             Spacer(minLength: 0)
 
-            if let plateText {
-                Chip(
-                    text: plateText,
-                    font: AppTheme.Typography.caption,
-                    backgroundColor: AppTheme.subtleFill,
-                    foregroundColor: AppTheme.secondaryText
-                )
+            if let plateLoading {
+                BarbellPlateView(loading: plateLoading, unitSystem: unitSystem)
             }
         }
         .padding(.horizontal, AppTheme.Spacing.sm)

@@ -16,7 +16,11 @@ struct WorkoutExerciseListView: View {
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
     let onToggleWarmup: (Exercise, Double, Int) -> Void
+    let onUpdateWarmupSet: (Exercise, Int, Double, Int, [WarmupSet]) -> Void
+    let onAddWarmupSet: (Exercise, [WarmupSet]) -> Void
+    let onRemoveWarmupSet: (Exercise, Int, [WarmupSet]) -> Void
     let onAddSet: (Exercise) -> Void
+    let onRemoveSet: (Exercise) -> Void
 
     var body: some View {
         ForEach(exercises) { exercise in
@@ -63,8 +67,20 @@ struct WorkoutExerciseListView: View {
                         onToggleWarmup: { weight, reps in
                             onToggleWarmup(exercise, weight, reps)
                         },
+                        onUpdateWarmupSet: { index, weight, reps, currentWarmups in
+                            onUpdateWarmupSet(exercise, index, weight, reps, currentWarmups)
+                        },
+                        onAddWarmupSet: { currentWarmups in
+                            onAddWarmupSet(exercise, currentWarmups)
+                        },
+                        onRemoveWarmupSet: { index, currentWarmups in
+                            onRemoveWarmupSet(exercise, index, currentWarmups)
+                        },
                         onAddSet: {
                             onAddSet(exercise)
+                        },
+                        onRemoveSet: {
+                            onRemoveSet(exercise)
                         }
                     )
                 }

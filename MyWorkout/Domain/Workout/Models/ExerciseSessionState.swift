@@ -38,6 +38,15 @@ struct ExerciseSessionState: Codable {
     /// template for next time.
     var extraWorkingSets: Int = 0
 
+    /// User-edited or user-added warm-up sets, overriding whatever
+    /// `WarmupEngine.generateWarmups` would otherwise compute. `nil` (the
+    /// default) means "use the auto-generated ramp" — the same override-vs-
+    /// default pattern as `targetWeightPounds` elsewhere in this codebase.
+    /// Once the user edits a single warm-up or adds one, the whole list
+    /// becomes explicit so the auto-generated ramp doesn't reappear
+    /// underneath their edits on the next render.
+    var customWarmups: [WarmupSet]? = nil
+
     enum CodingKeys: String, CodingKey {
         case targetReps = "reps"
         case workingWeightPounds = "weight"
@@ -46,6 +55,7 @@ struct ExerciseSessionState: Codable {
         case notes
         case completedWarmupKeys
         case extraWorkingSets
+        case customWarmups
     }
 
     init(
@@ -55,7 +65,8 @@ struct ExerciseSessionState: Codable {
         suggestionMessage: String? = nil,
         notes: String = "",
         completedWarmupKeys: Set<String> = [],
-        extraWorkingSets: Int = 0
+        extraWorkingSets: Int = 0,
+        customWarmups: [WarmupSet]? = nil
     ) {
         self.targetReps = targetReps
         self.workingWeightPounds = workingWeightPounds
@@ -64,6 +75,7 @@ struct ExerciseSessionState: Codable {
         self.notes = notes
         self.completedWarmupKeys = completedWarmupKeys
         self.extraWorkingSets = extraWorkingSets
+        self.customWarmups = customWarmups
     }
 
     init(from decoder: Decoder) throws {
@@ -112,5 +124,10 @@ struct ExerciseSessionState: Codable {
             Int.self,
             forKey: .extraWorkingSets
         ) ?? 0
+
+        customWarmups = try container.decodeIfPresent(
+            [WarmupSet].self,
+            forKey: .customWarmups
+        )
     }
 }

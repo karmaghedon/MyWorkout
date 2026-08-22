@@ -1,11 +1,11 @@
 import Foundation
 
 struct ProgressionRule: Codable {
-    let minReps: Int
-    let maxReps: Int
-    let increaseAmount: Double
-    let deloadAmount: Double
-    let stallLimit: Int
+    var minReps: Int
+    var maxReps: Int
+    var increaseAmount: Double
+    var deloadAmount: Double
+    var stallLimit: Int
     
     enum ConfigKeys: String, CodingKey {
         case minReps, maxReps, increaseAmount, deloadAmount, stallLimit

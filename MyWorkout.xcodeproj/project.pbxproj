@@ -232,6 +232,8 @@
 		F5BF30B92FFEDA7D00AB5AD9 /* ImportActionsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */; };
 		F5BF30BB2FFEDADD00AB5AD9 /* BackupImportHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */; };
 		F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */; };
+		9EAA7D45506442C086CD50C1 /* BarbellPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E19AFB3D5C42B38D2F0188 /* BarbellPlateView.swift */; };
+		5FF8AAFD139E4851B7C2C987 /* NumericPadTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7481624906B94793B26583E5 /* NumericPadTextField.swift */; };
 		F5BF30BF2FFEDD3600AB5AD9 /* CSVDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */; };
 		F5BF30C12FFF19E700AB5AD9 /* Rounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */; };
 		F5BF30C32FFF1A1C00AB5AD9 /* ErrorReportingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */; };
@@ -513,6 +515,8 @@
 		F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportActionsSection.swift; sourceTree = "<group>"; };
 		F5BF30BA2FFEDADD00AB5AD9 /* BackupImportHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackupImportHandler.swift; sourceTree = "<group>"; };
 		F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleBigStepperControl.swift; sourceTree = "<group>"; };
+		61E19AFB3D5C42B38D2F0188 /* BarbellPlateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarbellPlateView.swift; sourceTree = "<group>"; };
+		7481624906B94793B26583E5 /* NumericPadTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumericPadTextField.swift; sourceTree = "<group>"; };
 		F5BF30BE2FFEDD3600AB5AD9 /* CSVDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVDocument.swift; sourceTree = "<group>"; };
 		F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rounding.swift; sourceTree = "<group>"; };
 		F5BF30C22FFF1A1C00AB5AD9 /* ErrorReportingStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorReportingStore.swift; sourceTree = "<group>"; };
@@ -1343,7 +1347,9 @@
 		FBAB8929E50A2FB7B499EEF2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				61E19AFB3D5C42B38D2F0188 /* BarbellPlateView.swift */,
 				F5BF30542FF9FA4F00AB5AD9 /* BigStepperControl.swift */,
+				7481624906B94793B26583E5 /* NumericPadTextField.swift */,
 				709BE4C3593DA9AC442A7321 /* CompactWorkoutTimerBar.swift */,
 				F5BF305A2FF9FFD900AB5AD9 /* CurrentSetCardView.swift */,
 				F5BF30BC2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift */,
@@ -1614,6 +1620,8 @@
 				F54004C92FF0C8570079CC05 /* WorkoutLog.swift in Sources */,
 				F5BF30552FF9FA4F00AB5AD9 /* BigStepperControl.swift in Sources */,
 				F5BF30BD2FFEDBA400AB5AD9 /* DoubleBigStepperControl.swift in Sources */,
+				9EAA7D45506442C086CD50C1 /* BarbellPlateView.swift in Sources */,
+				5FF8AAFD139E4851B7C2C987 /* NumericPadTextField.swift in Sources */,
 				F54004ED2FF41A8C0079CC05 /* PlateLoading.swift in Sources */,
 				F5BF30652FFA7F9700AB5AD9 /* WorkoutSessionEngine.swift in Sources */,
 				F5B8EB15300DA96700CF5449 /* MyWorkoutTabBar.swift in Sources */,

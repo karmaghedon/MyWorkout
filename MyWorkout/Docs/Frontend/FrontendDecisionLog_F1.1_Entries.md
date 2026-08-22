@@ -928,3 +928,244 @@ tab bar in place.
   locally-scoped attempts here both looked reasonable and both failed
   on-device; verify visually rather than assuming a modifier placement
   is sufficient.
+
+---
+
+## FDL-028 — Per-template progression rep range
+
+**Decision**
+`ProgressionRule`'s five fields (`minReps`, `maxReps`, `increaseAmount`,
+`deloadAmount`, `stallLimit`) and `Exercise.progressionRule` changed
+from `let` to `var`, and `progressionRule` joins `targetSets` /
+`targetWeightPounds` / `supersetGroupID` as a fourth per-template
+override field — same value-copy pattern, since `WorkoutTemplate
+.exercises` holds copies of `Exercise`, not shared references.
+`WorkoutTemplateStore.refreshed(_:)` carries it over from the saved
+exercise on every load/save, exactly like the other three.
+`TemplateExercisesSection` gained two more steppers per exercise row:
+"Increase weight after: N reps" (`maxReps`) and "Minimum: N reps"
+(`minReps`), each clamped so the range can't invert.
+
+**Reason**
+Reported directly: progression wasn't suggesting a weight increase for
+most exercises. Root-caused by compiling the actual production
+`ProgressionEngine`/`SeedData`/`WorkoutLogStore` source against the
+real on-device logs (pulled via `devicectl device copy from`) in a
+standalone harness rather than guessing — this confirmed the engine
+itself was working exactly as designed (`weightedSuggestion` only
+increases weight once every set at the current weight hits `rule
+.maxReps`), it just didn't match how the user actually trains: straight
+sets of 8 reps against a global default `maxReps` of 10 (or 15 for a
+few isolation exercises), so the "all sets hit the ceiling" condition
+was never true. Given a choice between changing the global defaults
+(which would silently change behavior for every other exercise still
+using them) or making the range configurable per template, per-template
+configurability was chosen since it doesn't force a single rep scheme
+onto every exercise/template.
+
+**Consequences**
+- Templates created before this change keep the built-in defaults
+  (`minReps: 8, maxReps: 10` for compounds) until explicitly edited —
+  no migration needed since the field already existed, only its
+  mutability and refresh behavior changed.
+- Any future per-template override field needs the same explicit
+  carry-over in `WorkoutTemplateStore.refreshed(_:)` — its own doc
+  comment lists all four fields plainly so this isn't missed again
+  (see FDL-022, the original version of this exact class of bug).
+
+---
+
+## FDL-029 — Incline Bench Press (Barbell) added as a separate exercise
+
+**Decision**
+A new catalog exercise, "Incline Bench Press (Barbell)" (barbell
+equipment, chest), added alongside the existing "Incline Bench Press"
+(dumbbell equipment) rather than converting it or merging the two. The
+existing exercise's name, id, and 33 real logged sessions are untouched.
+
+**Reason**
+Reported directly: warm-ups for "Incline Bench Press" at a 120lb
+working weight came out as 50/70/90lb, which read as wrong. Root-caused
+as *not* an engine bug — `WarmupEngine`'s dumbbell-compound path
+(0.40/0.60/0.75 × working weight, rounded to nearest 5) produced exactly
+that sequence, correctly, because the exercise is modeled with dumbbell
+equipment; the actual gap was that the app had no barbell-equipped
+incline press variant to get the barbell path's fixed two-empty-bar-set
+ramp instead. Given a choice between converting the existing exercise to
+barbell equipment (which would rewrite the warm-up/plate behavior for
+33 already-logged sessions) or adding a new, separate exercise, the
+separate-exercise option was chosen specifically to leave that logged
+history untouched.
+
+**Consequences**
+- The seed catalog is now 43 exercises (was 42 — see
+  `Docs/Features/ExerciseLibrary.md` for the catalog's growth history).
+- Anyone who actually performs incline presses with a barbell needs to
+  add this new exercise to their template themselves — it isn't
+  substituted automatically into any existing template that referenced
+  the dumbbell version.
+
+---
+
+## FDL-030 — Superset members skip warm-ups; Checklist rest timer repositioned
+
+**Decision**
+Two related Checklist-layout changes from the same feedback round:
+- `ChecklistExerciseSessionCardView.warmups` and `ExerciseSessionCardView
+  .warmups` both return `[]` when `exercise.supersetGroupID != nil` —
+  grouped exercises no longer show a warm-up section at all, on either
+  layout.
+- The `RestTimerBadge` in `ChecklistExerciseSessionCardView` moved from
+  a fixed spot after the whole working-set list to inline, right after
+  whichever logged-set row was just completed (`index == state
+  .loggedSets.count - 1`) — so it sits between that set and whatever
+  comes next: the next working-set row, or (if that was the last
+  planned set) the "Add Set" button directly below.
+
+**Reason**
+Both reported directly in the same "Finding during workout" message.
+Superset/circuit members are, by definition, performed back-to-back
+with an already-warm muscle group by the time a given member comes up
+again — a fresh warm-up ramp only adds sets nobody needs. The rest
+timer's old position (trailing the entire card) put it somewhere the
+user had to scroll to notice, disconnected from the set that had just
+triggered it.
+
+**Consequences**
+- If an exercise is later ungrouped mid-session (`Ungroup` in template
+  editing doesn't retroactively affect an in-progress workout, but a
+  fresh session after re-editing would), its warm-up section reappears
+  normally — the gate is a live check on `supersetGroupID`, not a
+  one-time decision baked into session state.
+
+---
+
+## FDL-031 — Editable, addable, and removable warm-up and working sets
+
+**Decision**
+`WarmupSet` is now `Codable` (was previously not persistable), and
+`ExerciseSessionState` gained `customWarmups: [WarmupSet]?` — `nil`
+means "use `WarmupEngine`'s auto-generated ramp" (unchanged default
+behavior); once set, it fully overrides the auto-generated list.
+`ActiveWorkoutStore` gained `updateWarmupSet(at:weight:reps:currentWarmups:for:)`,
+`addWarmupSet(currentWarmups:for:)`, and `removeWarmupSet(at:currentWarmups:for:)`.
+In the Checklist layout, each warm-up row's pencil icon opens an inline
+weight/reps editor (reusing `DoubleBigStepperControl`/
+`BigStepperControl`, same as the working-set editor) with a "Remove
+This Set" action below it; an "Add Warm-up Set" button appends one
+seeded from the last warm-up's weight/reps. Working sets gained the
+mirror capability — a "Remove Set" button next to "Add Set" — but only
+rendered once `state.extraWorkingSets > 0 && state.loggedSets.count >=
+exercise.targetSets`: tapping "Add Set" always increments the counter
+immediately, but there's nothing visibly extra on screen to undo until
+the template's own default sets are actually all logged, so the button
+stays hidden until then to avoid a control that appears to do nothing.
+
+**Reason**
+Requested directly: the static, predetermined warm-up ramp needed to
+stay editable (weight, reps, and the ability to add more sets) for
+cases where the auto-generated defaults don't fit a particular day, plus
+an explicit follow-up ask for the ability to undo an accidental "Add
+Set" / "Add Warm-up Set" tap.
+
+This shipped with a real bug, found and fixed only after two rounds of
+on-device testing. `WarmupSet.id` in the auto-generated (non-custom)
+case is a fresh `UUID()` on *every* evaluation of the `warmups`
+computed property — necessary since nothing persists it otherwise — but
+that meant a row's captured id and the id search performed at
+edit-commit time (a separate, later evaluation of the same computed
+property) could never match, since each evaluation mints its own unique
+ids for otherwise-identical rows. The first attempted fix tried to
+paper over this by materializing `customWarmups` on the first pencil
+tap using the very same id-matching lookup — which failed for the exact
+same reason (two separate evaluations, two unrelated id sets), so nothing
+was ever actually written and the editor silently never opened except
+after "Add Warm-up Set" (which *does* produce a stable, persisted array
+with real ids). The actual fix abandoned id-matching entirely in favor
+of matching by **array position**: `WarmupEngine.generateWarmups` is a
+pure function of the working weight, so two separate evaluations
+produce identical weight/reps in the same order every time, even though
+the ids differ — position is the stable identity here, not `id`.
+
+**Consequences**
+- Any future code that needs to reference "this specific warm-up row"
+  before it's been materialized into `customWarmups` should match by
+  position (or by weight+reps, as `completedWarmupKeys` already does),
+  never by `WarmupSet.id`, unless it's known to already be reading from
+  a persisted `customWarmups` array.
+- "Remove Set"/"Remove This Set" only undo something added *this
+  session* — neither can reduce a template's own `targetSets` below its
+  configured value; that's a template edit, not a session action.
+
+---
+
+## FDL-032 — Exercise info button on session cards
+
+**Decision**
+The exercise name in `ExerciseSessionHeaderView` (shared by both
+Classic and Checklist layouts) is now a tappable button with a small
+"info.circle" icon beside it; tapping presents `ExerciseDetailView` (the
+same detail screen the Exercise Library uses) in a sheet, wrapped in its
+own `NavigationStack` with `showsDoneButton: true`.
+
+**Reason**
+Requested as a "nice to have" for beginners who don't yet know how to
+perform an exercise correctly, without leaving the active workout to go
+look it up in the Library.
+
+**Consequences**
+- `ExerciseSessionHeaderView`'s signature changed from a plain
+  `exerciseName: String` to `exercise: Exercise`, since the sheet needs
+  the full exercise value, not just its display name — both call sites
+  (`ExerciseSessionCardView`, `ChecklistExerciseSessionCardView`)
+  updated accordingly.
+- `showsDoneButton` on `ExerciseDetailView` existed before this change
+  but had no consumer; this is its first real use.
+
+---
+
+## FDL-033 — Compact plate graphic and direct-tap numeric input for working sets
+
+**Decision**
+Two related Checklist-layout display changes:
+- `BarbellPlateView`, a new component, replaces the plain-text plate
+  breakdown (e.g. "45 + 35 + 25 + 5 lb/side") with a compact schematic:
+  a sleeve nub followed by one block per plate, sized roughly to its
+  relative weight and labeled with its number. `SetChecklistRow`'s
+  `plateText: String?` parameter became `plateLoading: PlateLoading?` +
+  `unitSystem: UnitSystem` so it can render the graphic instead of a
+  `Chip`.
+- The next (unlogged) working-set row no longer requires a pencil tap to
+  reveal weight/reps steppers — it now shows two always-visible,
+  directly-tappable numeric fields (`NumericPadTextField`, a new
+  `UIViewRepresentable`-backed text field) that bring up the number pad
+  immediately.
+
+**Reason**
+Both requested directly: the plate text becomes unreadable at heavy
+loads with many plates (the user's own example: 345lb → "45 + 35 + 25 +
+25 + 10 + 5 + 5 lb/side"), and having to find and tap a small pencil
+icon before a stepper even appears was called out as an unnecessary
+extra step compared to just tapping a number and typing.
+
+A follow-up correction after on-device testing: plain SwiftUI
+`TextField` drops the cursor wherever the user taps, which made
+editing these short numbers awkward — a tap landing mid-string put new
+digits in the middle instead of appending, and deleting the last digit
+required tapping exactly at the end first. `NumericPadTextField` wraps
+`UITextField` directly so its delegate can force the cursor back to the
+end on both focus-gain (`textFieldDidBeginEditing`) and every
+subsequent selection change (`textFieldDidChangeSelection`, guarded
+against re-triggering itself once the selection is already collapsed at
+the end) — matching how these fields are actually meant to be used:
+replace the whole number, not edit part of it in place.
+
+**Consequences**
+- `BarbellPlateView` only renders for barbell-equipped exercises (same
+  `exercise.usesBarbell` gate `plateText`/`workingLoadRow` already used)
+  — dumbbell/bodyweight exercises show no plate graphic, same as before.
+- The Classic layout's plate display (`WarmupSectionView`,
+  `workingLoadRow`'s text-based "Working load: ... lb/side") was left
+  as-is; this pass was scoped to the Checklist layout specifically,
+  matching where the original complaint's screenshot-described bar
+  came from.

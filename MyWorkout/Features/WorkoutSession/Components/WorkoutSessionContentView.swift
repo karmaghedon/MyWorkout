@@ -19,7 +19,11 @@ struct WorkoutSessionContentView: View {
     let onStopRest: () -> Void
     let onDeleteSet: (UUID, Exercise) -> Void
     let onToggleWarmup: (Exercise, Double, Int) -> Void
+    let onUpdateWarmupSet: (Exercise, Int, Double, Int, [WarmupSet]) -> Void
+    let onAddWarmupSet: (Exercise, [WarmupSet]) -> Void
+    let onRemoveWarmupSet: (Exercise, Int, [WarmupSet]) -> Void
     let onAddSet: (Exercise) -> Void
+    let onRemoveSet: (Exercise) -> Void
 
     let onFinish: () -> Void
     let onCancel: () -> Void
@@ -42,7 +46,11 @@ struct WorkoutSessionContentView: View {
                         onStopRest: onStopRest,
                         onDeleteSet: onDeleteSet,
                         onToggleWarmup: onToggleWarmup,
-                        onAddSet: onAddSet
+                        onUpdateWarmupSet: onUpdateWarmupSet,
+                        onAddWarmupSet: onAddWarmupSet,
+                        onRemoveWarmupSet: onRemoveWarmupSet,
+                        onAddSet: onAddSet,
+                        onRemoveSet: onRemoveSet
                     )
                     .padding(.horizontal, AppTheme.Spacing.lg)
 

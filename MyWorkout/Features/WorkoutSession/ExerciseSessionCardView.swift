@@ -25,8 +25,18 @@ struct ExerciseSessionCardView: View {
         unitSystem.rawValue
     }
 
+    /// Superset/circuit members skip warm-ups entirely — the muscles are
+    /// already warm from the prior exercise in the group by the time this
+    /// one comes around, so a fresh warm-up ramp would only add
+    /// unnecessary sets to log.
     private var warmups: [WarmupSet] {
-        WarmupEngine.generateWarmups(
+        guard exercise.supersetGroupID == nil else { return [] }
+
+        if let customWarmups = state.customWarmups {
+            return customWarmups
+        }
+
+        return WarmupEngine.generateWarmups(
             for: state.workingWeightPounds,
             exerciseType: exercise.exerciseType,
             usesBarbell: exercise.usesBarbell,
@@ -48,7 +58,7 @@ struct ExerciseSessionCardView: View {
     var body: some View {
         WorkoutSessionCard {
             ExerciseSessionHeaderView(
-                exerciseName: exercise.name,
+                exercise: exercise,
                 exerciseType: exercise.exerciseType.rawValue.capitalized,
                 progressionStrategy: exercise.progressionStrategy.displayName,
                 nextSetNumber: nextSetNumber
