@@ -11,6 +11,12 @@ struct ExerciseSessionCardView: View {
     let restSecondsRemaining: Int
     let restTotalSeconds: Int
 
+    /// False when this exercise is part of a superset and has already
+    /// logged as many sets this round as its least-progressed sibling —
+    /// it must wait for the other member(s) before logging another.
+    let canLogNextSet: Bool
+    let nextSupersetExerciseName: String?
+
     let onLogSet: () -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID) -> Void
@@ -54,7 +60,7 @@ struct ExerciseSessionCardView: View {
             from: equipmentInventory.unitSystem
         )
     }
-    
+
     var body: some View {
         WorkoutSessionCard {
             ExerciseSessionHeaderView(
@@ -82,6 +88,8 @@ struct ExerciseSessionCardView: View {
                 weightUnit: weightUnit,
                 repRange: 1...50,
                 nextSetNumber: nextSetNumber,
+                canLogSet: canLogNextSet,
+                waitingOnExerciseName: nextSupersetExerciseName,
                 onLogSet: onLogSet
             )
 
@@ -91,6 +99,7 @@ struct ExerciseSessionCardView: View {
                     totalSeconds: restTotalSeconds,
                     onStop: onStopRest
                 )
+                .id(RestTimerBadge.scrollAnchorID(for: exercise.id))
             }
 
             if !state.loggedSets.isEmpty {

@@ -17,10 +17,16 @@ struct ChecklistExerciseSessionCardView: View {
     let restSecondsRemaining: Int
     let restTotalSeconds: Int
 
+    /// False when this exercise is part of a superset and has already
+    /// logged as many sets this round as its least-progressed sibling —
+    /// it must wait for the other member(s) before logging another.
+    let canLogNextSet: Bool
+    let nextSupersetExerciseName: String?
+
     let onLogSet: () -> Void
     let onStopRest: () -> Void
     let onDeleteSet: (UUID) -> Void
-    let onToggleWarmup: (Double, Int) -> Void
+    let onToggleWarmup: (Int, Double, Int) -> Void
     let onUpdateWarmupSet: (Int, Double, Int, [WarmupSet]) -> Void
     let onAddWarmupSet: ([WarmupSet]) -> Void
     let onRemoveWarmupSet: (Int, [WarmupSet]) -> Void
@@ -36,6 +42,19 @@ struct ChecklistExerciseSessionCardView: View {
     /// doc comment below), so an id captured here would never match again
     /// on the next render.
     @State private var editingWarmupIndex: Int?
+
+    /// Staged text for the next-set weight/reps fields — not driven
+    /// directly by a `Binding` computed from `state`. This card re-renders
+    /// on every workout-timer tick (every second, unrelated to anything
+    /// the user is doing), and a binding whose `get` always reflects the
+    /// last *committed* value would snap an in-progress edit back to that
+    /// value on the very next tick — most visibly right after clearing the
+    /// field to type a new number, since `Int("")`/`Double("")` fail to
+    /// parse and the field's displayed text would revert to the old digits
+    /// before the user finishes typing. Same pattern `BigStepperControl`
+    /// already uses for exactly this reason.
+    @State private var nextSetWeightText = ""
+    @State private var nextSetRepsText = ""
 
     private var unitSystem: UnitSystem {
         settingsStore.settings.unitSystem
@@ -113,10 +132,10 @@ struct ChecklistExerciseSessionCardView: View {
                     plateLoading: plateLoading(for: warmup.weight),
                     unitSystem: unitSystem,
                     isComplete: state.completedWarmupKeys.contains(
-                        ExerciseSessionState.warmupKey(weight: warmup.weight, reps: warmup.reps)
+                        ExerciseSessionState.warmupKey(index: index, weight: warmup.weight, reps: warmup.reps)
                     ),
                     isNext: false,
-                    onToggle: { onToggleWarmup(warmup.weight, warmup.reps) },
+                    onToggle: { onToggleWarmup(index, warmup.weight, warmup.reps) },
                     onEdit: {
                         editingWarmupIndex = (editingWarmupIndex == index) ? nil : index
                     }
@@ -242,6 +261,7 @@ struct ChecklistExerciseSessionCardView: View {
                             totalSeconds: restTotalSeconds,
                             onStop: onStopRest
                         )
+                        .id(RestTimerBadge.scrollAnchorID(for: exercise.id))
                     }
                 } else if index == state.loggedSets.count {
                     nextSetRow
@@ -282,36 +302,71 @@ struct ChecklistExerciseSessionCardView: View {
     /// rather than requiring a pencil tap to reveal a stepper first, per
     /// the user's request to remove that extra discovery step.
     private var nextSetRow: some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            Button(action: onLogSet) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(AppTheme.accent, lineWidth: 2)
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            HStack(spacing: AppTheme.Spacing.md) {
+                Button(action: onLogSet) {
+                    ZStack {
+                        Circle()
+                            .strokeBorder(AppTheme.accent, lineWidth: 2)
+                    }
+                    .frame(width: 26, height: 26)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
                 }
-                .frame(width: 26, height: 26)
-                .frame(minWidth: 44, minHeight: 44)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .accessibilityLabel("Mark complete: next set")
+
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    numericField(text: $nextSetWeightText, width: 52, keyboardType: .decimalPad)
+                        .onChange(of: nextSetWeightText) {
+                            updateWeightWhileTyping()
+                        }
+                        .onChange(of: state.workingWeightPounds) {
+                            syncNextSetWeightText()
+                        }
+                        .onAppear {
+                            syncNextSetWeightText()
+                        }
+
+                    Text(weightUnit)
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+
+                    Text("×")
+                        .foregroundStyle(AppTheme.secondaryText)
+
+                    numericField(text: $nextSetRepsText, width: 40, keyboardType: .numberPad)
+                        .onChange(of: nextSetRepsText) {
+                            updateRepsWhileTyping()
+                        }
+                        .onChange(of: state.targetReps) {
+                            syncNextSetRepsText()
+                        }
+                        .onAppear {
+                            syncNextSetRepsText()
+                        }
+                }
+
+                Spacer(minLength: 0)
+
+                if let plateLoading = plateLoading(for: state.workingWeightPounds) {
+                    BarbellPlateView(loading: plateLoading, unitSystem: unitSystem)
+                }
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Mark complete: next set")
+            // A blocked superset member (see `canLogNextSet`) shows this
+            // row dimmed and non-interactive rather than hidden — it's
+            // still useful to see the upcoming set's weight/reps, just not
+            // to log it until the sibling exercise(s) catch up this round.
+            .opacity(canLogNextSet ? 1 : 0.4)
+            .allowsHitTesting(canLogNextSet)
 
-            HStack(spacing: AppTheme.Spacing.xs) {
-                numericField(text: weightTextBinding, width: 52, keyboardType: .decimalPad)
-
-                Text(weightUnit)
-                    .font(AppTheme.Typography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
-
-                Text("×")
-                    .foregroundStyle(AppTheme.secondaryText)
-
-                numericField(text: repsTextBinding, width: 40, keyboardType: .numberPad)
-            }
-
-            Spacer(minLength: 0)
-
-            if let plateLoading = plateLoading(for: state.workingWeightPounds) {
-                BarbellPlateView(loading: plateLoading, unitSystem: unitSystem)
+            if !canLogNextSet, let nextSupersetExerciseName {
+                Label(
+                    "Do \(nextSupersetExerciseName)'s set first",
+                    systemImage: "arrow.right.circle"
+                )
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal, AppTheme.Spacing.sm)
@@ -336,31 +391,34 @@ struct ChecklistExerciseSessionCardView: View {
             )
     }
 
-    /// Text-backed binding (not `Binding<Double>`) so the field can hold
-    /// intermediate typing states like "" or "72." without the formatter
-    /// fighting the user mid-keystroke; only committed to `state` once the
-    /// text parses to a valid number.
-    private var weightTextBinding: Binding<String> {
-        Binding(
-            get: { formatWeight(displayWeight(state.workingWeightPounds)) },
-            set: { newText in
-                guard let displayedWeight = Double(newText) else { return }
-                state.workingWeightPounds = WeightConversion.storedPounds(
-                    fromDisplayedWeight: displayedWeight,
-                    unitSystem: unitSystem
-                )
-            }
+    /// Commits `nextSetWeightText` to `state` only once it parses to a
+    /// valid number — an empty or in-progress string (e.g. "72.") is left
+    /// as pure UI state rather than forced into `state.workingWeightPounds`,
+    /// so clearing the field to type a new value doesn't get immediately
+    /// overwritten by the sync triggered from the old committed value.
+    private func updateWeightWhileTyping() {
+        guard !nextSetWeightText.isEmpty,
+              let displayedWeight = Double(nextSetWeightText) else { return }
+
+        state.workingWeightPounds = WeightConversion.storedPounds(
+            fromDisplayedWeight: displayedWeight,
+            unitSystem: unitSystem
         )
     }
 
-    private var repsTextBinding: Binding<String> {
-        Binding(
-            get: { "\(state.targetReps)" },
-            set: { newText in
-                guard let reps = Int(newText) else { return }
-                state.targetReps = reps
-            }
-        )
+    private func syncNextSetWeightText() {
+        nextSetWeightText = formatWeight(displayWeight(state.workingWeightPounds))
+    }
+
+    private func updateRepsWhileTyping() {
+        guard !nextSetRepsText.isEmpty,
+              let reps = Int(nextSetRepsText) else { return }
+
+        state.targetReps = reps
+    }
+
+    private func syncNextSetRepsText() {
+        nextSetRepsText = "\(state.targetReps)"
     }
 
     private func plateLoading(for weight: Double) -> PlateLoading? {

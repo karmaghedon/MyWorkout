@@ -56,6 +56,31 @@ final class WorkoutTemplateStoreTests: XCTestCase {
         XCTAssertEqual(savedExercise?.targetWeightPounds, 135)
     }
 
+    /// Regression test: same reasoning as
+    /// `test_add_preservesTargetSetsAndWeightOverrideForBuiltInExercise`,
+    /// but for `supersetGroupID` — reported directly as "grouping two
+    /// exercises into a superset doesn't stick" after saving a template.
+    func test_add_preservesSupersetGroupIDForBuiltInExercises() {
+        let groupID = UUID()
+
+        var first = createSampleExercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = createSampleExercise(name: "Front Squat")
+        second.supersetGroupID = groupID
+
+        let template = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [first, second]
+        )
+
+        sut.add(template)
+
+        let savedExercises = sut.templates.first?.exercises ?? []
+        XCTAssertEqual(savedExercises[0].supersetGroupID, groupID)
+        XCTAssertEqual(savedExercises[1].supersetGroupID, groupID)
+    }
+
     func test_add_multipleTemplatesAreStored() {
         sut.add(createSampleTemplate(name: "Push"))
         sut.add(createSampleTemplate(name: "Pull"))
@@ -112,6 +137,35 @@ final class WorkoutTemplateStoreTests: XCTestCase {
         let savedExercise = sut.templates.first?.exercises.first
         XCTAssertEqual(savedExercise?.targetSets, 4)
         XCTAssertEqual(savedExercise?.targetWeightPounds, 185)
+    }
+
+    /// Regression test matching the exact real-world flow: open an
+    /// already-saved template for editing (its exercises have already
+    /// been through one `refreshed(_:)` pass via `add`), group two of
+    /// them into a superset, then save. Reported directly as "grouping
+    /// two exercises into a superset doesn't stick."
+    func test_update_preservesSupersetGroupIDForBuiltInExercises() {
+        let original = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [
+                createSampleExercise(name: "Bench Press"),
+                createSampleExercise(name: "Front Squat")
+            ]
+        )
+        sut.add(original)
+
+        let groupID = UUID()
+        var editedExercises = sut.templates.first!.exercises
+        editedExercises[0].supersetGroupID = groupID
+        editedExercises[1].supersetGroupID = groupID
+
+        var updated = sut.templates.first!
+        updated.exercises = editedExercises
+        sut.update(updated)
+
+        let savedExercises = sut.templates.first?.exercises ?? []
+        XCTAssertEqual(savedExercises[0].supersetGroupID, groupID)
+        XCTAssertEqual(savedExercises[1].supersetGroupID, groupID)
     }
 
     func test_update_doesNothingWhenTemplateNotFound() {

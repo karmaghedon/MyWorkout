@@ -15,20 +15,26 @@ struct ExerciseSessionState: Codable {
     var notes: String = ""
 
     /// Warm-up rows the user has checked off in the Checklist layout, keyed
-    /// by `warmupKey(weight:reps:)` rather than `WarmupSet.id` — that id is
-    /// a fresh `UUID()` on every call to `WarmupEngine.generateWarmups(...)`,
-    /// which runs fresh on every render since `warmups` is a computed
-    /// property, not stored. An id-keyed set would never match between
-    /// renders. Weight alone isn't enough either: `WarmupEngine`'s barbell
-    /// ramp starts with two sets at the same empty-bar weight (10 reps,
-    /// then 8), so a weight-only key would mark both complete at once.
-    /// Weight+reps together are deterministic for a given working weight,
-    /// and if the user changes their working weight mid-warm-up, stale
-    /// completions for pairs that no longer appear simply stop mattering.
+    /// by `warmupKey(index:weight:reps:)` rather than `WarmupSet.id` — that
+    /// id is a fresh `UUID()` on every call to
+    /// `WarmupEngine.generateWarmups(...)`, which runs fresh on every
+    /// render since `warmups` is a computed property, not stored. An
+    /// id-keyed set would never match between renders. Weight alone isn't
+    /// enough either: `WarmupEngine`'s barbell ramp starts with two sets at
+    /// the same empty-bar weight (10 reps, then 8), so a weight-only key
+    /// would mark both complete at once. Weight+reps alone isn't enough
+    /// either: "Add Warm-up Set" seeds the new row from the previous row's
+    /// weight/reps, so right after adding one, two rows briefly share an
+    /// identical weight+reps pair — a content-only key would mark both
+    /// complete the moment either one is checked. Position is included to
+    /// disambiguate that case; it's still safe across a working-weight
+    /// change mid-warm-up (the same reasoning as before) because the
+    /// weight+reps at a given position changes too, so a stale key simply
+    /// stops matching anything rather than misattaching to the wrong row.
     var completedWarmupKeys: Set<String> = []
 
-    static func warmupKey(weight: Double, reps: Int) -> String {
-        "\(weight)|\(reps)"
+    static func warmupKey(index: Int, weight: Double, reps: Int) -> String {
+        "\(index)|\(weight)|\(reps)"
     }
 
     /// Extra working sets added mid-session via the Checklist layout's

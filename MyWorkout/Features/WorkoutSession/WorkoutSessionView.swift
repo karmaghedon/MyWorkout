@@ -130,8 +130,12 @@ struct WorkoutSessionView: View {
                 Haptics.setLogged()
 
                 // Superset members don't rest between each other — only
-                // the last exercise in the group triggers the timer.
-                if WorkoutSessionEngine.shouldStartRest(after: exercise, in: workout) {
+                // the round's actual last turn triggers the timer.
+                if WorkoutSessionEngine.shouldStartRest(
+                    after: exercise,
+                    in: workout,
+                    states: activeWorkoutStore.exerciseStates
+                ) {
                     activeWorkoutStore.startRestTimer(
                         for: exercise,
                         settings: settingsStore.settings
@@ -144,8 +148,8 @@ struct WorkoutSessionView: View {
             onDeleteSet: { setID, exercise in
                 activeWorkoutStore.deleteSet(setID: setID, for: exercise.id)
             },
-            onToggleWarmup: { exercise, weight, reps in
-                activeWorkoutStore.toggleWarmupComplete(weight: weight, reps: reps, for: exercise.id)
+            onToggleWarmup: { exercise, index, weight, reps in
+                activeWorkoutStore.toggleWarmupComplete(at: index, weight: weight, reps: reps, for: exercise.id)
                 Haptics.setLogged()
                 // Deliberately no rest timer here — warm-ups never trigger
                 // rest, checked or unchecked.

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct BigStepperControl: View {
     let title: String
@@ -15,21 +16,28 @@ struct BigStepperControl: View {
                 .font(AppTheme.Typography.eyebrow)
                 .foregroundStyle(.secondary)
 
-            TextField(title, text: $textValue)
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.center)
-                .font(AppTheme.Typography.numeric(30))
-                .minimumScaleFactor(0.75)
-                .lineLimit(1)
-                .onChange(of: textValue) {
-                    updateValueWhileTyping()
-                }
-                .onChange(of: value) {
-                    textValue = "\(value)"
-                }
-                .onAppear {
-                    textValue = "\(value)"
-                }
+            // `NumericPadTextField` (not a plain SwiftUI `TextField`)
+            // because editing here needs to be "replace the whole
+            // number": a plain `TextField` lands the cursor wherever a
+            // tap landed and lets new digits append, which turned typing
+            // "7" over an existing "6" into "67". `NumericPadTextField`
+            // already solves exactly this for other numeric fields in
+            // this app by selecting the existing value on focus.
+            NumericPadTextField(
+                text: $textValue,
+                keyboardType: .numberPad,
+                textAlignment: .center,
+                font: numericFont
+            )
+            .onChange(of: textValue) {
+                updateValueWhileTyping()
+            }
+            .onChange(of: value) {
+                textValue = "\(value)"
+            }
+            .onAppear {
+                textValue = "\(value)"
+            }
 
             HStack(spacing: AppTheme.Spacing.sm) {
                 Button {
@@ -82,5 +90,16 @@ struct BigStepperControl: View {
         if textValue.isEmpty {
             textValue = "\(value)"
         }
+    }
+
+    /// Matches `AppTheme.Typography.numeric(30)` as closely as UIKit
+    /// allows — `NumericPadTextField` is a `UIViewRepresentable`, so a
+    /// SwiftUI `.font()` modifier can't reach its underlying `UITextField`.
+    private var numericFont: UIFont {
+        let base = UIFont.systemFont(ofSize: 30, weight: .bold)
+        guard let roundedDescriptor = base.fontDescriptor.withDesign(.rounded) else {
+            return base
+        }
+        return UIFont(descriptor: roundedDescriptor, size: 30)
     }
 }

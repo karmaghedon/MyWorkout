@@ -66,3 +66,15 @@ struct RestTimerBadge: View {
         .transition(AppTheme.Motion.cardTransition)
     }
 }
+
+extension RestTimerBadge {
+    /// Stable scroll-anchor id for the badge itself, distinct from the
+    /// exercise card's own id. The card can be much taller than the
+    /// screen (warm-ups, several logged sets, notes), so scrolling to
+    /// center the *card* doesn't put the badge — which can sit well down
+    /// the card — anywhere near the center of the viewport. Scrolling to
+    /// this id instead centers the badge exactly.
+    static func scrollAnchorID(for exerciseID: UUID) -> String {
+        "restTimerBadge_\(exerciseID.uuidString)"
+    }
+}

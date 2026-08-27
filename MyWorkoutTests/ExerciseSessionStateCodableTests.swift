@@ -13,7 +13,7 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
             workingWeightPounds: 135,
             notes: "Test notes",
             completedWarmupKeys: [
-                ExerciseSessionState.warmupKey(weight: 45, reps: 10)
+                ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)
             ],
             extraWorkingSets: 2
         )
@@ -42,8 +42,8 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
     func testDecodingPayloadWithNewFieldsPreservesValues() throws {
         let state = ExerciseSessionState(
             completedWarmupKeys: [
-                ExerciseSessionState.warmupKey(weight: 45, reps: 10),
-                ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+                ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10),
+                ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 8)
             ],
             extraWorkingSets: 2
         )
@@ -57,8 +57,8 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
         XCTAssertEqual(
             decoded.completedWarmupKeys,
             [
-                ExerciseSessionState.warmupKey(weight: 45, reps: 10),
-                ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+                ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10),
+                ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 8)
             ]
         )
         XCTAssertEqual(decoded.extraWorkingSets, 2)
@@ -70,8 +70,8 @@ final class ExerciseSessionStateCodableTests: XCTestCase {
     /// complete the other too (see `WarmupEngine`'s barbell ramp, which
     /// starts with two sets at the empty-bar weight).
     func testWarmupKeyDistinguishesSameWeightDifferentReps() {
-        let tenRepKey = ExerciseSessionState.warmupKey(weight: 45, reps: 10)
-        let eightRepKey = ExerciseSessionState.warmupKey(weight: 45, reps: 8)
+        let tenRepKey = ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)
+        let eightRepKey = ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 8)
 
         XCTAssertNotEqual(tenRepKey, eightRepKey)
     }

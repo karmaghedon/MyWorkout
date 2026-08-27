@@ -13,6 +13,11 @@ struct CurrentSetCardView: View {
 
     let nextSetNumber: Int
 
+    /// False when a superset partner still needs to catch up this round —
+    /// see `WorkoutSessionEngine.canLogNextSet`.
+    var canLogSet: Bool = true
+    var waitingOnExerciseName: String? = nil
+
     let onLogSet: () -> Void
 
     var body: some View {
@@ -54,6 +59,16 @@ struct CurrentSetCardView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(AppTheme.accent)
                 .controlSize(.large)
+                .disabled(!canLogSet)
+
+                if !canLogSet, let waitingOnExerciseName {
+                    Label(
+                        "Do \(waitingOnExerciseName)'s set first",
+                        systemImage: "arrow.right.circle"
+                    )
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
+                }
             }
         }
     }

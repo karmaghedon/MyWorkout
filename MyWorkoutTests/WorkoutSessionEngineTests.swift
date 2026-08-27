@@ -287,11 +287,14 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let workout = Workout(name: "Push", exercises: [ex])
 
         XCTAssertTrue(
-            WorkoutSessionEngine.shouldStartRest(after: ex, in: workout)
+            WorkoutSessionEngine.shouldStartRest(after: ex, in: workout, states: [:])
         )
     }
 
-    func test_shouldStartRest_notLastInGroup_doesNotStartRest() {
+    /// `first` just logged the round's opening set (its own turn); the
+    /// round isn't complete until `second` also logs one, so this must
+    /// not start rest yet.
+    func test_shouldStartRest_notCompletingTheRound_doesNotStartRest() {
         let groupID = UUID()
 
         var first = exercise(name: "Bench Press")
@@ -301,13 +304,22 @@ final class WorkoutSessionEngineTests: XCTestCase {
         second.supersetGroupID = groupID
 
         let workout = Workout(name: "Push", exercises: [first, second])
+
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [])
+        ]
 
         XCTAssertFalse(
-            WorkoutSessionEngine.shouldStartRest(after: first, in: workout)
+            WorkoutSessionEngine.shouldStartRest(after: first, in: workout, states: states)
         )
     }
 
-    func test_shouldStartRest_lastInGroup_startsRest() {
+    /// `second` logging brings both members to 1 set each — the round is
+    /// now complete, so this is the log that should start rest.
+    func test_shouldStartRest_completingTheRound_startsRest() {
         let groupID = UUID()
 
         var first = exercise(name: "Bench Press")
@@ -318,12 +330,21 @@ final class WorkoutSessionEngineTests: XCTestCase {
 
         let workout = Workout(name: "Push", exercises: [first, second])
 
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 25, reps: 12)
+            ])
+        ]
+
         XCTAssertTrue(
-            WorkoutSessionEngine.shouldStartRest(after: second, in: workout)
+            WorkoutSessionEngine.shouldStartRest(after: second, in: workout, states: states)
         )
     }
 
-    func test_shouldStartRest_threeExerciseGroup_onlyLastStartsRest() {
+    func test_shouldStartRest_threeExerciseGroup_onlyLastTurnStartsRest() {
         let groupID = UUID()
 
         var first = exercise(name: "Bench Press")
@@ -337,9 +358,25 @@ final class WorkoutSessionEngineTests: XCTestCase {
 
         let workout = Workout(name: "Push", exercises: [first, second, third])
 
-        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: first, in: workout))
-        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout))
-        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout))
+        let afterFirst: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 135, reps: 8)]),
+            second.id: ExerciseSessionState(loggedSets: []),
+            third.id: ExerciseSessionState(loggedSets: [])
+        ]
+        let afterSecond: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 135, reps: 8)]),
+            second.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 25, reps: 12)]),
+            third.id: ExerciseSessionState(loggedSets: [])
+        ]
+        let afterThird: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 135, reps: 8)]),
+            second.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 25, reps: 12)]),
+            third.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 60, reps: 15)])
+        ]
+
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: first, in: workout, states: afterFirst))
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout, states: afterSecond))
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout, states: afterThird))
     }
 
     func test_shouldStartRest_unrelatedGroupsDoNotInterfere() {
@@ -357,10 +394,220 @@ final class WorkoutSessionEngineTests: XCTestCase {
 
         let workout = Workout(name: "Push", exercises: [first, second, third])
 
-        // first is the only (and therefore last) member of groupA.
-        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: first, in: workout))
-        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout))
-        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout))
+        // first is the only member of groupA, so every one of its own
+        // logs trivially completes its (one-member) round.
+        let firstLogsAlone: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 135, reps: 8)])
+        ]
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: first, in: workout, states: firstLogsAlone))
+
+        let afterSecond: [UUID: ExerciseSessionState] = [
+            second.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 25, reps: 12)]),
+            third.id: ExerciseSessionState(loggedSets: [])
+        ]
+        XCTAssertFalse(WorkoutSessionEngine.shouldStartRest(after: second, in: workout, states: afterSecond))
+
+        let afterThird: [UUID: ExerciseSessionState] = [
+            second.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 25, reps: 12)]),
+            third.id: ExerciseSessionState(loggedSets: [LoggedSet(setNumber: 1, weight: 60, reps: 15)])
+        ]
+        XCTAssertTrue(WorkoutSessionEngine.shouldStartRest(after: third, in: workout, states: afterThird))
+    }
+
+    // MARK: - restTimerAnchorExerciseID
+
+    func test_restTimerAnchorExerciseID_ungroupedExercise_anchorsOnItself() {
+        let ex = exercise(name: "Bench Press")
+        let workout = Workout(name: "Push", exercises: [ex])
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: workout),
+            ex.id
+        )
+    }
+
+    /// Regression test: rest between superset rounds is "time until the
+    /// round starts again," and the round restarts at the group's first
+    /// exercise — the badge should anchor there, not on the last member
+    /// (the one that just triggered rest by finishing the round).
+    func test_restTimerAnchorExerciseID_groupedExercise_anchorsOnFirstGroupMember() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let workout = Workout(name: "Push", exercises: [first, second])
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: second, in: workout),
+            first.id
+        )
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: first, in: workout),
+            first.id
+        )
+    }
+
+    func test_restTimerAnchorExerciseID_noActiveWorkout_anchorsOnExerciseItself() {
+        let ex = exercise(name: "Bench Press")
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: nil),
+            ex.id
+        )
+    }
+
+    // MARK: - canLogNextSet / nextSupersetExercise (superset round-robin)
+
+    func test_canLogNextSet_ungroupedExercise_alwaysAllowed() {
+        let ex = exercise(name: "Bench Press")
+
+        XCTAssertTrue(
+            WorkoutSessionEngine.canLogNextSet(for: ex, in: [ex], states: [:])
+        )
+    }
+
+    /// Regression test: without this rule, logging exercise A's set 1
+    /// immediately exposed A's set 2 as available, letting the user race
+    /// ahead through A's whole working-set list before ever touching B —
+    /// defeating the point of a superset.
+    func test_canLogNextSet_memberAheadOfSibling_isBlocked() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [])
+        ]
+
+        XCTAssertFalse(
+            WorkoutSessionEngine.canLogNextSet(for: first, in: [first, second], states: states)
+        )
+        XCTAssertTrue(
+            WorkoutSessionEngine.canLogNextSet(for: second, in: [first, second], states: states)
+        )
+    }
+
+    /// Regression test for the bug this milestone fixed: previously, a tie
+    /// let *either* member go next, which meant a member could take two
+    /// turns in a row purely because nothing forced the other member's
+    /// turn first — and a later catch-up set from the sibling could then
+    /// look like it completed a round that was never actually alternated
+    /// (see `WorkoutSessionEngineTests.test_shouldStartRest_*`, and the
+    /// on-device report that rest kept restarting mid-superset). Strict
+    /// rotation means a tie resolves to exactly one exercise — whichever
+    /// is next in `exercises` order — not both.
+    func test_canLogNextSet_tiedForTheRound_onlyNextInRotationAllowed() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 25, reps: 12)
+            ])
+        ]
+
+        // Both tied at 1 set each — total logged (2) cycles back to
+        // `first`'s turn, not `second`'s, even though they're tied.
+        XCTAssertTrue(
+            WorkoutSessionEngine.canLogNextSet(for: first, in: [first, second], states: states)
+        )
+        XCTAssertFalse(
+            WorkoutSessionEngine.canLogNextSet(for: second, in: [first, second], states: states)
+        )
+    }
+
+    /// Regression test: group members don't have to share the same
+    /// `targetSets`. Without excluding a finished member from the
+    /// round's minimum, a partner with more sets would freeze forever the
+    /// moment the shorter member finished — the "minimum" would be
+    /// permanently pinned at the finished member's final count, which the
+    /// partner can never step back down to. Here `first` has only 2
+    /// target sets and finishes first; `second` (4 target sets) must still
+    /// be able to log its 3rd and 4th sets afterward.
+    func test_canLogNextSet_shorterMemberFinishes_longerMemberContinuesUnblocked() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+        first.targetSets = 2
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+        second.targetSets = 4
+
+        // `first` has already logged both of its sets; `second` is only
+        // on its 3rd.
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8),
+                LoggedSet(setNumber: 2, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 25, reps: 12),
+                LoggedSet(setNumber: 2, weight: 25, reps: 12)
+            ])
+        ]
+
+        XCTAssertTrue(
+            WorkoutSessionEngine.canLogNextSet(for: second, in: [first, second], states: states),
+            "second should be free to log its 3rd set once first has finished, not stuck waiting on a partner with nothing left to log"
+        )
+        XCTAssertNil(
+            WorkoutSessionEngine.nextSupersetExercise(after: second, in: [first, second], states: states),
+            "a finished member should never be pointed to as who to do next"
+        )
+    }
+
+    func test_nextSupersetExercise_ungroupedExercise_isNil() {
+        let ex = exercise(name: "Bench Press")
+
+        XCTAssertNil(
+            WorkoutSessionEngine.nextSupersetExercise(after: ex, in: [ex], states: [:])
+        )
+    }
+
+    func test_nextSupersetExercise_memberAheadOfSibling_pointsToTheLaggingSibling() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 8)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [])
+        ]
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.nextSupersetExercise(after: first, in: [first, second], states: states)?.id,
+            second.id
+        )
+        XCTAssertNil(
+            WorkoutSessionEngine.nextSupersetExercise(after: second, in: [first, second], states: states)
+        )
     }
 
     // MARK: - newPersonalRecords

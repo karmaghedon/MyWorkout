@@ -155,9 +155,9 @@ final class ActiveWorkoutStore: ObservableObject {
         )
     }
 
-    func toggleWarmupComplete(weight: Double, reps: Int, for exerciseID: UUID) {
+    func toggleWarmupComplete(at index: Int, weight: Double, reps: Int, for exerciseID: UUID) {
         var state = exerciseStates[exerciseID] ?? ExerciseSessionState()
-        let key = ExerciseSessionState.warmupKey(weight: weight, reps: reps)
+        let key = ExerciseSessionState.warmupKey(index: index, weight: weight, reps: reps)
 
         if state.completedWarmupKeys.contains(key) {
             state.completedWarmupKeys.remove(key)
@@ -310,8 +310,13 @@ final class ActiveWorkoutStore: ObservableObject {
             settings: settings
         )
 
+        let anchorExerciseID = WorkoutSessionEngine.restTimerAnchorExerciseID(
+            for: exercise,
+            in: activeWorkout
+        )
+
         startRestTimer(
-            for: exercise.id,
+            for: anchorExerciseID,
             totalSeconds: seconds
         )
     }
@@ -329,7 +334,23 @@ final class ActiveWorkoutStore: ObservableObject {
         }
     }
 
+    /// Called once right after a restore. The common case — no rest timer
+    /// was active when the app closed — should be a pure read: `restTimerState`
+    /// was already correctly set to `nil` during the restore itself, so
+    /// there's nothing here that needs correcting or re-persisting. Only
+    /// fall through to `updateRestSecondsRemaining`/`stopRestTimer` when a
+    /// timer actually *was* persisted — that's the one case genuinely
+    /// needing a write: the timer may have quietly expired while the app
+    /// was closed, and clearing that stale state is a real correction, not
+    /// a no-op. Without this early-out, restoring a workout with no active
+    /// rest timer triggered a wasted `stopRestTimer(clearPersistedState:
+    /// true)` → persist on every single launch.
     func restoreRestTimerIfNeeded() {
+        guard restTimerState != nil else {
+            restSecondsRemaining = 0
+            return
+        }
+
         updateRestSecondsRemaining()
 
         if restSecondsRemaining > 0 {

@@ -56,8 +56,14 @@ struct NumericPadTextField: UIViewRepresentable {
             text = textField.text ?? ""
         }
 
+        /// Selects the entire existing value on focus so the very first
+        /// keystroke replaces it, matching this field's "editing is
+        /// always replace the whole number" intent. Without this, the
+        /// cursor lands collapsed at the end (see `snapToEnd` below) and
+        /// a new digit appends instead of replacing — e.g. typing "7"
+        /// over an existing "6" produced "67" instead of "7".
         func textFieldDidBeginEditing(_ textField: UITextField) {
-            snapToEnd(textField)
+            selectAll(textField)
         }
 
         /// Fires on every tap/selection change, not just on focus gain —
@@ -65,9 +71,28 @@ struct NumericPadTextField: UIViewRepresentable {
         /// cursor anywhere but the end. Guarded so it doesn't fight
         /// itself: setting `selectedTextRange` below fires this delegate
         /// method again, and the guard sees the selection is already
-        /// collapsed at the end and returns without looping.
+        /// collapsed at the end and returns without looping. Also leaves
+        /// the initial select-all from `textFieldDidBeginEditing` alone —
+        /// that selection change would otherwise immediately get
+        /// collapsed back to the end, undoing it before the user can type
+        /// over it.
         func textFieldDidChangeSelection(_ textField: UITextField) {
+            guard !isEntireTextSelected(textField) else { return }
             snapToEnd(textField)
+        }
+
+        private func selectAll(_ textField: UITextField) {
+            textField.selectedTextRange = textField.textRange(
+                from: textField.beginningOfDocument,
+                to: textField.endOfDocument
+            )
+        }
+
+        private func isEntireTextSelected(_ textField: UITextField) -> Bool {
+            guard let selection = textField.selectedTextRange,
+                  let text = textField.text, !text.isEmpty else { return false }
+            return selection.start == textField.beginningOfDocument
+                && selection.end == textField.endOfDocument
         }
 
         private func snapToEnd(_ textField: UITextField) {

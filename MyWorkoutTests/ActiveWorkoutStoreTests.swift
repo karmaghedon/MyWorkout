@@ -870,20 +870,20 @@ final class ActiveWorkoutStoreTests:
         let store = ActiveWorkoutStore(persistence: persistence)
         let exerciseID = UUID()
 
-        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
+        store.toggleWarmupComplete(at: 0, weight: 45, reps: 10, for: exerciseID)
 
         XCTAssertTrue(
             store.exerciseStates[exerciseID]?
                 .completedWarmupKeys
-                .contains(ExerciseSessionState.warmupKey(weight: 45, reps: 10)) ?? false
+                .contains(ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)) ?? false
         )
 
-        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
+        store.toggleWarmupComplete(at: 0, weight: 45, reps: 10, for: exerciseID)
 
         XCTAssertFalse(
             store.exerciseStates[exerciseID]?
                 .completedWarmupKeys
-                .contains(ExerciseSessionState.warmupKey(weight: 45, reps: 10)) ?? true
+                .contains(ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)) ?? true
         )
     }
 
@@ -897,19 +897,44 @@ final class ActiveWorkoutStoreTests:
         let store = ActiveWorkoutStore(persistence: persistence)
         let exerciseID = UUID()
 
-        store.toggleWarmupComplete(weight: 45, reps: 10, for: exerciseID)
-        store.toggleWarmupComplete(weight: 95, reps: 5, for: exerciseID)
-        store.toggleWarmupComplete(weight: 95, reps: 5, for: exerciseID)
+        store.toggleWarmupComplete(at: 0, weight: 45, reps: 10, for: exerciseID)
+        store.toggleWarmupComplete(at: 1, weight: 95, reps: 5, for: exerciseID)
+        store.toggleWarmupComplete(at: 1, weight: 95, reps: 5, for: exerciseID)
 
         let completed =
             store.exerciseStates[exerciseID]?
                 .completedWarmupKeys
                 ?? []
 
-        XCTAssertEqual(completed, [ExerciseSessionState.warmupKey(weight: 45, reps: 10)])
+        XCTAssertEqual(completed, [ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)])
         XCTAssertFalse(
-            completed.contains(ExerciseSessionState.warmupKey(weight: 45, reps: 8))
+            completed.contains(ExerciseSessionState.warmupKey(index: 1, weight: 45, reps: 8))
         )
+    }
+
+    /// Regression test for the bug this milestone fixed: "Add Warm-up Set"
+    /// seeds the new row from the previous row's weight/reps, so right
+    /// after adding one, two rows briefly share an identical weight+reps
+    /// pair. A content-only key would mark both complete the moment either
+    /// one was checked. Confirms checking the original (lower-index) row
+    /// leaves the newly-added duplicate (higher-index) row unchecked.
+    func testToggleWarmupCompleteDoesNotAffectDuplicateWeightAndRepsAtDifferentIndex() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+        let exerciseID = UUID()
+
+        // Simulates the last warm-up (index 0) and a freshly-added
+        // duplicate of it (index 1) — the exact state right after
+        // tapping "Add Warm-up Set".
+        store.toggleWarmupComplete(at: 0, weight: 45, reps: 10, for: exerciseID)
+
+        let completed =
+            store.exerciseStates[exerciseID]?
+                .completedWarmupKeys
+                ?? []
+
+        XCTAssertTrue(completed.contains(ExerciseSessionState.warmupKey(index: 0, weight: 45, reps: 10)))
+        XCTAssertFalse(completed.contains(ExerciseSessionState.warmupKey(index: 1, weight: 45, reps: 10)))
     }
 
     // MARK: - Extra Working Sets
