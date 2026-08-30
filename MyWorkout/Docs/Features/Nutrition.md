@@ -127,11 +127,30 @@ at the time it was added). Same hard rule as every other domain in
 this app: no test may construct `FileDailyNutritionLogRepository()`'s
 default initializer or a real `HKHealthStore`-backed service.
 
+## UI (Phase 4 — Home/Today Unification)
+
+`TodayNutritionCard` — a Home-screen card showing today's calories
+against the active goal (a `ProgressView(value:total:)` bar, since no
+prior linear-progress convention existed in this app to match) plus
+one progress row per macro (protein/carbs/fat). Reads
+`MacroGoalStore.activeGoal(on: .now)` and
+`DailyNutritionLogStore.entry(on: .now)` directly — both are already
+`@Published`-backed and resolve synchronously, so this card needs no
+`.task`/async loading step at all (the original plan for this phase
+assumed an async HealthKit `totalsToday()` query, which no longer
+exists after Phase 3's redirection to a single local daily record).
+If no goal is set yet, the card shows a plain prompt to set one in
+Profile rather than a bar with a zero target. The whole card is a
+`NavigationLink` to `AppRoute.logNutrition` — tapping it always opens
+the entry screen, whether or not a goal exists yet, since logging
+today's macros doesn't require a goal to already be set.
+`DashboardView` embeds it via `todaysNutritionSection`, directly after
+`todaysProgressSection`. Pure UI composition — no new persistence, no
+`AppBackup` version bump.
+
 ## Future extensions
 
 - Editing an existing goal in place rather than only add/delete.
-- Phase 4 (Home unification): `TodayNutritionCard` reading
-  `activeGoal(on: .now)` alongside `DailyNutritionLogStore.entry(on: .now)`.
 - Phase 7/8: FatSecret pulls a day's calorie/macro totals directly
   (not an item-by-item diary) into the same `DailyNutritionLog` model
   — the sync coordinator's dedup key becomes "has this day already

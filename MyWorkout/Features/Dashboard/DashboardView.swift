@@ -37,6 +37,8 @@ struct DashboardView: View {
 
                 todaysProgressSection
 
+                todaysNutritionSection
+
                 bodyMetricsQuickActionsSection
 
                 prHighlightsSection
@@ -253,6 +255,12 @@ struct DashboardView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    // MARK: - Today's Nutrition
+
+    private var todaysNutritionSection: some View {
+        TodayNutritionCard()
     }
 
     // MARK: - Body Metrics

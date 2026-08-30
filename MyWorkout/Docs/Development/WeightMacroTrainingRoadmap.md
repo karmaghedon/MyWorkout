@@ -39,9 +39,12 @@ than expanding the 5-tab chrome.
   day's dietary totals. `LogNutritionView`, reached via a "Log
   Nutrition" quick action on Home. `AppBackup` → v5. See
   `Docs/Features/Nutrition.md`.
-- ☐ **Phase 4 — Home/Today Nutrition Unification.** `TodayNutritionCard`
+- ✅ **Phase 4 — Home/Today Nutrition Unification.** `TodayNutritionCard`
   on `DashboardView` showing today's logged totals against the active
-  macro goal. Pure UI composition — no new persistence.
+  macro goal. Reads `MacroGoalStore`/`DailyNutritionLogStore` directly
+  (both resolve synchronously, so no async loading step). Pure UI
+  composition — no new persistence, no `AppBackup` bump. See
+  `Docs/Features/Nutrition.md`.
 - ☐ **Phase 5 — Weekly Report.** Computed (never stored) per-week
   weight/waist/neck cards, windowed by actual logging cadence rather
   than fixed calendar weeks. `WeeklyReportView`, reached from Progress.
