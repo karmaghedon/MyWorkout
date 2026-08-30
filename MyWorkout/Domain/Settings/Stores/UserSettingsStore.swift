@@ -95,6 +95,7 @@ final class UserSettingsStore: ObservableObject {
     ) -> UserSettings {
         UserSettings(
             unitSystem: settings.unitSystem,
+            bodyWeightUnitSystem: settings.bodyWeightUnitSystem,
             compoundRestSeconds:
                 InputValidation.clampRestDuration(
                     settings.compoundRestSeconds

@@ -48,4 +48,58 @@ final class BodyMetricsHealthKitService: BodyMetricsHealthKitServicing {
 
         try await healthStore.save(samples)
     }
+
+    func weightSamples(since date: Date) async throws -> [DatedValue] {
+        try await samples(
+            type: HealthKitTypeCatalog.bodyMassType,
+            unit: .gramUnit(with: .kilo),
+            since: date
+        )
+    }
+
+    func waistSamples(since date: Date) async throws -> [DatedValue] {
+        try await samples(
+            type: HealthKitTypeCatalog.waistCircumferenceType,
+            unit: .meterUnit(with: .centi),
+            since: date
+        )
+    }
+
+    private func samples(
+        type: HKQuantityType,
+        unit: HKUnit,
+        since date: Date
+    ) async throws -> [DatedValue] {
+        let predicate = HKQuery.predicateForSamples(
+            withStart: date,
+            end: .now,
+            options: .strictStartDate
+        )
+        let sortDescriptor = NSSortDescriptor(
+            key: HKSampleSortIdentifierStartDate,
+            ascending: true
+        )
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: type,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                let values = (samples as? [HKQuantitySample] ?? []).map {
+                    DatedValue(date: $0.startDate, value: $0.quantity.doubleValue(for: unit))
+                }
+
+                continuation.resume(returning: values)
+            }
+
+            healthStore.execute(query)
+        }
+    }
 }

@@ -85,6 +85,12 @@ enum WorkoutSessionLayout:
 
 struct UserSettings: Codable {
     var unitSystem: UnitSystem
+    /// Separate from `unitSystem`, which governs training weights
+    /// (barbell/plates/dumbbells, workout logging). Body-metrics screens
+    /// (`LogWeightView`, `WeeklyReportView`) use this instead, so the two
+    /// can be switched independently — e.g. training in lb while tracking
+    /// body weight in kg.
+    var bodyWeightUnitSystem: UnitSystem
     var compoundRestSeconds: Int
     var isolationRestSeconds: Int
     var bodyweightRestSeconds: Int
@@ -96,6 +102,7 @@ struct UserSettings: Codable {
 
     static let defaults = UserSettings(
         unitSystem: .pounds,
+        bodyWeightUnitSystem: .pounds,
         compoundRestSeconds: 180,
         isolationRestSeconds: 90,
         bodyweightRestSeconds: 120,
@@ -132,6 +139,7 @@ struct UserSettings: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case unitSystem
+        case bodyWeightUnitSystem
         case compoundRestSeconds
         case isolationRestSeconds
         case bodyweightRestSeconds
@@ -144,6 +152,7 @@ struct UserSettings: Codable {
 
     init(
         unitSystem: UnitSystem,
+        bodyWeightUnitSystem: UnitSystem,
         compoundRestSeconds: Int,
         isolationRestSeconds: Int,
         bodyweightRestSeconds: Int,
@@ -154,6 +163,7 @@ struct UserSettings: Codable {
         workoutSessionLayout: WorkoutSessionLayout
     ) {
         self.unitSystem = unitSystem
+        self.bodyWeightUnitSystem = bodyWeightUnitSystem
         self.compoundRestSeconds = compoundRestSeconds
         self.isolationRestSeconds = isolationRestSeconds
         self.bodyweightRestSeconds = bodyweightRestSeconds
@@ -175,6 +185,11 @@ struct UserSettings: Codable {
             UnitSystem.self,
             forKey: .unitSystem
         ) ?? defaults.unitSystem
+
+        bodyWeightUnitSystem = try container.decodeIfPresent(
+            UnitSystem.self,
+            forKey: .bodyWeightUnitSystem
+        ) ?? defaults.bodyWeightUnitSystem
 
         compoundRestSeconds = try container.decodeIfPresent(
             Int.self,

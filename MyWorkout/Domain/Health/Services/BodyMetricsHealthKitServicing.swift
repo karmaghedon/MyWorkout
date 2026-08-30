@@ -17,4 +17,12 @@ protocol BodyMetricsHealthKitServicing {
         waistCm: Double?,
         date: Date
     ) async throws
+
+    /// All weight samples (in kilograms) recorded on or after `date`,
+    /// oldest first. Feeds `WeeklyBodyReportEngine`.
+    func weightSamples(since date: Date) async throws -> [DatedValue]
+
+    /// All waist-circumference samples (in centimeters) recorded on or
+    /// after `date`, oldest first. Feeds `WeeklyBodyReportEngine`.
+    func waistSamples(since date: Date) async throws -> [DatedValue]
 }

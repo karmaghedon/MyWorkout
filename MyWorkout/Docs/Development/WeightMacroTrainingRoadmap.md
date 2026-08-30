@@ -45,9 +45,10 @@ than expanding the 5-tab chrome.
   (both resolve synchronously, so no async loading step). Pure UI
   composition — no new persistence, no `AppBackup` bump. See
   `Docs/Features/Nutrition.md`.
-- ☐ **Phase 5 — Weekly Report.** Computed (never stored) per-week
+- ✅ **Phase 5 — Weekly Report.** Computed (never stored) per-week
   weight/waist/neck cards, windowed by actual logging cadence rather
   than fixed calendar weeks. `WeeklyReportView`, reached from Progress.
+  See `Docs/Features/WeeklyReport.md`.
 - ☐ **Phase 6 — Progress Chart.** Swift Charts line chart of weight
   over time with optional waist/neck overlays and a 1M/3M/6M/1Y/All
   range picker. `BodyProgressView`, reached from Progress.

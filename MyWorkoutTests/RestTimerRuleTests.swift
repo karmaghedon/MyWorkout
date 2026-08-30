@@ -10,6 +10,7 @@ final class RestTimerRuleTests: XCTestCase {
     ) -> UserSettings {
         UserSettings(
             unitSystem: .pounds,
+            bodyWeightUnitSystem: .pounds,
             compoundRestSeconds: compound,
             isolationRestSeconds: isolation,
             bodyweightRestSeconds: bodyweight,

@@ -198,6 +198,9 @@ struct AppShellView: View {
         case .logNutrition:
             LogNutritionView()
 
+        case .weeklyReport:
+            WeeklyReportView()
+
         case .activeWorkout:
             WorkoutSessionView()
 

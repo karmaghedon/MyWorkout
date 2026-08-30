@@ -28,8 +28,8 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Units") {
-                Picker("Weight Unit", selection: $settingsStore.settings.unitSystem) {
+            Section {
+                Picker("Training Weight Unit", selection: $settingsStore.settings.unitSystem) {
                     ForEach(UnitSystem.allCases) { unit in
                         Text(unit.rawValue).tag(unit)
                     }
@@ -41,6 +41,19 @@ struct SettingsView: View {
 
                     settingsStore.save()
                 }
+
+                Picker("Body Weight Unit", selection: $settingsStore.settings.bodyWeightUnitSystem) {
+                    ForEach(UnitSystem.allCases) { unit in
+                        Text(unit.rawValue).tag(unit)
+                    }
+                }
+                .onChange(of: settingsStore.settings.bodyWeightUnitSystem) { _, _ in
+                    settingsStore.save()
+                }
+            } header: {
+                Text("Units")
+            } footer: {
+                Text("Training weight applies to workouts and equipment. Body weight applies to weigh-ins and the weekly report, and can be set independently.")
             }
 
             Section("Rest Timers") {

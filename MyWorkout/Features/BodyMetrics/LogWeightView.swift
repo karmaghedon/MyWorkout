@@ -116,13 +116,13 @@ struct LogWeightView: View {
     // MARK: - Units
 
     private var weightUnit: String {
-        settingsStore.settings.unitSystem.rawValue
+        settingsStore.settings.bodyWeightUnitSystem.rawValue
     }
 
     private var weightKilograms: Double {
         let pounds = WeightConversion.toPounds(
             weight,
-            from: settingsStore.settings.unitSystem
+            from: settingsStore.settings.bodyWeightUnitSystem
         )
 
         return WeightConversion.poundsToKilograms(pounds)
