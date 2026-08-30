@@ -8,6 +8,7 @@ struct DashboardView: View {
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @EnvironmentObject private var analyticsCache: AnalyticsCache
+    @EnvironmentObject private var bodyMeasurementLogStore: BodyMeasurementLogStore
 
     /// Routes to the Workout tab, resuming an in-progress session when one
     /// exists. Owned by `AppShellView` since only it holds tab selection
@@ -33,6 +34,8 @@ struct DashboardView: View {
                 nextWorkoutSection
 
                 todaysProgressSection
+
+                bodyMetricsQuickActionsSection
 
                 prHighlightsSection
 
@@ -247,6 +250,29 @@ struct DashboardView: View {
                 }
             }
         }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Body Metrics
+
+    /// A single row for now ("Log Weight"); grows to include "Log Food"
+    /// once nutrition tracking ships, matching how `nextWorkoutSection`
+    /// above establishes the same NavigationLink-wrapped `AppCard` pattern
+    /// this reuses.
+    private var bodyMetricsQuickActionsSection: some View {
+        NavigationLink(value: AppRoute.logWeight) {
+            AppCard {
+                WorkoutCard(
+                    systemImage: "scalemass.fill",
+                    title: "Log Weight"
+                ) {
+                    Text("Weight, body fat %, waist, and neck")
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+            }
+        }
+        .buttonStyle(.plain)
         .padding(.horizontal)
     }
 
@@ -568,7 +594,8 @@ struct DashboardView: View {
             equipmentStore,
             settingsStore,
             activeWorkoutStore,
-            customExerciseStore
+            customExerciseStore,
+            bodyMeasurementLogStore
         ]
     }
 

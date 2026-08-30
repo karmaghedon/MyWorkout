@@ -34,6 +34,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `EquipmentInventory.md`
 - `CustomExercises.md`
 - `Recovery.md`
+- `WeightTracking.md`
 
 ## Development documents
 

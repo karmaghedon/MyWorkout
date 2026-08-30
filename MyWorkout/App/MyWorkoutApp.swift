@@ -10,6 +10,8 @@ struct MyWorkoutApp: App {
     @StateObject private var customExerciseStore = CustomExerciseStore()
     @StateObject private var analyticsCache = AnalyticsCache()
     @StateObject private var favoriteExercisesStore = FavoriteExercisesStore()
+    @StateObject private var healthKitAuthorizationManager = HealthKitAuthorizationManager()
+    @StateObject private var bodyMeasurementLogStore = BodyMeasurementLogStore()
 
     var body: some Scene {
         WindowGroup {
@@ -23,6 +25,8 @@ struct MyWorkoutApp: App {
                 .environmentObject(analyticsCache)
                 .environmentObject(customExerciseStore)
                 .environmentObject(favoriteExercisesStore)
+                .environmentObject(healthKitAuthorizationManager)
+                .environmentObject(bodyMeasurementLogStore)
                 .onAppear {
                     analyticsCache.bind(
                         to: logStore,

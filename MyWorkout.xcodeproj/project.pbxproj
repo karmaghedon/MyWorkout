@@ -241,6 +241,19 @@
 		F5BF30C73000401400AB5AD9 /* InputValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C63000401400AB5AD9 /* InputValidationTests.swift */; };
 		F5BF30C93000421D00AB5AD9 /* WorkoutLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */; };
 		F5BF30CB3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */; };
+		CB05BB39A46F486DA14BA2CB /* BodyMeasurementLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6021A2FA9AE64EF593E877B3 /* BodyMeasurementLog.swift */; };
+		DDF1EF78CC8443DE9D9830C5 /* BodyMeasurementLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3DCCD7B8394C35B66C5464 /* BodyMeasurementLogRepository.swift */; };
+		3D8E15EBB77B4093BDD35E32 /* FileBodyMeasurementLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC94360D167940B3AD374FC8 /* FileBodyMeasurementLogRepository.swift */; };
+		37A06FD040E746858C4C6610 /* BodyMeasurementLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A971836DD048CC92B0EFD5 /* BodyMeasurementLogStore.swift */; };
+		7BFA1A1D62FB44C99BE5A4BD /* HealthKitTypeCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */; };
+		17FAC1382B6A40938F8A570C /* HealthKitAuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AA3B0EB9564A06BAA6FA5F /* HealthKitAuthorizationManager.swift */; };
+		2E11EFC52D1040E7BB59CE24 /* BodyMetricsHealthKitServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */; };
+		29DEA22041094F41A2F35C72 /* BodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */; };
+		59EA408FD3AB46B3912774A6 /* BodyMeasurementLogReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */; };
+		D343C96750CC48B99E3D5862 /* LogWeightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934BC148AC0F4E06B8705BEA /* LogWeightView.swift */; };
+		0AD031E5FC9C42C2B68859B7 /* MockBodyMeasurementLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */; };
+		F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */; };
+		9E7FDD8481FC415AA546400B /* BodyMeasurementLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -525,6 +538,20 @@
 		F5BF30C83000421D00AB5AD9 /* WorkoutLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLogStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CA3000432700AB5AD9 /* WorkoutTemplateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateStoreTests.swift; sourceTree = "<group>"; };
 		F5BF30CC3000490100AB5AD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6021A2FA9AE64EF593E877B3 /* BodyMeasurementLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLog.swift; sourceTree = "<group>"; };
+		7E3DCCD7B8394C35B66C5464 /* BodyMeasurementLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLogRepository.swift; sourceTree = "<group>"; };
+		BC94360D167940B3AD374FC8 /* FileBodyMeasurementLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBodyMeasurementLogRepository.swift; sourceTree = "<group>"; };
+		72A971836DD048CC92B0EFD5 /* BodyMeasurementLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLogStore.swift; sourceTree = "<group>"; };
+		38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTypeCatalog.swift; sourceTree = "<group>"; };
+		63AA3B0EB9564A06BAA6FA5F /* HealthKitAuthorizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitAuthorizationManager.swift; sourceTree = "<group>"; };
+		461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMetricsHealthKitServicing.swift; sourceTree = "<group>"; };
+		B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMetricsHealthKitService.swift; sourceTree = "<group>"; };
+		35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLogReplacing.swift; sourceTree = "<group>"; };
+		934BC148AC0F4E06B8705BEA /* LogWeightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWeightView.swift; sourceTree = "<group>"; };
+		496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMeasurementLogRepository.swift; sourceTree = "<group>"; };
+		BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMetricsHealthKitService.swift; sourceTree = "<group>"; };
+		7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLogStoreTests.swift; sourceTree = "<group>"; };
+		62FDE05263AD419DBF9AF1D0 /* WeightTracking.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = WeightTracking.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -617,6 +644,7 @@
 			isa = PBXGroup;
 			children = (
 				A2CE3C728331E40DF9A3FAD5 /* Analytics */,
+				804CDB9F10344F8698F8B910 /* BodyMetrics */,
 				F5C606212D97E0F214F5019D /* CustomExercises */,
 				D874DF8B24DF89547E3128DD /* Dashboard */,
 				39FABE6393E025DF759E4C67 /* Equipment */,
@@ -631,6 +659,14 @@
 				85B257E037D9AA6052D979F4 /* WorkoutSession */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		804CDB9F10344F8698F8B910 /* BodyMetrics */ = {
+			isa = PBXGroup;
+			children = (
+				934BC148AC0F4E06B8705BEA /* LogWeightView.swift */,
+			);
+			path = BodyMetrics;
 			sourceTree = "<group>";
 		};
 		02ACFC1728FBFBC10367F8B9 /* Profile */ = {
@@ -1015,6 +1051,7 @@
 				F54B8132300D018D00615DA0 /* Progression.md */,
 				F54B8133300D018D00615DA0 /* Recovery.md */,
 				F54B8134300D018D00615DA0 /* Templates.md */,
+				62FDE05263AD419DBF9AF1D0 /* WeightTracking.md */,
 				F54B8135300D018D00615DA0 /* WorkoutSessions.md */,
 			);
 			path = Features;
@@ -1120,6 +1157,7 @@
 		D36FE27A3B94632B997D94B1 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */,
 				F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */,
 				F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */,
 				F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */,
@@ -1316,6 +1354,9 @@
 				F54B80FB300C675300615DA0 /* WorkoutTemplateTestFactory.swift */,
 				3EB6C13B39F032E5372A408E /* ExerciseCodableTests.swift */,
 				0418C9A4DE65957D5E12FB12 /* ExerciseSessionStateCodableTests.swift */,
+				496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */,
+				BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */,
+				7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -1377,10 +1418,58 @@
 				E242D8BF4D17470C2904352C /* Backup */,
 				7D6861F949899863A8B5FC40 /* Equipment */,
 				664648032D8763B8B56A4E32 /* Exercise */,
+				C06C875FA4E6488FBCEF5D8B /* Health */,
 				844A824BF75DE7B86BD120E3 /* Settings */,
 				0A2765FC1384FB8E3B78918F /* Workout */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		C06C875FA4E6488FBCEF5D8B /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				63AA3B0EB9564A06BAA6FA5F /* HealthKitAuthorizationManager.swift */,
+				38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */,
+				4D02B94249F14D27B5E23A93 /* Models */,
+				A30A31B3A40940D498CC528B /* Repositories */,
+				78427BA9D67E416D83CEDEF1 /* Services */,
+				2CC66B28021048A4BBD9416E /* Stores */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		4D02B94249F14D27B5E23A93 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6021A2FA9AE64EF593E877B3 /* BodyMeasurementLog.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A30A31B3A40940D498CC528B /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				7E3DCCD7B8394C35B66C5464 /* BodyMeasurementLogRepository.swift */,
+				BC94360D167940B3AD374FC8 /* FileBodyMeasurementLogRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		78427BA9D67E416D83CEDEF1 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */,
+				B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		2CC66B28021048A4BBD9416E /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				72A971836DD048CC92B0EFD5 /* BodyMeasurementLogStore.swift */,
+			);
+			path = Stores;
 			sourceTree = "<group>";
 		};
 		FFC6FD87EC94B9320DF054FF /* Models */ = {
@@ -1698,6 +1787,16 @@
 				F5BF306F2FFB143A00AB5AD9 /* WorkoutSessionDialogs.swift in Sources */,
 				F54005202FF6E5250079CC05 /* RecoveryAnalyzer.swift in Sources */,
 				F54005082FF5686C0079CC05 /* ExerciseSessionCardView.swift in Sources */,
+				CB05BB39A46F486DA14BA2CB /* BodyMeasurementLog.swift in Sources */,
+				DDF1EF78CC8443DE9D9830C5 /* BodyMeasurementLogRepository.swift in Sources */,
+				3D8E15EBB77B4093BDD35E32 /* FileBodyMeasurementLogRepository.swift in Sources */,
+				37A06FD040E746858C4C6610 /* BodyMeasurementLogStore.swift in Sources */,
+				7BFA1A1D62FB44C99BE5A4BD /* HealthKitTypeCatalog.swift in Sources */,
+				17FAC1382B6A40938F8A570C /* HealthKitAuthorizationManager.swift in Sources */,
+				2E11EFC52D1040E7BB59CE24 /* BodyMetricsHealthKitServicing.swift in Sources */,
+				29DEA22041094F41A2F35C72 /* BodyMetricsHealthKitService.swift in Sources */,
+				59EA408FD3AB46B3912774A6 /* BodyMeasurementLogReplacing.swift in Sources */,
+				D343C96750CC48B99E3D5862 /* LogWeightView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1737,6 +1836,9 @@
 				F54B80EA300C40EE00615DA0 /* PerformanceDeclineAnalyzerTests.swift in Sources */,
 				B1F15467CDE54B4BC721FA70 /* ExerciseCodableTests.swift in Sources */,
 				61773A08933B4F42FE5C03FE /* ExerciseSessionStateCodableTests.swift in Sources */,
+				0AD031E5FC9C42C2B68859B7 /* MockBodyMeasurementLogRepository.swift in Sources */,
+				F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */,
+				9E7FDD8481FC415AA546400B /* BodyMeasurementLogStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1882,6 +1984,8 @@
 				DEVELOPMENT_TEAM = 6XVQUYT5J7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MyWorkout reads your weight, body fat percentage, and waist measurements from Health to show your body-composition trends.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MyWorkout writes weigh-ins you log to Health.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -1915,6 +2019,8 @@
 				DEVELOPMENT_TEAM = 6XVQUYT5J7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MyWorkout reads your weight, body fat percentage, and waist measurements from Health to show your body-composition trends.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MyWorkout writes weigh-ins you log to Health.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

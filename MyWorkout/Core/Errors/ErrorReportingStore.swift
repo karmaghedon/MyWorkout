@@ -28,3 +28,5 @@ extension UserSettingsStore: ErrorReportingStore {}
 extension ActiveWorkoutStore: ErrorReportingStore {}
 
 extension CustomExerciseStore: ErrorReportingStore {}
+
+extension BodyMeasurementLogStore: ErrorReportingStore {}

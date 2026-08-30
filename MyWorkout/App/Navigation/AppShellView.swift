@@ -189,6 +189,9 @@ struct AppShellView: View {
         case .export:
             ExportView()
 
+        case .logWeight:
+            LogWeightView()
+
         case .activeWorkout:
             WorkoutSessionView()
 

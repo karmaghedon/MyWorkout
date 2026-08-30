@@ -6,6 +6,7 @@ struct ExportActionsSection: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var customExerciseStore: CustomExerciseStore
+    @EnvironmentObject var bodyMeasurementLogStore: BodyMeasurementLogStore
 
     @State private var showJSONExporter = false
     @State private var backupDocument = BackupDocument(backup: nil)
@@ -45,7 +46,8 @@ struct ExportActionsSection: View {
                         templates: templateStore.templates,
                         equipment: equipmentStore.inventory,
                         settings: settingsStore.settings,
-                        customExercises: customExerciseStore.storedExercises
+                        customExercises: customExerciseStore.storedExercises,
+                        bodyMeasurementLogs: bodyMeasurementLogStore.logs
                     )
                 )
                 showJSONExporter = true

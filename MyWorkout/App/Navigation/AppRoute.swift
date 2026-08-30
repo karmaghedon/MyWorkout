@@ -12,6 +12,7 @@ enum AppRoute: Hashable {
     case customExercises
     case settings
     case export
+    case logWeight
 
     // MARK: - Detail Destinations
 

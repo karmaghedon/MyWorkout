@@ -6,6 +6,7 @@ struct ImportActionsSection: View {
     @EnvironmentObject var templateStore: WorkoutTemplateStore
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var customExerciseStore: CustomExerciseStore
+    @EnvironmentObject var bodyMeasurementLogStore: BodyMeasurementLogStore
 
     @State private var showJSONImporter = false
 
@@ -23,7 +24,8 @@ struct ImportActionsSection: View {
             templateStore: templateStore,
             equipmentStore: equipmentStore,
             settingsStore: settingsStore,
-            customExerciseStore: customExerciseStore
+            customExerciseStore: customExerciseStore,
+            bodyMeasurementLogStore: bodyMeasurementLogStore
         )
     }
 
