@@ -273,6 +273,8 @@
 		E8275F565C814D28A40028AA /* WeeklyBodyReportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94966903C2F746F68AE26F17 /* WeeklyBodyReportStore.swift */; };
 		67B6DAFEE6164B76ADCB334A /* WeeklyReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64164050B00E41348AEBF0C9 /* WeeklyReportView.swift */; };
 		3A418B8709DD43B594EAD180 /* WeeklyBodyReportEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E96D556478486E8D59943C /* WeeklyBodyReportEngineTests.swift */; };
+		279340D77B7B4160B9DBC94C /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316893ABDFAB43D0A98913F5 /* DateRangePicker.swift */; };
+		9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */; };
 		D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */; };
 		250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */; };
 		ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */; };
@@ -582,6 +584,9 @@
 		2B7D2BBF3C1249A9977740FA /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		EF93EEB1DA43471C8A04A8A6 /* Nutrition.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Nutrition.md; sourceTree = "<group>"; };
 		CDB92CDBC97A4C0F9EBD643E /* WeeklyReport.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = WeeklyReport.md; sourceTree = "<group>"; };
+		316893ABDFAB43D0A98913F5 /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
+		F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyProgressView.swift; sourceTree = "<group>"; };
+		E0B147B780D344B3819F3603 /* BodyProgress.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BodyProgress.md; sourceTree = "<group>"; };
 		92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMacroGoalRepository.swift; sourceTree = "<group>"; };
 		2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStoreTests.swift; sourceTree = "<group>"; };
 		9CAAFB41FE0D40E29F8518B4 /* DailyNutritionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLog.swift; sourceTree = "<group>"; };
@@ -757,6 +762,7 @@
 			children = (
 				E82B542EBA777CA86D33C186 /* ProgressHubView.swift */,
 				64164050B00E41348AEBF0C9 /* WeeklyReportView.swift */,
+				F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */,
 			);
 			path = Progress;
 			sourceTree = "<group>";
@@ -1091,6 +1097,7 @@
 				F54B8092300690A400615DA0 /* AppEmptyStateView.swift */,
 				2A6BD5B1138A55E7D5CF2F5A /* CardHeader.swift */,
 				60925D9AC6021896DE70AAB9 /* Chip.swift */,
+				316893ABDFAB43D0A98913F5 /* DateRangePicker.swift */,
 				01FAA93E96472C1264BA7151 /* DestructiveButton.swift */,
 				F4A86E48B45BCFF4A84D0D29 /* ErrorState.swift */,
 				F5BF30452FF9E28700AB5AD9 /* FlowLayout.swift */,
@@ -1129,6 +1136,7 @@
 				62FDE05263AD419DBF9AF1D0 /* WeightTracking.md */,
 				EF93EEB1DA43471C8A04A8A6 /* Nutrition.md */,
 				CDB92CDBC97A4C0F9EBD643E /* WeeklyReport.md */,
+				E0B147B780D344B3819F3603 /* BodyProgress.md */,
 				F54B8135300D018D00615DA0 /* WorkoutSessions.md */,
 			);
 			path = Features;
@@ -1981,6 +1989,8 @@
 				3E07584038264919B48B3622 /* WeeklyBodyReportEngine.swift in Sources */,
 				E8275F565C814D28A40028AA /* WeeklyBodyReportStore.swift in Sources */,
 				67B6DAFEE6164B76ADCB334A /* WeeklyReportView.swift in Sources */,
+				279340D77B7B4160B9DBC94C /* DateRangePicker.swift in Sources */,
+				9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

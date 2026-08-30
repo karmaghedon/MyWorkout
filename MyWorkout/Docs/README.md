@@ -37,6 +37,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `WeightTracking.md`
 - `Nutrition.md`
 - `WeeklyReport.md`
+- `BodyProgress.md`
 
 ## Development documents
 

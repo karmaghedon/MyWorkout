@@ -201,6 +201,9 @@ struct AppShellView: View {
         case .weeklyReport:
             WeeklyReportView()
 
+        case .bodyProgress:
+            BodyProgressView()
+
         case .activeWorkout:
             WorkoutSessionView()
 

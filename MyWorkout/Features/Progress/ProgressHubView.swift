@@ -49,6 +49,15 @@ struct ProgressHubView: View {
                         subtitle: "Weight, waist & neck by week",
                         route: .weeklyReport
                     )
+
+                    Divider()
+
+                    quickActionLink(
+                        systemImage: "chart.xyaxis.line",
+                        title: "Weight & Body",
+                        subtitle: "Progress chart over time",
+                        route: .bodyProgress
+                    )
                 }
             }
             .padding(.bottom)
