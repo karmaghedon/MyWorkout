@@ -14,6 +14,7 @@ enum AppRoute: Hashable {
     case export
     case logWeight
     case macroGoals
+    case logNutrition
 
     // MARK: - Detail Destinations
 

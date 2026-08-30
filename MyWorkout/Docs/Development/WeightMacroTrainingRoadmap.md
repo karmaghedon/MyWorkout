@@ -31,11 +31,14 @@ than expanding the 5-tab chrome.
   `MacroGoalStore`; `activeGoal(on:)` resolves which goal applies to a
   given day. `GoalsView` reached from Profile → Health & Nutrition →
   Macro Goals. `AppBackup` → v4. See `Docs/Features/Nutrition.md`.
-- ☐ **Phase 3 — Manual Food Log Entry.** `FoodLogEntry` written to both
-  HealthKit (`dietaryEnergyConsumed`/`dietaryProtein`/
-  `dietaryCarbohydrates`/`dietaryFatTotal`) and local
-  `FoodLogEntryStore`. `FoodLogView`, reached via a "Log Food" quick
-  action on Home. `AppBackup` → v5.
+- ✅ **Phase 3 — Daily Nutrition Log.** Redirected mid-implementation
+  away from its original per-food-item design (see note below): one
+  editable `DailyNutritionLog` record per calendar day (protein/carbs/
+  fat; calories always computed via 4/4/9, never typed) via
+  `DailyNutritionLogStore.upsert(...)`, written to HealthKit as that
+  day's dietary totals. `LogNutritionView`, reached via a "Log
+  Nutrition" quick action on Home. `AppBackup` → v5. See
+  `Docs/Features/Nutrition.md`.
 - ☐ **Phase 4 — Home/Today Nutrition Unification.** `TodayNutritionCard`
   on `DashboardView` showing today's logged totals against the active
   macro goal. Pure UI composition — no new persistence.
@@ -51,10 +54,22 @@ than expanding the 5-tab chrome.
   `GENERATE_INFOPLIST_FILE = YES` to a physical `Info.plist` to
   express the callback URL scheme. `FatSecretConnectionView`, reached
   from Profile. `AppBackup` → v6 (connection metadata only).
-- ☐ **Phase 8 — FatSecret Food Diary Sync.** "Sync from FatSecret"
-  pulls a day's diary, dedups by `fatSecretEntryId`, writes new
-  entries to HealthKit + `FoodLogEntryStore`. Wires up the previously
-  inert sync button in `FoodLogView`.
+- ☐ **Phase 8 — FatSecret Daily Totals Sync.** "Sync from FatSecret"
+  pulls a day's calorie/macro totals (not an item-by-item diary, per
+  Phase 3's redirection) and upserts them into the same
+  `DailyNutritionLogStore` + HealthKit path `LogNutritionView`'s manual
+  entry already uses. Dedup becomes "has this day already been
+  synced," not a per-item id.
+
+**Note on Phase 3's redirection**: the plan originally called for a
+per-food-item diary (`FoodLogEntry` with a food name and meal type,
+one row per item eaten). Before that shipped, the actual product need
+was clarified: this feature tracks calories and macros, not a food
+diary — the preferred long-term source of daily totals is FatSecret,
+and manual entry only needs to be a quick way to set/edit *today's*
+protein/carbs/fat with calories computed automatically. Phase 3 and
+this doc were revised accordingly before Phase 3's on-device
+verification; Phase 8's design note above reflects the same shift.
 
 ## Cross-cutting rules (every phase)
 
@@ -95,7 +110,7 @@ than expanding the 5-tab chrome.
 |---|---|---|
 | 1 | 3 | `bodyMeasurementLogs` |
 | 2 | 4 | `macroGoals` |
-| 3 | 5 | `foodLogEntries` |
+| 3 | 5 | `dailyNutritionLogs` |
 | 7 | 6 | `fatSecretConnectionMetadata` |
 
 Phases 4, 5, 6, and 8 add no new backed-up field.

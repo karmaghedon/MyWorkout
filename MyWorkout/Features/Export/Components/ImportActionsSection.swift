@@ -8,6 +8,7 @@ struct ImportActionsSection: View {
     @EnvironmentObject var customExerciseStore: CustomExerciseStore
     @EnvironmentObject var bodyMeasurementLogStore: BodyMeasurementLogStore
     @EnvironmentObject var macroGoalStore: MacroGoalStore
+    @EnvironmentObject var dailyNutritionLogStore: DailyNutritionLogStore
 
     @State private var showJSONImporter = false
 
@@ -27,7 +28,8 @@ struct ImportActionsSection: View {
             settingsStore: settingsStore,
             customExerciseStore: customExerciseStore,
             bodyMeasurementLogStore: bodyMeasurementLogStore,
-            macroGoalStore: macroGoalStore
+            macroGoalStore: macroGoalStore,
+            dailyNutritionLogStore: dailyNutritionLogStore
         )
     }
 

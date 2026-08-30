@@ -10,6 +10,7 @@ struct DashboardView: View {
     @EnvironmentObject private var analyticsCache: AnalyticsCache
     @EnvironmentObject private var bodyMeasurementLogStore: BodyMeasurementLogStore
     @EnvironmentObject private var macroGoalStore: MacroGoalStore
+    @EnvironmentObject private var dailyNutritionLogStore: DailyNutritionLogStore
 
     /// Routes to the Workout tab, resuming an in-progress session when one
     /// exists. Owned by `AppShellView` since only it holds tab selection
@@ -256,24 +257,41 @@ struct DashboardView: View {
 
     // MARK: - Body Metrics
 
-    /// A single row for now ("Log Weight"); grows to include "Log Food"
-    /// once nutrition tracking ships, matching how `nextWorkoutSection`
+    /// "Log Weight" and "Log Nutrition", matching how `nextWorkoutSection`
     /// above establishes the same NavigationLink-wrapped `AppCard` pattern
     /// this reuses.
     private var bodyMetricsQuickActionsSection: some View {
-        NavigationLink(value: AppRoute.logWeight) {
-            AppCard {
-                WorkoutCard(
-                    systemImage: "scalemass.fill",
-                    title: "Log Weight"
-                ) {
-                    Text("Weight, body fat %, waist, and neck")
-                        .font(AppTheme.Typography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
+        HStack(spacing: AppTheme.Spacing.md) {
+            NavigationLink(value: AppRoute.logWeight) {
+                AppCard {
+                    WorkoutCard(
+                        systemImage: "scalemass.fill",
+                        title: "Log Weight"
+                    ) {
+                        Text("Weight, body fat %, waist, and neck")
+                            .font(AppTheme.Typography.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
                 }
             }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity)
+
+            NavigationLink(value: AppRoute.logNutrition) {
+                AppCard {
+                    WorkoutCard(
+                        systemImage: "flame.fill",
+                        title: "Log Nutrition"
+                    ) {
+                        Text("Today's calories and macros")
+                            .font(AppTheme.Typography.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.plain)
         .padding(.horizontal)
     }
 
@@ -597,7 +615,8 @@ struct DashboardView: View {
             activeWorkoutStore,
             customExerciseStore,
             bodyMeasurementLogStore,
-            macroGoalStore
+            macroGoalStore,
+            dailyNutritionLogStore
         ]
     }
 

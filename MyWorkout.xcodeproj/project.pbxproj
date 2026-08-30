@@ -258,6 +258,17 @@
 		279B6C3D317F4EA3B224C0C7 /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7D2BBF3C1249A9977740FA /* GoalsView.swift */; };
 		391B04EEA2DE416390CA331E /* MockMacroGoalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */; };
 		B90D101D213A42049774102D /* MacroGoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */; };
+		FEEF8511E9F44D1D8650285D /* DailyNutritionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CAAFB41FE0D40E29F8518B4 /* DailyNutritionLog.swift */; };
+		21344FECB89841EE978B19B4 /* DailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632374CE4EA04CE9B7C876C1 /* DailyNutritionLogRepository.swift */; };
+		91EB5242B5624327B6C032AC /* FileDailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B811A2316A7C46ACB9AD2A26 /* FileDailyNutritionLogRepository.swift */; };
+		63B9DBAE9B6F477B83FBCAFF /* DailyNutritionLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C255D4A95245F5AA831B48 /* DailyNutritionLogStore.swift */; };
+		0B067EADD64B44969DF1CEA7 /* DailyNutritionLogReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B87B19E9E33458BAC67CEAB /* DailyNutritionLogReplacing.swift */; };
+		2E746867A5D240F6921E9DBC /* NutritionHealthKitServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0877F8B6FA34134AC31AE71 /* NutritionHealthKitServicing.swift */; };
+		51BFE5040C144FF4AB11E67F /* NutritionHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09395B3110084ED0908184A0 /* NutritionHealthKitService.swift */; };
+		AEFABBA1ABAC4817917373D0 /* LogNutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D5FB03FDF74007AE5B73AC /* LogNutritionView.swift */; };
+		D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */; };
+		250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */; };
+		ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */; };
 		D343C96750CC48B99E3D5862 /* LogWeightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934BC148AC0F4E06B8705BEA /* LogWeightView.swift */; };
 		0AD031E5FC9C42C2B68859B7 /* MockBodyMeasurementLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */; };
 		F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */; };
@@ -565,6 +576,17 @@
 		EF93EEB1DA43471C8A04A8A6 /* Nutrition.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Nutrition.md; sourceTree = "<group>"; };
 		92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMacroGoalRepository.swift; sourceTree = "<group>"; };
 		2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStoreTests.swift; sourceTree = "<group>"; };
+		9CAAFB41FE0D40E29F8518B4 /* DailyNutritionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLog.swift; sourceTree = "<group>"; };
+		632374CE4EA04CE9B7C876C1 /* DailyNutritionLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLogRepository.swift; sourceTree = "<group>"; };
+		B811A2316A7C46ACB9AD2A26 /* FileDailyNutritionLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDailyNutritionLogRepository.swift; sourceTree = "<group>"; };
+		61C255D4A95245F5AA831B48 /* DailyNutritionLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLogStore.swift; sourceTree = "<group>"; };
+		9B87B19E9E33458BAC67CEAB /* DailyNutritionLogReplacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLogReplacing.swift; sourceTree = "<group>"; };
+		C0877F8B6FA34134AC31AE71 /* NutritionHealthKitServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionHealthKitServicing.swift; sourceTree = "<group>"; };
+		09395B3110084ED0908184A0 /* NutritionHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionHealthKitService.swift; sourceTree = "<group>"; };
+		D2D5FB03FDF74007AE5B73AC /* LogNutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNutritionView.swift; sourceTree = "<group>"; };
+		40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDailyNutritionLogRepository.swift; sourceTree = "<group>"; };
+		CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNutritionHealthKitService.swift; sourceTree = "<group>"; };
+		F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyNutritionLogStoreTests.swift; sourceTree = "<group>"; };
 		934BC148AC0F4E06B8705BEA /* LogWeightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWeightView.swift; sourceTree = "<group>"; };
 		496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMeasurementLogRepository.swift; sourceTree = "<group>"; };
 		BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMetricsHealthKitService.swift; sourceTree = "<group>"; };
@@ -692,6 +714,7 @@
 			isa = PBXGroup;
 			children = (
 				2B7D2BBF3C1249A9977740FA /* GoalsView.swift */,
+				D2D5FB03FDF74007AE5B73AC /* LogNutritionView.swift */,
 			);
 			path = Nutrition;
 			sourceTree = "<group>";
@@ -1189,6 +1212,7 @@
 				F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */,
 				F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */,
 				668D36AE2FD6419FA874B901 /* MacroGoalReplacing.swift */,
+				9B87B19E9E33458BAC67CEAB /* DailyNutritionLogReplacing.swift */,
 				F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */,
 				F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */,
 				F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */,
@@ -1389,6 +1413,9 @@
 				7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */,
 				92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */,
 				2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */,
+				40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */,
+				CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */,
+				F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -1484,6 +1511,7 @@
 			children = (
 				2064A3E372804CA1A143479D /* Models */,
 				443AD4EB44B344ABA9379A8F /* Repositories */,
+				BFFBB4F2EF054CAAA6EA89A6 /* Services */,
 				08B6F93144D449618D663A86 /* Stores */,
 			);
 			path = Nutrition;
@@ -1493,6 +1521,7 @@
 			isa = PBXGroup;
 			children = (
 				CFC2031A2E9E40FCAFDA0EC2 /* MacroGoal.swift */,
+				9CAAFB41FE0D40E29F8518B4 /* DailyNutritionLog.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1502,14 +1531,26 @@
 			children = (
 				B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */,
 				F637A6714D394AA9BE1D6985 /* FileMacroGoalRepository.swift */,
+				632374CE4EA04CE9B7C876C1 /* DailyNutritionLogRepository.swift */,
+				B811A2316A7C46ACB9AD2A26 /* FileDailyNutritionLogRepository.swift */,
 			);
 			path = Repositories;
+			sourceTree = "<group>";
+		};
+		BFFBB4F2EF054CAAA6EA89A6 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C0877F8B6FA34134AC31AE71 /* NutritionHealthKitServicing.swift */,
+				09395B3110084ED0908184A0 /* NutritionHealthKitService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		08B6F93144D449618D663A86 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
 				2110046977E0499991F4EAB3 /* MacroGoalStore.swift */,
+				61C255D4A95245F5AA831B48 /* DailyNutritionLogStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -1871,6 +1912,14 @@
 				B13D1C9A61C54403A752EC2F /* MacroGoalStore.swift in Sources */,
 				2ADFB6CA213141C6AF694C9D /* MacroGoalReplacing.swift in Sources */,
 				279B6C3D317F4EA3B224C0C7 /* GoalsView.swift in Sources */,
+				FEEF8511E9F44D1D8650285D /* DailyNutritionLog.swift in Sources */,
+				21344FECB89841EE978B19B4 /* DailyNutritionLogRepository.swift in Sources */,
+				91EB5242B5624327B6C032AC /* FileDailyNutritionLogRepository.swift in Sources */,
+				63B9DBAE9B6F477B83FBCAFF /* DailyNutritionLogStore.swift in Sources */,
+				0B067EADD64B44969DF1CEA7 /* DailyNutritionLogReplacing.swift in Sources */,
+				2E746867A5D240F6921E9DBC /* NutritionHealthKitServicing.swift in Sources */,
+				51BFE5040C144FF4AB11E67F /* NutritionHealthKitService.swift in Sources */,
+				AEFABBA1ABAC4817917373D0 /* LogNutritionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1915,6 +1964,9 @@
 				9E7FDD8481FC415AA546400B /* BodyMeasurementLogStoreTests.swift in Sources */,
 				391B04EEA2DE416390CA331E /* MockMacroGoalRepository.swift in Sources */,
 				B90D101D213A42049774102D /* MacroGoalStoreTests.swift in Sources */,
+				D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */,
+				250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */,
+				ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

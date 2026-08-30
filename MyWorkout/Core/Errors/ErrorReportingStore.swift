@@ -32,3 +32,5 @@ extension CustomExerciseStore: ErrorReportingStore {}
 extension BodyMeasurementLogStore: ErrorReportingStore {}
 
 extension MacroGoalStore: ErrorReportingStore {}
+
+extension DailyNutritionLogStore: ErrorReportingStore {}

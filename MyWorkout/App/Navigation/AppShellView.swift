@@ -195,6 +195,9 @@ struct AppShellView: View {
         case .macroGoals:
             GoalsView()
 
+        case .logNutrition:
+            LogNutritionView()
+
         case .activeWorkout:
             WorkoutSessionView()
 

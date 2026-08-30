@@ -1,7 +1,7 @@
 import Foundation
 
 struct AppBackup: Codable {
-    static let currentVersion = 4
+    static let currentVersion = 5
 
     let version: Int
     let exportedAt: Date
@@ -16,6 +16,7 @@ struct AppBackup: Codable {
     /// body-metrics field backed up here.
     let bodyMeasurementLogs: [BodyMeasurementLog]
     let macroGoals: [MacroGoal]
+    let dailyNutritionLogs: [DailyNutritionLog]
 
     init(
         version: Int = Self.currentVersion,
@@ -26,7 +27,8 @@ struct AppBackup: Codable {
         settings: UserSettings,
         customExercises: [StoredCustomExercise] = [],
         bodyMeasurementLogs: [BodyMeasurementLog] = [],
-        macroGoals: [MacroGoal] = []
+        macroGoals: [MacroGoal] = [],
+        dailyNutritionLogs: [DailyNutritionLog] = []
     ) {
         self.version = version
         self.exportedAt = exportedAt
@@ -37,6 +39,7 @@ struct AppBackup: Codable {
         self.customExercises = customExercises
         self.bodyMeasurementLogs = bodyMeasurementLogs
         self.macroGoals = macroGoals
+        self.dailyNutritionLogs = dailyNutritionLogs
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -49,6 +52,7 @@ struct AppBackup: Codable {
         case customExercises
         case bodyMeasurementLogs
         case macroGoals
+        case dailyNutritionLogs
     }
 
     init(from decoder: Decoder) throws {
@@ -91,6 +95,10 @@ struct AppBackup: Codable {
         macroGoals = try container.decodeIfPresent(
             [MacroGoal].self,
             forKey: .macroGoals
+        ) ?? []
+        dailyNutritionLogs = try container.decodeIfPresent(
+            [DailyNutritionLog].self,
+            forKey: .dailyNutritionLogs
         ) ?? []
     }
 }
