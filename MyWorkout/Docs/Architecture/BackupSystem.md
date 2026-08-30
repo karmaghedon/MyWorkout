@@ -16,11 +16,12 @@ The backup system provides a portable JSON representation of user-owned applicat
 - user settings
 - custom exercises
 - body measurement logs (neck circumference only — see below)
+- macro goals (calorie/macro target history)
 
 Current backup version:
 
 ```swift
-AppBackup.currentVersion == 3
+AppBackup.currentVersion == 4
 ```
 
 HealthKit-resident data (weight, body fat %, waist circumference,
@@ -32,12 +33,12 @@ type for.
 
 ## Backward compatibility
 
-`customExercises` and `bodyMeasurementLogs` both decode with an
-empty-array fallback. This allows older backups that predate either
-field to remain readable.
+`customExercises`, `bodyMeasurementLogs`, and `macroGoals` all decode
+with an empty-array fallback. This allows older backups that predate
+any of these fields to remain readable.
 
 ```text
-missing customExercises / bodyMeasurementLogs
+missing customExercises / bodyMeasurementLogs / macroGoals
    ↓
 []
 ```
@@ -100,6 +101,7 @@ The importer depends on narrow replacement capabilities:
 - `SettingsReplacing`
 - `CustomExerciseReplacing`
 - `BodyMeasurementLogReplacing`
+- `MacroGoalReplacing`
 
 This makes the import coordinator testable without constructing real persistence stores.
 
@@ -113,6 +115,7 @@ Current replacement order:
 4. settings
 5. custom exercises
 6. body measurement logs
+7. macro goals
 
 The order is part of current behavior and should be covered by regression tests if dependency assumptions develop.
 

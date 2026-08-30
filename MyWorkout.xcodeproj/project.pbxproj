@@ -250,6 +250,14 @@
 		2E11EFC52D1040E7BB59CE24 /* BodyMetricsHealthKitServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */; };
 		29DEA22041094F41A2F35C72 /* BodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */; };
 		59EA408FD3AB46B3912774A6 /* BodyMeasurementLogReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */; };
+		0A4CCF5FBE0D4D4DA8BA0236 /* MacroGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC2031A2E9E40FCAFDA0EC2 /* MacroGoal.swift */; };
+		B45AD8CCBFCD45DEA0670F69 /* MacroGoalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */; };
+		7B409E3950A1400FBEF93539 /* FileMacroGoalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F637A6714D394AA9BE1D6985 /* FileMacroGoalRepository.swift */; };
+		B13D1C9A61C54403A752EC2F /* MacroGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110046977E0499991F4EAB3 /* MacroGoalStore.swift */; };
+		2ADFB6CA213141C6AF694C9D /* MacroGoalReplacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668D36AE2FD6419FA874B901 /* MacroGoalReplacing.swift */; };
+		279B6C3D317F4EA3B224C0C7 /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7D2BBF3C1249A9977740FA /* GoalsView.swift */; };
+		391B04EEA2DE416390CA331E /* MockMacroGoalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */; };
+		B90D101D213A42049774102D /* MacroGoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */; };
 		D343C96750CC48B99E3D5862 /* LogWeightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934BC148AC0F4E06B8705BEA /* LogWeightView.swift */; };
 		0AD031E5FC9C42C2B68859B7 /* MockBodyMeasurementLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */; };
 		F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */; };
@@ -413,6 +421,7 @@
 		F54B812A300D018D00615DA0 /* DevelopmentRoadmap.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentRoadmap.md; sourceTree = "<group>"; };
 		F54B812B300D018D00615DA0 /* DevelopmentWorkflow.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DevelopmentWorkflow.md; sourceTree = "<group>"; };
 		F54B812C300D018D00615DA0 /* ReleaseChecklist.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = ReleaseChecklist.md; sourceTree = "<group>"; };
+		CC93CA5A11F64633A0C885DE /* WeightMacroTrainingRoadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = WeightMacroTrainingRoadmap.md; sourceTree = "<group>"; };
 		F54B812E300D018D00615DA0 /* Analytics.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Analytics.md; sourceTree = "<group>"; };
 		F54B812F300D018D00615DA0 /* CustomExercises.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CustomExercises.md; sourceTree = "<group>"; };
 		F54B8130300D018D00615DA0 /* EquipmentInventory.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = EquipmentInventory.md; sourceTree = "<group>"; };
@@ -547,6 +556,15 @@
 		461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMetricsHealthKitServicing.swift; sourceTree = "<group>"; };
 		B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMetricsHealthKitService.swift; sourceTree = "<group>"; };
 		35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyMeasurementLogReplacing.swift; sourceTree = "<group>"; };
+		CFC2031A2E9E40FCAFDA0EC2 /* MacroGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoal.swift; sourceTree = "<group>"; };
+		B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalRepository.swift; sourceTree = "<group>"; };
+		F637A6714D394AA9BE1D6985 /* FileMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMacroGoalRepository.swift; sourceTree = "<group>"; };
+		2110046977E0499991F4EAB3 /* MacroGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStore.swift; sourceTree = "<group>"; };
+		668D36AE2FD6419FA874B901 /* MacroGoalReplacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalReplacing.swift; sourceTree = "<group>"; };
+		2B7D2BBF3C1249A9977740FA /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
+		EF93EEB1DA43471C8A04A8A6 /* Nutrition.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Nutrition.md; sourceTree = "<group>"; };
+		92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMacroGoalRepository.swift; sourceTree = "<group>"; };
+		2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStoreTests.swift; sourceTree = "<group>"; };
 		934BC148AC0F4E06B8705BEA /* LogWeightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWeightView.swift; sourceTree = "<group>"; };
 		496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMeasurementLogRepository.swift; sourceTree = "<group>"; };
 		BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBodyMetricsHealthKitService.swift; sourceTree = "<group>"; };
@@ -651,6 +669,7 @@
 				980F1444F7A3FA85E035C5DC /* ExerciseLibrary */,
 				D5B0329385884637F91C8AD9 /* Export */,
 				6AC0719028128D2297FDAFDA /* History */,
+				5B9624F950F14D77B65C80E6 /* Nutrition */,
 				02ACFC1728FBFBC10367F8B9 /* Profile */,
 				67FF71775A43602CEAAEEC28 /* Progress */,
 				CC0C23F35D49BC8A9B409B07 /* Settings */,
@@ -667,6 +686,14 @@
 				934BC148AC0F4E06B8705BEA /* LogWeightView.swift */,
 			);
 			path = BodyMetrics;
+			sourceTree = "<group>";
+		};
+		5B9624F950F14D77B65C80E6 /* Nutrition */ = {
+			isa = PBXGroup;
+			children = (
+				2B7D2BBF3C1249A9977740FA /* GoalsView.swift */,
+			);
+			path = Nutrition;
 			sourceTree = "<group>";
 		};
 		02ACFC1728FBFBC10367F8B9 /* Profile */ = {
@@ -1052,6 +1079,7 @@
 				F54B8133300D018D00615DA0 /* Recovery.md */,
 				F54B8134300D018D00615DA0 /* Templates.md */,
 				62FDE05263AD419DBF9AF1D0 /* WeightTracking.md */,
+				EF93EEB1DA43471C8A04A8A6 /* Nutrition.md */,
 				F54B8135300D018D00615DA0 /* WorkoutSessions.md */,
 			);
 			path = Features;
@@ -1160,6 +1188,7 @@
 				35FC111174214C119E8DAB06 /* BodyMeasurementLogReplacing.swift */,
 				F54B8112300CF6A400615DA0 /* CustomExerciseReplacing.swift */,
 				F54B8116300CF6B700615DA0 /* EquipmentReplacing.swift */,
+				668D36AE2FD6419FA874B901 /* MacroGoalReplacing.swift */,
 				F54B8114300CF6AF00615DA0 /* SettingsReplacing.swift */,
 				F54B811A300CF6CA00615DA0 /* WorkoutLogReplacing.swift */,
 				F54B8118300CF6C300615DA0 /* WorkoutTemplateReplacing.swift */,
@@ -1223,6 +1252,7 @@
 				F54B812A300D018D00615DA0 /* DevelopmentRoadmap.md */,
 				F54B812B300D018D00615DA0 /* DevelopmentWorkflow.md */,
 				F54B812C300D018D00615DA0 /* ReleaseChecklist.md */,
+				CC93CA5A11F64633A0C885DE /* WeightMacroTrainingRoadmap.md */,
 			);
 			path = Development;
 			sourceTree = "<group>";
@@ -1357,6 +1387,8 @@
 				496565B324DF4E839D087608 /* MockBodyMeasurementLogRepository.swift */,
 				BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */,
 				7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */,
+				92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */,
+				2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
 			sourceTree = "<group>";
@@ -1419,6 +1451,7 @@
 				7D6861F949899863A8B5FC40 /* Equipment */,
 				664648032D8763B8B56A4E32 /* Exercise */,
 				C06C875FA4E6488FBCEF5D8B /* Health */,
+				BE9CBEA3D3E94F1C83B09DDE /* Nutrition */,
 				844A824BF75DE7B86BD120E3 /* Settings */,
 				0A2765FC1384FB8E3B78918F /* Workout */,
 			);
@@ -1444,6 +1477,41 @@
 				6021A2FA9AE64EF593E877B3 /* BodyMeasurementLog.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		BE9CBEA3D3E94F1C83B09DDE /* Nutrition */ = {
+			isa = PBXGroup;
+			children = (
+				2064A3E372804CA1A143479D /* Models */,
+				443AD4EB44B344ABA9379A8F /* Repositories */,
+				08B6F93144D449618D663A86 /* Stores */,
+			);
+			path = Nutrition;
+			sourceTree = "<group>";
+		};
+		2064A3E372804CA1A143479D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CFC2031A2E9E40FCAFDA0EC2 /* MacroGoal.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		443AD4EB44B344ABA9379A8F /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */,
+				F637A6714D394AA9BE1D6985 /* FileMacroGoalRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		08B6F93144D449618D663A86 /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				2110046977E0499991F4EAB3 /* MacroGoalStore.swift */,
+			);
+			path = Stores;
 			sourceTree = "<group>";
 		};
 		A30A31B3A40940D498CC528B /* Repositories */ = {
@@ -1797,6 +1865,12 @@
 				29DEA22041094F41A2F35C72 /* BodyMetricsHealthKitService.swift in Sources */,
 				59EA408FD3AB46B3912774A6 /* BodyMeasurementLogReplacing.swift in Sources */,
 				D343C96750CC48B99E3D5862 /* LogWeightView.swift in Sources */,
+				0A4CCF5FBE0D4D4DA8BA0236 /* MacroGoal.swift in Sources */,
+				B45AD8CCBFCD45DEA0670F69 /* MacroGoalRepository.swift in Sources */,
+				7B409E3950A1400FBEF93539 /* FileMacroGoalRepository.swift in Sources */,
+				B13D1C9A61C54403A752EC2F /* MacroGoalStore.swift in Sources */,
+				2ADFB6CA213141C6AF694C9D /* MacroGoalReplacing.swift in Sources */,
+				279B6C3D317F4EA3B224C0C7 /* GoalsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1839,6 +1913,8 @@
 				0AD031E5FC9C42C2B68859B7 /* MockBodyMeasurementLogRepository.swift in Sources */,
 				F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */,
 				9E7FDD8481FC415AA546400B /* BodyMeasurementLogStoreTests.swift in Sources */,
+				391B04EEA2DE416390CA331E /* MockMacroGoalRepository.swift in Sources */,
+				B90D101D213A42049774102D /* MacroGoalStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

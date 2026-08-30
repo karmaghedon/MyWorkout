@@ -9,6 +9,7 @@ struct DashboardView: View {
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @EnvironmentObject private var analyticsCache: AnalyticsCache
     @EnvironmentObject private var bodyMeasurementLogStore: BodyMeasurementLogStore
+    @EnvironmentObject private var macroGoalStore: MacroGoalStore
 
     /// Routes to the Workout tab, resuming an in-progress session when one
     /// exists. Owned by `AppShellView` since only it holds tab selection
@@ -595,7 +596,8 @@ struct DashboardView: View {
             settingsStore,
             activeWorkoutStore,
             customExerciseStore,
-            bodyMeasurementLogStore
+            bodyMeasurementLogStore,
+            macroGoalStore
         ]
     }
 

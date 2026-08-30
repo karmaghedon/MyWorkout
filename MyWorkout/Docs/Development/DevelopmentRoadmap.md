@@ -112,6 +112,22 @@ The remaining large files were reviewed by responsibility rather than line count
 - ☐ release notes
 - ☐ version 1.0 architecture review
 
+## Phase 21 — Weight, Macro & Training Tracking
+
+Multi-week feature adding HealthKit-backed weight/nutrition tracking
+and FatSecret food-diary sync, built in 8 independently-verified
+phases. Full breakdown, cross-cutting rules, and per-phase backup
+version: `Docs/Development/WeightMacroTrainingRoadmap.md`.
+
+- ✅ 21.1 HealthKit Foundation + Log Weight — `AppBackup` v3
+- ✅ 21.2 Macro Goals — `AppBackup` v4
+- ☐ 21.3 Manual Food Log Entry — `AppBackup` v5
+- ☐ 21.4 Home/Today Nutrition Unification
+- ☐ 21.5 Weekly Report
+- ☐ 21.6 Progress Chart
+- ☐ 21.7 FatSecret OAuth Connection — `AppBackup` v6
+- ☐ 21.8 FatSecret Food Diary Sync
+
 ## Deferred product ideas
 
 - exercise search

@@ -1,7 +1,7 @@
 import Foundation
 
 struct AppBackup: Codable {
-    static let currentVersion = 3
+    static let currentVersion = 4
 
     let version: Int
     let exportedAt: Date
@@ -15,6 +15,7 @@ struct AppBackup: Codable {
     /// HealthKit/iCloud. Neck has no HealthKit type, so it's the one
     /// body-metrics field backed up here.
     let bodyMeasurementLogs: [BodyMeasurementLog]
+    let macroGoals: [MacroGoal]
 
     init(
         version: Int = Self.currentVersion,
@@ -24,7 +25,8 @@ struct AppBackup: Codable {
         equipment: EquipmentInventory,
         settings: UserSettings,
         customExercises: [StoredCustomExercise] = [],
-        bodyMeasurementLogs: [BodyMeasurementLog] = []
+        bodyMeasurementLogs: [BodyMeasurementLog] = [],
+        macroGoals: [MacroGoal] = []
     ) {
         self.version = version
         self.exportedAt = exportedAt
@@ -34,6 +36,7 @@ struct AppBackup: Codable {
         self.settings = settings
         self.customExercises = customExercises
         self.bodyMeasurementLogs = bodyMeasurementLogs
+        self.macroGoals = macroGoals
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -45,6 +48,7 @@ struct AppBackup: Codable {
         case settings
         case customExercises
         case bodyMeasurementLogs
+        case macroGoals
     }
 
     init(from decoder: Decoder) throws {
@@ -83,6 +87,10 @@ struct AppBackup: Codable {
         bodyMeasurementLogs = try container.decodeIfPresent(
             [BodyMeasurementLog].self,
             forKey: .bodyMeasurementLogs
+        ) ?? []
+        macroGoals = try container.decodeIfPresent(
+            [MacroGoal].self,
+            forKey: .macroGoals
         ) ?? []
     }
 }

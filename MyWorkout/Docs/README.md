@@ -35,6 +35,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `CustomExercises.md`
 - `Recovery.md`
 - `WeightTracking.md`
+- `Nutrition.md`
 
 ## Development documents
 
@@ -42,6 +43,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `DevelopmentWorkflow.md`
 - `CodingStandards.md`
 - `ReleaseChecklist.md`
+- `WeightMacroTrainingRoadmap.md`
 
 ## Documentation rule
 

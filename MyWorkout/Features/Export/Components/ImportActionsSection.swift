@@ -7,6 +7,7 @@ struct ImportActionsSection: View {
     @EnvironmentObject var equipmentStore: EquipmentInventoryStore
     @EnvironmentObject var customExerciseStore: CustomExerciseStore
     @EnvironmentObject var bodyMeasurementLogStore: BodyMeasurementLogStore
+    @EnvironmentObject var macroGoalStore: MacroGoalStore
 
     @State private var showJSONImporter = false
 
@@ -25,7 +26,8 @@ struct ImportActionsSection: View {
             equipmentStore: equipmentStore,
             settingsStore: settingsStore,
             customExerciseStore: customExerciseStore,
-            bodyMeasurementLogStore: bodyMeasurementLogStore
+            bodyMeasurementLogStore: bodyMeasurementLogStore,
+            macroGoalStore: macroGoalStore
         )
     }
 

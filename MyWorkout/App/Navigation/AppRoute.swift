@@ -13,6 +13,7 @@ enum AppRoute: Hashable {
     case settings
     case export
     case logWeight
+    case macroGoals
 
     // MARK: - Detail Destinations
 

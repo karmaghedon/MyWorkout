@@ -12,6 +12,7 @@ struct MyWorkoutApp: App {
     @StateObject private var favoriteExercisesStore = FavoriteExercisesStore()
     @StateObject private var healthKitAuthorizationManager = HealthKitAuthorizationManager()
     @StateObject private var bodyMeasurementLogStore = BodyMeasurementLogStore()
+    @StateObject private var macroGoalStore = MacroGoalStore()
 
     var body: some Scene {
         WindowGroup {
@@ -27,6 +28,7 @@ struct MyWorkoutApp: App {
                 .environmentObject(favoriteExercisesStore)
                 .environmentObject(healthKitAuthorizationManager)
                 .environmentObject(bodyMeasurementLogStore)
+                .environmentObject(macroGoalStore)
                 .onAppear {
                     analyticsCache.bind(
                         to: logStore,

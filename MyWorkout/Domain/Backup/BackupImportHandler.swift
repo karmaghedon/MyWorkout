@@ -20,6 +20,7 @@ struct BackupImportHandler {
     let settingsStore: any SettingsReplacing
     let customExerciseStore: any CustomExerciseReplacing
     let bodyMeasurementLogStore: any BodyMeasurementLogReplacing
+    let macroGoalStore: any MacroGoalReplacing
 
     func importBackup(
         from url: URL
@@ -97,6 +98,10 @@ struct BackupImportHandler {
 
             bodyMeasurementLogStore.replaceAll(
                 with: backup.bodyMeasurementLogs
+            )
+
+            macroGoalStore.replaceAll(
+                with: backup.macroGoals
             )
 
             return .success

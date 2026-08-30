@@ -192,6 +192,9 @@ struct AppShellView: View {
         case .logWeight:
             LogWeightView()
 
+        case .macroGoals:
+            GoalsView()
+
         case .activeWorkout:
             WorkoutSessionView()
 
