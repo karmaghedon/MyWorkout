@@ -125,8 +125,9 @@ version: `Docs/Development/WeightMacroTrainingRoadmap.md`.
 - ✅ 21.4 Home/Today Nutrition Unification
 - ✅ 21.5 Weekly Report
 - ✅ 21.6 Progress Chart
-- ☐ 21.7 FatSecret OAuth Connection — `AppBackup` v6
-- ☐ 21.8 FatSecret Food Diary Sync
+- ⏸ 21.7 FatSecret OAuth Connection — `AppBackup` v6 — **on hold**,
+  blocked on the user obtaining FatSecret developer credentials
+- ⏸ 21.8 FatSecret Food Diary Sync — on hold (depends on 21.7)
 
 ## Deferred product ideas
 

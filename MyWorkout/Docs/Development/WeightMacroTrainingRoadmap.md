@@ -49,17 +49,24 @@ than expanding the 5-tab chrome.
   weight/waist/neck cards, windowed by actual logging cadence rather
   than fixed calendar weeks. `WeeklyReportView`, reached from Progress.
   See `Docs/Features/WeeklyReport.md`.
-- ✅ **Phase 6 — Progress Chart.** Swift Charts line chart of weight
-  over time with optional waist/neck panels and a 1M/3M/6M/1Y/All
-  range picker. `BodyProgressView`, reached from Progress. See
-  `Docs/Features/BodyProgress.md`.
-- ☐ **Phase 7 — FatSecret OAuth Connection.** 3-legged OAuth 1.0a via
+- ✅ **Phase 6 — Progress Chart.** Single Swift Charts line chart with
+  weight, waist, and neck as color-coded lines toggled independently
+  (not separate panels — combined onto one shared axis per explicit
+  request, despite the lb/kg vs. cm unit mismatch), plus a
+  1M/3M/6M/1Y/All range picker. `BodyProgressView`, reached from
+  Progress. See `Docs/Features/BodyProgress.md`.
+- ⏸ **Phase 7 — FatSecret OAuth Connection. ON HOLD.** Deferred at the
+  user's request after Phase 6 — will resume later. Blocked on the
+  user obtaining a FatSecret developer account (consumer key/secret)
+  before any of this phase's code can be written; nothing here can
+  start without those credentials. 3-legged OAuth 1.0a via
   `ASWebAuthenticationSession`; tokens in Keychain only (never
   backed up). Requires migrating the app target from
   `GENERATE_INFOPLIST_FILE = YES` to a physical `Info.plist` to
   express the callback URL scheme. `FatSecretConnectionView`, reached
   from Profile. `AppBackup` → v6 (connection metadata only).
-- ☐ **Phase 8 — FatSecret Daily Totals Sync.** "Sync from FatSecret"
+- ⏸ **Phase 8 — FatSecret Daily Totals Sync. ON HOLD** (depends on
+  Phase 7). "Sync from FatSecret"
   pulls a day's calorie/macro totals (not an item-by-item diary, per
   Phase 3's redirection) and upserts them into the same
   `DailyNutritionLogStore` + HealthKit path `LogNutritionView`'s manual
