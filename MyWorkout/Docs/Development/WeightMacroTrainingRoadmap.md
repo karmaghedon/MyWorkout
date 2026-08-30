@@ -49,12 +49,16 @@ than expanding the 5-tab chrome.
   weight/waist/neck cards, windowed by actual logging cadence rather
   than fixed calendar weeks. `WeeklyReportView`, reached from Progress.
   See `Docs/Features/WeeklyReport.md`.
-- ✅ **Phase 6 — Progress Chart.** Single Swift Charts line chart with
-  weight, waist, and neck as color-coded lines toggled independently
-  (not separate panels — combined onto one shared axis per explicit
-  request, despite the lb/kg vs. cm unit mismatch), plus a
-  1M/3M/6M/1Y/All range picker. `BodyProgressView`, reached from
-  Progress. See `Docs/Features/BodyProgress.md`.
+- ✅ **Phase 6 — Progress Chart.** Extended past its original scope
+  (weight/waist/neck) after seeing a reference design: now six
+  toggle-selectable metrics (weight, body fat %, waist, neck,
+  calories, steps) on one combined, independently-normalized chart,
+  with a smoothed weight trend line, tap-to-inspect tooltip, and a
+  paged 1W/1M/3M/6M/1Y/All date range (chevrons step through history
+  instead of always anchoring to "today minus N"). Added
+  `ActivityHealthKitServicing` for read-only step counts.
+  `BodyProgressView`, reached from Progress. See
+  `Docs/Features/BodyProgress.md`.
 - ⏸ **Phase 7 — FatSecret OAuth Connection. ON HOLD.** Deferred at the
   user's request after Phase 6 — will resume later. Blocked on the
   user obtaining a FatSecret developer account (consumer key/secret)
