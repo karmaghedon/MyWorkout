@@ -1,12 +1,14 @@
 import Foundation
 
-/// Computed, never persisted — `reload(neckLogs:)` re-fetches weight/waist
-/// from HealthKit and feeds them plus the caller-supplied local neck logs
-/// into `WeeklyBodyReportEngine`. Neck logs are passed in rather than
-/// injected as a `BodyMeasurementLogStore` dependency at init time, since
-/// `@StateObject` properties in `MyWorkoutApp` can't reference sibling
-/// `@StateObject` properties during initialization — the caller (a View,
-/// which already holds both as `@EnvironmentObject`s) bridges the two.
+/// Computed, never persisted — `reload(bodyMeasurementLogs:sex:heightCm:)`
+/// re-fetches weight/waist/body-fat-% from HealthKit and feeds them plus
+/// the caller-supplied local neck/hip logs into `WeeklyBodyReportEngine`.
+/// Neck/hip logs, sex, and height are all passed in rather than injected
+/// as dependencies at init time, since `@StateObject` properties in
+/// `MyWorkoutApp` can't reference sibling `@StateObject` properties
+/// during initialization — the caller (a View, which already holds
+/// `BodyMeasurementLogStore` and `UserSettingsStore` as
+/// `@EnvironmentObject`s) bridges them.
 ///
 /// `.task`-loaded on view appear; there is no live `HKObserverQuery` push,
 /// so a change made in Apple's Health app directly won't appear until the
@@ -26,15 +28,42 @@ final class WeeklyBodyReportStore: ObservableObject {
         self.healthKitService = healthKitService
     }
 
-    func reload(neckLogs: [BodyMeasurementLog]) async {
+    func reload(
+        bodyMeasurementLogs: [BodyMeasurementLog],
+        sex: BiologicalSex?,
+        heightCm: Double?
+    ) async {
         isLoading = true
 
         do {
             let weight = try await healthKitService.weightSamples(since: .distantPast)
             let waist = try await healthKitService.waistSamples(since: .distantPast)
-            let neck = neckLogs.map { DatedValue(date: $0.date, value: $0.neckCm) }
+            let actualBodyFatPercent = try await healthKitService.bodyFatPercentSamples(since: .distantPast)
 
-            cards = WeeklyBodyReportEngine.reportCards(bodyMass: weight, waist: waist, neck: neck)
+            let neck = bodyMeasurementLogs.compactMap { log -> DatedValue? in
+                guard let neckCm = log.neckCm else { return nil }
+                return DatedValue(date: log.date, value: neckCm)
+            }
+            let hip = bodyMeasurementLogs.compactMap { log -> DatedValue? in
+                guard let hipCm = log.hipCm else { return nil }
+                return DatedValue(date: log.date, value: hipCm)
+            }
+
+            let bodyFatPercent = NavyBodyFatCalculator.fillGaps(
+                actual: actualBodyFatPercent,
+                waist: waist,
+                neck: neck,
+                hip: hip,
+                sex: sex,
+                heightCm: heightCm
+            )
+
+            cards = WeeklyBodyReportEngine.reportCards(
+                bodyMass: weight,
+                waist: waist,
+                neck: neck,
+                bodyFatPercent: bodyFatPercent
+            )
             loadError = nil
         } catch {
             loadError = "Couldn't load your weekly report: \(error.localizedDescription)"

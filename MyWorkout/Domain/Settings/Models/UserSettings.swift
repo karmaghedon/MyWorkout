@@ -91,6 +91,14 @@ struct UserSettings: Codable {
     /// can be switched independently — e.g. training in lb while tracking
     /// body weight in kg.
     var bodyWeightUnitSystem: UnitSystem
+    /// Only used to pick which U.S. Navy body-fat formula variant
+    /// applies (`NavyBodyFatCalculator`). `nil` until the user fills in
+    /// the Body Profile section — the calculator simply can't produce
+    /// an estimate until then.
+    var biologicalSex: BiologicalSex?
+    /// Centimeters. Same reasoning as `biologicalSex`: `nil` until set,
+    /// needed only for the Navy body-fat estimate.
+    var heightCm: Double?
     var compoundRestSeconds: Int
     var isolationRestSeconds: Int
     var bodyweightRestSeconds: Int
@@ -103,6 +111,8 @@ struct UserSettings: Codable {
     static let defaults = UserSettings(
         unitSystem: .pounds,
         bodyWeightUnitSystem: .pounds,
+        biologicalSex: nil,
+        heightCm: nil,
         compoundRestSeconds: 180,
         isolationRestSeconds: 90,
         bodyweightRestSeconds: 120,
@@ -140,6 +150,8 @@ struct UserSettings: Codable {
     private enum CodingKeys: String, CodingKey {
         case unitSystem
         case bodyWeightUnitSystem
+        case biologicalSex
+        case heightCm
         case compoundRestSeconds
         case isolationRestSeconds
         case bodyweightRestSeconds
@@ -153,6 +165,8 @@ struct UserSettings: Codable {
     init(
         unitSystem: UnitSystem,
         bodyWeightUnitSystem: UnitSystem,
+        biologicalSex: BiologicalSex?,
+        heightCm: Double?,
         compoundRestSeconds: Int,
         isolationRestSeconds: Int,
         bodyweightRestSeconds: Int,
@@ -164,6 +178,8 @@ struct UserSettings: Codable {
     ) {
         self.unitSystem = unitSystem
         self.bodyWeightUnitSystem = bodyWeightUnitSystem
+        self.biologicalSex = biologicalSex
+        self.heightCm = heightCm
         self.compoundRestSeconds = compoundRestSeconds
         self.isolationRestSeconds = isolationRestSeconds
         self.bodyweightRestSeconds = bodyweightRestSeconds
@@ -190,6 +206,16 @@ struct UserSettings: Codable {
             UnitSystem.self,
             forKey: .bodyWeightUnitSystem
         ) ?? defaults.bodyWeightUnitSystem
+
+        biologicalSex = try container.decodeIfPresent(
+            BiologicalSex.self,
+            forKey: .biologicalSex
+        ) ?? defaults.biologicalSex
+
+        heightCm = try container.decodeIfPresent(
+            Double.self,
+            forKey: .heightCm
+        ) ?? defaults.heightCm
 
         compoundRestSeconds = try container.decodeIfPresent(
             Int.self,

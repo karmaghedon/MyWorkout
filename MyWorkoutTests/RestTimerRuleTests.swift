@@ -11,6 +11,8 @@ final class RestTimerRuleTests: XCTestCase {
         UserSettings(
             unitSystem: .pounds,
             bodyWeightUnitSystem: .pounds,
+            biologicalSex: nil,
+            heightCm: nil,
             compoundRestSeconds: compound,
             isolationRestSeconds: isolation,
             bodyweightRestSeconds: bodyweight,

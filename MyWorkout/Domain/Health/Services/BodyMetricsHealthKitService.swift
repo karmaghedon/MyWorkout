@@ -65,6 +65,19 @@ final class BodyMetricsHealthKitService: BodyMetricsHealthKitServicing {
         )
     }
 
+    func bodyFatPercentSamples(since date: Date) async throws -> [DatedValue] {
+        let fractions = try await samples(
+            type: HealthKitTypeCatalog.bodyFatPercentageType,
+            unit: .percent(),
+            since: date
+        )
+
+        // HealthKit stores a 0-1 fraction; every other body fat %
+        // value in this app (LogWeightView's input, NavyBodyFatCalculator's
+        // output) is 0-100.
+        return fractions.map { DatedValue(date: $0.date, value: $0.value * 100) }
+    }
+
     private func samples(
         type: HKQuantityType,
         unit: HKUnit,

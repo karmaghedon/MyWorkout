@@ -25,4 +25,11 @@ protocol BodyMetricsHealthKitServicing {
     /// All waist-circumference samples (in centimeters) recorded on or
     /// after `date`, oldest first. Feeds `WeeklyBodyReportEngine`.
     func waistSamples(since date: Date) async throws -> [DatedValue]
+
+    /// All body fat % samples (0–100 scale, converted back from
+    /// HealthKit's 0–1 fraction) recorded on or after `date`, oldest
+    /// first. A day with no sample here means the user never entered or
+    /// synced a direct reading for it — `NavyBodyFatCalculator` fills
+    /// that gap from waist/neck/hip instead.
+    func bodyFatPercentSamples(since date: Date) async throws -> [DatedValue]
 }

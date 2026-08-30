@@ -93,10 +93,39 @@ HealthKit can corrupt real production data or pop real permission
 dialogs — this already happened once to this project's real template
 data before this rule was written down.
 
+## Body Profile and the Navy body-fat estimate
+
+Added after the original phases shipped, in response to wanting the
+Weekly Report to show body fat % even on weeks without a direct
+scale/manual reading. `UserSettings` gained two optional fields —
+`biologicalSex: BiologicalSex?` and `heightCm: Double?` — entered once
+in a "Body Profile" section on `SettingsView`, used for nothing except
+picking which variant of the U.S. Navy circumference formula applies
+(`NavyBodyFatCalculator`, in `Domain/Health/`). Both are `nil` until
+the user fills them in; the app never requires them.
+
+`BodyMeasurementLog` gained a second optional field, `hipCm`, needed
+only for the women's Navy formula (the men's formula doesn't use hip
+at all). Both `neckCm` and `hipCm` are now `Optional`, and
+`LogWeightView` saves a `BodyMeasurementLog` when *either* toggle is
+on — logging just a neck or just a hip measurement is valid, not only
+both together. The "Hip" toggle only appears on `LogWeightView` when
+`biologicalSex == .female`.
+
+`NavyBodyFatCalculator.estimate(sex:heightCm:waistCm:neckCm:hipCm:)`
+is a pure function (±3–4% accuracy vs. hydrostatic weighing, per the
+published U.S. Navy method) that returns `nil` outside its formula's
+valid domain (e.g. waist not exceeding neck) rather than a nonsensical
+result. `NavyBodyFatCalculator.fillGaps(...)` merges actual HealthKit
+body-fat-% readings with estimates computed from that day's
+waist/neck(/hip) — an actual reading for a day is never overridden by
+an estimate; this is strictly a gap-filler, used by
+`WeeklyBodyReportStore` (see `Docs/Features/WeeklyReport.md`).
+
 ## Future extensions
 
-- Inches/cm toggle for waist and neck, matching the existing lb/kg
-  toggle for weight.
-- Editing or deleting a previously-logged neck measurement.
+- Inches/cm toggle for waist, neck, hip, and height, matching the
+  existing lb/kg toggle for weight.
+- Editing or deleting a previously-logged neck/hip measurement.
 - Surfacing a "last weighed in" summary on Home ahead of the full
   Weekly Report / Progress chart phases.

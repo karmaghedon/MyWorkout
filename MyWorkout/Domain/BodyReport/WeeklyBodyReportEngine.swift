@@ -15,7 +15,8 @@ enum WeeklyBodyReportEngine {
     static func reportCards(
         bodyMass: [DatedValue],
         waist: [DatedValue],
-        neck: [DatedValue]
+        neck: [DatedValue],
+        bodyFatPercent: [DatedValue] = []
     ) -> [WeeklyBodyReportCard] {
         let sortedWeightDates = bodyMass.map(\.date).sorted()
 
@@ -58,6 +59,12 @@ enum WeeklyBodyReportEngine {
             let neckLatest = latestValue(neck, in: window)
             let neckDelta = delta(current: neckLatest, previous: previousCard?.neckLatest)
 
+            let bodyFatPercentLatest = latestValue(bodyFatPercent, in: window)
+            let bodyFatPercentDelta = delta(
+                current: bodyFatPercentLatest,
+                previous: previousCard?.bodyFatPercentLatest
+            )
+
             let card = WeeklyBodyReportCard(
                 windowStart: window.start,
                 windowEnd: window.end,
@@ -68,7 +75,9 @@ enum WeeklyBodyReportEngine {
                 waistLatest: waistLatest,
                 waistDelta: waistDelta,
                 neckLatest: neckLatest,
-                neckDelta: neckDelta
+                neckDelta: neckDelta,
+                bodyFatPercentLatest: bodyFatPercentLatest,
+                bodyFatPercentDelta: bodyFatPercentDelta
             )
 
             cards.append(card)

@@ -155,8 +155,9 @@ struct BodyProgressView: View {
     }
 
     private var neckPoints: [DatedValue] {
-        let neckSamples = bodyMeasurementLogStore.logs.map {
-            DatedValue(date: $0.date, value: $0.neckCm)
+        let neckSamples = bodyMeasurementLogStore.logs.compactMap { log -> DatedValue? in
+            guard let neckCm = log.neckCm else { return nil }
+            return DatedValue(date: log.date, value: neckCm)
         }
 
         return filtered(neckSamples)

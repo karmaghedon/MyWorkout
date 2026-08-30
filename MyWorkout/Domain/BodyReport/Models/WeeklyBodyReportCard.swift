@@ -30,4 +30,12 @@ struct WeeklyBodyReportCard: Identifiable, Equatable {
     /// Same reasoning as `waistLatest`, for neck.
     let neckLatest: Double?
     let neckDelta: Double?
+
+    /// Same reasoning as `waistLatest`, for body fat %. The value here
+    /// may be an actual HealthKit reading or a `NavyBodyFatCalculator`
+    /// estimate filled in for a gap day — `WeeklyBodyReportStore` merges
+    /// the two before this engine ever sees them, so this card has no
+    /// way to distinguish which one it got.
+    let bodyFatPercentLatest: Double?
+    let bodyFatPercentDelta: Double?
 }

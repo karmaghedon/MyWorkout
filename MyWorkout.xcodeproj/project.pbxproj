@@ -275,6 +275,9 @@
 		3A418B8709DD43B594EAD180 /* WeeklyBodyReportEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E96D556478486E8D59943C /* WeeklyBodyReportEngineTests.swift */; };
 		279340D77B7B4160B9DBC94C /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316893ABDFAB43D0A98913F5 /* DateRangePicker.swift */; };
 		9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */; };
+		B29B419C08084D3BA8C2E7BA /* BiologicalSex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CEE279C3C84B79B914863F /* BiologicalSex.swift */; };
+		3105B1F6584C464BB9C151E4 /* NavyBodyFatCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */; };
+		7A5A76B0CE10420AB57F65B0 /* NavyBodyFatCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */; };
 		D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */; };
 		250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */; };
 		ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */; };
@@ -586,6 +589,9 @@
 		CDB92CDBC97A4C0F9EBD643E /* WeeklyReport.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = WeeklyReport.md; sourceTree = "<group>"; };
 		316893ABDFAB43D0A98913F5 /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyProgressView.swift; sourceTree = "<group>"; };
+		59CEE279C3C84B79B914863F /* BiologicalSex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiologicalSex.swift; sourceTree = "<group>"; };
+		58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavyBodyFatCalculator.swift; sourceTree = "<group>"; };
+		0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavyBodyFatCalculatorTests.swift; sourceTree = "<group>"; };
 		E0B147B780D344B3819F3603 /* BodyProgress.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BodyProgress.md; sourceTree = "<group>"; };
 		92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMacroGoalRepository.swift; sourceTree = "<group>"; };
 		2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStoreTests.swift; sourceTree = "<group>"; };
@@ -1450,6 +1456,7 @@
 				40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */,
 				65E96D556478486E8D59943C /* WeeklyBodyReportEngineTests.swift */,
 				CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */,
+				0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */,
 				F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
@@ -1553,6 +1560,7 @@
 			children = (
 				63AA3B0EB9564A06BAA6FA5F /* HealthKitAuthorizationManager.swift */,
 				38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */,
+				58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */,
 				4D02B94249F14D27B5E23A93 /* Models */,
 				A30A31B3A40940D498CC528B /* Repositories */,
 				78427BA9D67E416D83CEDEF1 /* Services */,
@@ -1565,6 +1573,7 @@
 			isa = PBXGroup;
 			children = (
 				6021A2FA9AE64EF593E877B3 /* BodyMeasurementLog.swift */,
+				59CEE279C3C84B79B914863F /* BiologicalSex.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1991,6 +2000,8 @@
 				67B6DAFEE6164B76ADCB334A /* WeeklyReportView.swift in Sources */,
 				279340D77B7B4160B9DBC94C /* DateRangePicker.swift in Sources */,
 				9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */,
+				B29B419C08084D3BA8C2E7BA /* BiologicalSex.swift in Sources */,
+				3105B1F6584C464BB9C151E4 /* NavyBodyFatCalculator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2038,6 +2049,7 @@
 				D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */,
 				250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */,
 				3A418B8709DD43B594EAD180 /* WeeklyBodyReportEngineTests.swift in Sources */,
+				7A5A76B0CE10420AB57F65B0 /* NavyBodyFatCalculatorTests.swift in Sources */,
 				ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

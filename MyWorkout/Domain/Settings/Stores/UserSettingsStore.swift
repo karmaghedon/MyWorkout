@@ -96,6 +96,8 @@ final class UserSettingsStore: ObservableObject {
         UserSettings(
             unitSystem: settings.unitSystem,
             bodyWeightUnitSystem: settings.bodyWeightUnitSystem,
+            biologicalSex: settings.biologicalSex,
+            heightCm: settings.heightCm,
             compoundRestSeconds:
                 InputValidation.clampRestDuration(
                     settings.compoundRestSeconds

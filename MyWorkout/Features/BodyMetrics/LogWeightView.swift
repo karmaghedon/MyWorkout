@@ -2,9 +2,11 @@ import SwiftUI
 import UIKit
 
 /// Logs a weigh-in. Weight is required and always goes to HealthKit;
-/// body fat % and waist are optional HealthKit fields; neck is optional
-/// and local-only (`BodyMeasurementLogStore`) since HealthKit has no
-/// quantity type for it.
+/// body fat % and waist are optional HealthKit fields; neck (everyone)
+/// and hip (shown only when Biological Sex is set to Female in
+/// Settings, since it's only needed for the women's Navy body-fat
+/// formula) are optional and local-only (`BodyMeasurementLogStore`)
+/// since HealthKit has no quantity type for either.
 struct LogWeightView: View {
     @EnvironmentObject private var settingsStore: UserSettingsStore
     @EnvironmentObject private var healthKitAuthorizationManager: HealthKitAuthorizationManager
@@ -17,10 +19,12 @@ struct LogWeightView: View {
     @State private var bodyFatPercent: Double = 20
     @State private var waistCm: Double = 80
     @State private var neckCm: Double = 38
+    @State private var hipCm: Double = 95
 
     @State private var includeBodyFat = false
     @State private var includeWaist = false
     @State private var includeNeck = false
+    @State private var includeHip = false
 
     @State private var isSaving = false
     @State private var authorizationDenied = false
@@ -73,6 +77,20 @@ struct LogWeightView: View {
                 }
             } footer: {
                 Text("Neck isn't tracked by Health, so it's saved in MyWorkout only.")
+            }
+
+            if settingsStore.settings.biologicalSex == .female {
+                Section {
+                    Toggle("Hip", isOn: $includeHip.animation())
+
+                    if includeHip {
+                        NumericEntryField(title: "Hip", value: $hipCm, suffix: "cm")
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                    }
+                } footer: {
+                    Text("Needed for the body fat % estimate on days without a direct reading. Saved in MyWorkout only, same as neck.")
+                }
             }
 
             if authorizationDenied {
@@ -157,9 +175,13 @@ struct LogWeightView: View {
                     date: .now
                 )
 
-                if includeNeck {
+                if includeNeck || includeHip {
                     bodyMeasurementLogStore.add(
-                        BodyMeasurementLog(date: .now, neckCm: neckCm)
+                        BodyMeasurementLog(
+                            date: .now,
+                            neckCm: includeNeck ? neckCm : nil,
+                            hipCm: includeHip ? hipCm : nil
+                        )
                     )
                 }
 

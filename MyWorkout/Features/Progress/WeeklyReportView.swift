@@ -1,10 +1,13 @@
 import SwiftUI
 
-/// Newest-first weekly weight/waist/neck cards, computed from HealthKit
-/// samples plus local neck logs — see `WeeklyBodyReportEngine` for the
-/// windowing algorithm. Weight respects `UserSettings.bodyWeightUnitSystem`
-/// (lb/kg) — separate from the training-weight unit — waist and neck
-/// stay in centimeters, same as `LogWeightView`.
+/// Newest-first weekly weight/body-fat-%/waist/neck cards, computed from
+/// HealthKit samples plus local neck/hip logs — see
+/// `WeeklyBodyReportEngine` for the windowing algorithm. Weight respects
+/// `UserSettings.bodyWeightUnitSystem` (lb/kg) — separate from the
+/// training-weight unit — waist and neck stay in centimeters, same as
+/// `LogWeightView`. Body fat % is whichever HealthKit reading or
+/// `NavyBodyFatCalculator` estimate `WeeklyBodyReportStore` resolved for
+/// that window — this view has no way to tell which one it is.
 struct WeeklyReportView: View {
     @EnvironmentObject private var weeklyBodyReportStore: WeeklyBodyReportStore
     @EnvironmentObject private var bodyMeasurementLogStore: BodyMeasurementLogStore
@@ -18,7 +21,11 @@ struct WeeklyReportView: View {
         .navigationTitle("Weekly Report")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await weeklyBodyReportStore.reload(neckLogs: bodyMeasurementLogStore.logs)
+            await weeklyBodyReportStore.reload(
+                bodyMeasurementLogs: bodyMeasurementLogStore.logs,
+                sex: settingsStore.settings.biologicalSex,
+                heightCm: settingsStore.settings.heightCm
+            )
         }
     }
 
@@ -59,6 +66,14 @@ struct WeeklyReportView: View {
                     value: weightRangeText(card),
                     delta: card.weightAvgDelta.map { displayWeightDelta($0) }
                 )
+
+                if let bodyFatLatest = card.bodyFatPercentLatest {
+                    metricRow(
+                        label: "Fat %",
+                        value: "\(formatWeight(bodyFatLatest)) %",
+                        delta: card.bodyFatPercentDelta.map { deltaText($0, unit: "%") }
+                    )
+                }
 
                 if let waistLatest = card.waistLatest {
                     metricRow(

@@ -27,6 +27,7 @@ final class MockBodyMetricsHealthKitService:
         var loggedWeights: [LoggedWeight] = []
         var weightSamplesResult: Result<[DatedValue], Error> = .success([])
         var waistSamplesResult: Result<[DatedValue], Error> = .success([])
+        var bodyFatPercentSamplesResult: Result<[DatedValue], Error> = .success([])
     }
 
     private let state = ThreadSafeBox(State())
@@ -45,6 +46,10 @@ final class MockBodyMetricsHealthKitService:
 
     func setWaistSamplesResult(_ result: Result<[DatedValue], Error>) {
         state.mutate { $0.waistSamplesResult = result }
+    }
+
+    func setBodyFatPercentSamplesResult(_ result: Result<[DatedValue], Error>) {
+        state.mutate { $0.bodyFatPercentSamplesResult = result }
     }
 
     func logWeight(
@@ -69,5 +74,9 @@ final class MockBodyMetricsHealthKitService:
 
     func waistSamples(since date: Date) async throws -> [DatedValue] {
         try state.read { try $0.waistSamplesResult.get() }
+    }
+
+    func bodyFatPercentSamples(since date: Date) async throws -> [DatedValue] {
+        try state.read { try $0.bodyFatPercentSamplesResult.get() }
     }
 }
