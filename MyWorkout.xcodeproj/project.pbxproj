@@ -278,6 +278,11 @@
 		B29B419C08084D3BA8C2E7BA /* BiologicalSex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CEE279C3C84B79B914863F /* BiologicalSex.swift */; };
 		3105B1F6584C464BB9C151E4 /* NavyBodyFatCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */; };
 		7A5A76B0CE10420AB57F65B0 /* NavyBodyFatCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */; };
+		32A2561453FA41A1875252CA /* ActivityHealthKitServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69DC2BBDD0B48B4924FA51B /* ActivityHealthKitServicing.swift */; };
+		8108DA52392D47C9A6181AEF /* ActivityHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D61983F360040D6BEF9F315 /* ActivityHealthKitService.swift */; };
+		247914E93F464F6597C60D59 /* TrendSmoother.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDB818BF44148F19129939D /* TrendSmoother.swift */; };
+		CAF23025360F4D2A841DDBB2 /* MockActivityHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FB7BFB3A8648C1AECBA44B /* MockActivityHealthKitService.swift */; };
+		6DE8290D50944B2D94741A57 /* TrendSmootherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD5392A8F73C414C96228CFA /* TrendSmootherTests.swift */; };
 		D2BE4B1E225B4466B99D709C /* MockDailyNutritionLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */; };
 		250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */; };
 		ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */; };
@@ -592,6 +597,11 @@
 		59CEE279C3C84B79B914863F /* BiologicalSex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiologicalSex.swift; sourceTree = "<group>"; };
 		58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavyBodyFatCalculator.swift; sourceTree = "<group>"; };
 		0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavyBodyFatCalculatorTests.swift; sourceTree = "<group>"; };
+		E69DC2BBDD0B48B4924FA51B /* ActivityHealthKitServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHealthKitServicing.swift; sourceTree = "<group>"; };
+		7D61983F360040D6BEF9F315 /* ActivityHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHealthKitService.swift; sourceTree = "<group>"; };
+		5DDB818BF44148F19129939D /* TrendSmoother.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendSmoother.swift; sourceTree = "<group>"; };
+		C0FB7BFB3A8648C1AECBA44B /* MockActivityHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockActivityHealthKitService.swift; sourceTree = "<group>"; };
+		BD5392A8F73C414C96228CFA /* TrendSmootherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendSmootherTests.swift; sourceTree = "<group>"; };
 		E0B147B780D344B3819F3603 /* BodyProgress.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BodyProgress.md; sourceTree = "<group>"; };
 		92B02B003A814837861AA9D4 /* MockMacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMacroGoalRepository.swift; sourceTree = "<group>"; };
 		2CF9FC34EF24467F9400E0AB /* MacroGoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalStoreTests.swift; sourceTree = "<group>"; };
@@ -1457,6 +1467,8 @@
 				65E96D556478486E8D59943C /* WeeklyBodyReportEngineTests.swift */,
 				CCBEA02F359B49FB844ECA5D /* MockNutritionHealthKitService.swift */,
 				0ECA07C809F74E059DB14052 /* NavyBodyFatCalculatorTests.swift */,
+				C0FB7BFB3A8648C1AECBA44B /* MockActivityHealthKitService.swift */,
+				BD5392A8F73C414C96228CFA /* TrendSmootherTests.swift */,
 				F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */,
 			);
 			path = MyWorkoutTests;
@@ -1532,6 +1544,7 @@
 			isa = PBXGroup;
 			children = (
 				B17C0E9F00A248B791EC88A2 /* WeeklyBodyReportEngine.swift */,
+				5DDB818BF44148F19129939D /* TrendSmoother.swift */,
 				BD6F46FC12E842B1ABFDDCE9 /* Models */,
 				B1517934EABD4D1DABDCB10F /* Stores */,
 			);
@@ -1641,6 +1654,8 @@
 			children = (
 				461A43F82987461682C089C9 /* BodyMetricsHealthKitServicing.swift */,
 				B2709E54B9CB441CB7E59DD9 /* BodyMetricsHealthKitService.swift */,
+				E69DC2BBDD0B48B4924FA51B /* ActivityHealthKitServicing.swift */,
+				7D61983F360040D6BEF9F315 /* ActivityHealthKitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2002,6 +2017,9 @@
 				9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */,
 				B29B419C08084D3BA8C2E7BA /* BiologicalSex.swift in Sources */,
 				3105B1F6584C464BB9C151E4 /* NavyBodyFatCalculator.swift in Sources */,
+				32A2561453FA41A1875252CA /* ActivityHealthKitServicing.swift in Sources */,
+				8108DA52392D47C9A6181AEF /* ActivityHealthKitService.swift in Sources */,
+				247914E93F464F6597C60D59 /* TrendSmoother.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2050,6 +2068,8 @@
 				250161A5A93B4477BE545C14 /* MockNutritionHealthKitService.swift in Sources */,
 				3A418B8709DD43B594EAD180 /* WeeklyBodyReportEngineTests.swift in Sources */,
 				7A5A76B0CE10420AB57F65B0 /* NavyBodyFatCalculatorTests.swift in Sources */,
+				CAF23025360F4D2A841DDBB2 /* MockActivityHealthKitService.swift in Sources */,
+				6DE8290D50944B2D94741A57 /* TrendSmootherTests.swift in Sources */,
 				ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

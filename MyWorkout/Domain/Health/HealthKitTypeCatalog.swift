@@ -17,6 +17,10 @@ enum HealthKitTypeCatalog {
     static let dietaryCarbohydratesType = HKQuantityType(.dietaryCarbohydrates)
     static let dietaryFatTotalType = HKQuantityType(.dietaryFatTotal)
 
+    /// Read-only — this app never writes step counts, only reads what
+    /// the phone/watch already recorded automatically.
+    static let stepCountType = HKQuantityType(.stepCount)
+
     static let shareTypes: Set<HKSampleType> = [
         bodyMassType,
         bodyFatPercentageType,
@@ -27,5 +31,5 @@ enum HealthKitTypeCatalog {
         dietaryFatTotalType
     ]
 
-    static let readTypes: Set<HKObjectType> = shareTypes
+    static let readTypes: Set<HKObjectType> = shareTypes.union([stepCountType])
 }
