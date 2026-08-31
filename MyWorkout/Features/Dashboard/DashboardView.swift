@@ -381,49 +381,43 @@ struct DashboardView: View {
 
     // MARK: - Weekly Summary
 
-    private var currentWeekInterval: DateInterval? {
-        Calendar.current.dateInterval(of: .weekOfYear, for: .now)
+    /// A rolling 7-day window ending today (inclusive), not a fixed
+    /// calendar week. A fixed calendar week (e.g. `Calendar.current
+    /// .dateInterval(of: .weekOfYear, for:)`) silently resets to empty
+    /// on the first day of a new week even with several very recent
+    /// workouts, since those workouts fall in the *previous* week's
+    /// window — surprising on a screen whose whole point is showing
+    /// recent activity.
+    private var weekDays: [Date] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+
+        return (0..<7).compactMap { daysAgo in
+            calendar.date(byAdding: .day, value: -(6 - daysAgo), to: today)
+        }
     }
 
-    private var weekDays: [Date] {
-        guard let interval = currentWeekInterval else {
-            return []
-        }
-
+    private var recentWeekInterval: DateInterval {
         let calendar = Calendar.current
-        var days: [Date] = []
-        var day = interval.start
+        let today = calendar.startOfDay(for: .now)
+        let start = weekDays.first ?? today
+        let end = calendar.date(byAdding: .day, value: 1, to: today) ?? .now
 
-        while day < interval.end {
-            days.append(day)
-
-            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else {
-                break
-            }
-
-            day = nextDay
-        }
-
-        return days
+        return DateInterval(start: start, end: end)
     }
 
     private var thisWeeksLogs: [WorkoutLog] {
-        guard let interval = currentWeekInterval else {
-            return []
-        }
-
-        return logStore.logs.filter {
-            interval.contains($0.date)
+        logStore.logs.filter {
+            recentWeekInterval.contains($0.date)
         }
     }
 
     private var activeWorkoutStartedThisWeek: Bool {
-        guard let startedAt = activeWorkoutStore.startedAt,
-              let interval = currentWeekInterval else {
+        guard let startedAt = activeWorkoutStore.startedAt else {
             return false
         }
 
-        return interval.contains(startedAt)
+        return recentWeekInterval.contains(startedAt)
     }
 
     private var workoutsThisWeek: Int {
