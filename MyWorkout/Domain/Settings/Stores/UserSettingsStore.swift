@@ -125,7 +125,9 @@ final class UserSettingsStore: ObservableObject {
             appearanceMode:
                 settings.appearanceMode,
             workoutSessionLayout:
-                settings.workoutSessionLayout
+                settings.workoutSessionLayout,
+            restTimerSound:
+                settings.restTimerSound
         )
     }
 

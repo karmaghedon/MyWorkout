@@ -83,6 +83,43 @@ enum WorkoutSessionLayout:
     }
 }
 
+/// A short, built-in iOS system sound to play when the rest timer
+/// finishes. Foundation-only, same reasoning as `AppearanceMode` — the
+/// actual `SystemSoundID` mapping (`AudioToolbox`, a UI-framework
+/// dependency) lives in `Haptics.swift` instead.
+enum RestTimerSound:
+    String,
+    Codable,
+    CaseIterable,
+    Identifiable {
+
+    case none
+    case triTone
+    case trumpet
+    case digital
+    case silverBell
+
+    var id: String { rawValue }
+
+    /// `.triTone`/`.trumpet`/`.digital` play a built-in system alert
+    /// tone by numeric ID (see `Haptics.swift`) — confirmed, on a real
+    /// device, to sound like their names. Apple's real *named* modern
+    /// alert tones (Cosmic, Radar, etc.) turned out to be unreachable —
+    /// those live as files under a system path this app's sandbox can't
+    /// read on current iOS — so `.silverBell` is synthesized from scratch
+    /// instead (`BellSynthesizer`), sidestepping the whole undocumented
+    /// system-sound catalog.
+    var displayName: String {
+        switch self {
+        case .none: "Off"
+        case .triTone: "Tri-tone"
+        case .trumpet: "Trumpet"
+        case .digital: "Digital"
+        case .silverBell: "Silver Bell"
+        }
+    }
+}
+
 struct UserSettings: Codable {
     var unitSystem: UnitSystem
     /// Separate from `unitSystem`, which governs training weights
@@ -107,6 +144,7 @@ struct UserSettings: Codable {
     var isolationIncrement: Int
     var appearanceMode: AppearanceMode
     var workoutSessionLayout: WorkoutSessionLayout
+    var restTimerSound: RestTimerSound
 
     static let defaults = UserSettings(
         unitSystem: .pounds,
@@ -120,7 +158,8 @@ struct UserSettings: Codable {
         compoundIncrement: 5,
         isolationIncrement: 5,
         appearanceMode: .system,
-        workoutSessionLayout: .classic
+        workoutSessionLayout: .classic,
+        restTimerSound: .triTone
     )
 
     var weightUnitLabel: String {
@@ -160,6 +199,7 @@ struct UserSettings: Codable {
         case isolationIncrement
         case appearanceMode
         case workoutSessionLayout
+        case restTimerSound
     }
 
     init(
@@ -174,7 +214,8 @@ struct UserSettings: Codable {
         compoundIncrement: Int,
         isolationIncrement: Int,
         appearanceMode: AppearanceMode,
-        workoutSessionLayout: WorkoutSessionLayout
+        workoutSessionLayout: WorkoutSessionLayout,
+        restTimerSound: RestTimerSound
     ) {
         self.unitSystem = unitSystem
         self.bodyWeightUnitSystem = bodyWeightUnitSystem
@@ -188,6 +229,7 @@ struct UserSettings: Codable {
         self.isolationIncrement = isolationIncrement
         self.appearanceMode = appearanceMode
         self.workoutSessionLayout = workoutSessionLayout
+        self.restTimerSound = restTimerSound
     }
 
     init(from decoder: Decoder) throws {
@@ -256,5 +298,10 @@ struct UserSettings: Codable {
             WorkoutSessionLayout.self,
             forKey: .workoutSessionLayout
         ) ?? defaults.workoutSessionLayout
+
+        restTimerSound = try container.decodeIfPresent(
+            RestTimerSound.self,
+            forKey: .restTimerSound
+        ) ?? defaults.restTimerSound
     }
 }

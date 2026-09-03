@@ -214,6 +214,7 @@
 		F5630A373003EAB1000BB3AD /* TemplateExerciseSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A363003EAB1000BB3AD /* TemplateExerciseSource.swift */; };
 		F5630A393003EAF6000BB3AD /* ExerciseRegistryFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5630A383003EAF6000BB3AD /* ExerciseRegistryFactory.swift */; };
 		F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B32FF83B9D00991F1D /* Haptics.swift */; };
+		0C1EC5A1C0564150AD87A557 /* BellSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB6DF2008D045EB9A1AFF5E /* BellSynthesizer.swift */; };
 		F59350B62FF848AD00991F1D /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B52FF848AD00991F1D /* TemplatesView.swift */; };
 		F59350B82FF848FA00991F1D /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */; };
 		F5B8EAED300D4A7E00CF5449 /* ActiveWorkoutPersistenceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B8EAEC300D4A7E00CF5449 /* ActiveWorkoutPersistenceCoordinator.swift */; };
@@ -541,6 +542,7 @@
 		F5630A363003EAB1000BB3AD /* TemplateExerciseSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateExerciseSource.swift; sourceTree = "<group>"; };
 		F5630A383003EAF6000BB3AD /* ExerciseRegistryFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseRegistryFactory.swift; sourceTree = "<group>"; };
 		F59350B32FF83B9D00991F1D /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		3DB6DF2008D045EB9A1AFF5E /* BellSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BellSynthesizer.swift; sourceTree = "<group>"; };
 		F59350B52FF848AD00991F1D /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatesView.swift; sourceTree = "<group>"; };
 		F59350B72FF848FA00991F1D /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
 		F5B8EAEC300D4A7E00CF5449 /* ActiveWorkoutPersistenceCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutPersistenceCoordinator.swift; sourceTree = "<group>"; };
@@ -971,6 +973,7 @@
 			isa = PBXGroup;
 			children = (
 				F59350B32FF83B9D00991F1D /* Haptics.swift */,
+				3DB6DF2008D045EB9A1AFF5E /* BellSynthesizer.swift */,
 				F5BF30842FFD9E5000AB5AD9 /* Keyboard.swift */,
 				F5BF30C02FFF19E700AB5AD9 /* Rounding.swift */,
 				F5BF307F2FFC75AD00AB5AD9 /* WeightFormatter.swift */,
@@ -1934,6 +1937,7 @@
 				F54B80D730091DB500615DA0 /* ExerciseNameValidator.swift in Sources */,
 				F54005242FF6F8DD0079CC05 /* ProgressionStrategy.swift in Sources */,
 				F59350B42FF83B9D00991F1D /* Haptics.swift in Sources */,
+				0C1EC5A1C0564150AD87A557 /* BellSynthesizer.swift in Sources */,
 				F54B80C8300850C600615DA0 /* CustomExerciseEducationSections.swift in Sources */,
 				F54B80AB3006DE3600615DA0 /* AnalyticsInputFactory.swift in Sources */,
 				F5BF307C2FFC5DFD00AB5AD9 /* ExerciseOverviewView.swift in Sources */,

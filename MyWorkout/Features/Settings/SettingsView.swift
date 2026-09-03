@@ -17,6 +17,39 @@ struct SettingsView: View {
                 }
             }
 
+            Section {
+                ForEach(RestTimerSound.allCases) { sound in
+                    HStack {
+                        Text(sound.displayName)
+
+                        Spacer()
+
+                        if sound != .none {
+                            Button {
+                                Haptics.preview(sound)
+                            } label: {
+                                Image(systemName: "play.circle")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+
+                        if settingsStore.settings.restTimerSound == sound {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(AppTheme.accent)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        settingsStore.settings.restTimerSound = sound
+                        settingsStore.save()
+                    }
+                }
+            } header: {
+                Text("Rest Timer Sound")
+            } footer: {
+                Text("Plays when the rest timer finishes, alongside the haptic buzz. Tap \(Image(systemName: "play.circle")) to preview.")
+            }
+
             Section("Workout Session") {
                 Picker("Layout", selection: $settingsStore.settings.workoutSessionLayout) {
                     ForEach(WorkoutSessionLayout.allCases) { layout in

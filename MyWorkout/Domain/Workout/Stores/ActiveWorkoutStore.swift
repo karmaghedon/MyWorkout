@@ -39,6 +39,14 @@ final class ActiveWorkoutStore: ObservableObject {
     private var isRestoring = false
     private var restTimer: Timer?
 
+    /// Set whenever `startRestTimer(for:settings:)` runs, so the
+    /// completion callback (which fires from an internal timer tick, with
+    /// no direct access to `UserSettingsStore`) knows which sound the user
+    /// currently has picked without this store needing a standing
+    /// dependency on settings — matches how `RestTimerRule.seconds` is
+    /// already threaded through that same call.
+    private var restTimerSound: RestTimerSound = .triTone
+
     init(
         persistence: any ActiveWorkoutPersisting =
             FileActiveWorkoutPersistence()
@@ -315,6 +323,8 @@ final class ActiveWorkoutStore: ObservableObject {
         for exercise: Exercise,
         settings: UserSettings
     ) {
+        restTimerSound = settings.restTimerSound
+
         let seconds = RestTimerRule.seconds(
             for: exercise.exerciseType,
             settings: settings
@@ -434,7 +444,7 @@ final class ActiveWorkoutStore: ObservableObject {
             stopRestTimer(clearPersistedState: true)
 
             if playsCompletionHaptic {
-                Haptics.restComplete()
+                Haptics.restComplete(sound: restTimerSound)
             }
         }
     }
