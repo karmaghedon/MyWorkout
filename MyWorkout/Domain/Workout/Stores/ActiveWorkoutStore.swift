@@ -501,6 +501,22 @@ final class ActiveWorkoutStore: ObservableObject {
 
     // MARK: - Persistence Coordination
 
+    /// Forces any pending debounced save of the active workout through
+    /// immediately and waits for it to finish — call when the app is
+    /// about to background or terminate, since the mutation `didSet`
+    /// hooks only *schedule* a write 0.3s out and there's otherwise
+    /// nothing that guarantees it actually runs before the process is
+    /// suspended or killed.
+    func flushPendingSave() {
+        guard !isRestoring else { return }
+
+        persistenceCoordinator.flush(
+            persistenceRequest(),
+            onSuccess: persistenceDidSucceed,
+            onFailure: persistenceDidFail
+        )
+    }
+
     private func schedulePersist() {
         guard !isRestoring else {
             return

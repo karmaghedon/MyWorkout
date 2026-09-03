@@ -20,7 +20,8 @@ final class RestTimerRuleTests: XCTestCase {
             compoundIncrement: 5,
             isolationIncrement: 5,
             appearanceMode: .system,
-            workoutSessionLayout: .classic
+            workoutSessionLayout: .classic,
+            restTimerSound: .triTone
         )
     }
 

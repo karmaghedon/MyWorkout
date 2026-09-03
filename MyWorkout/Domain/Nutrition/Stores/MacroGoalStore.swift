@@ -106,6 +106,15 @@ final class MacroGoalStore: ObservableObject {
         }
     }
 
+    /// Blocks until any save already queued by `save()` has actually
+    /// finished writing to disk — call when the app is about to
+    /// background or terminate, since `save()`'s dispatch to
+    /// `saveQueue` is not otherwise guaranteed to complete before the
+    /// process is suspended or killed.
+    func flushPendingSave() {
+        saveQueue.sync {}
+    }
+
     private func save() {
         guard isPersistenceWritable else {
             setPersistenceError(

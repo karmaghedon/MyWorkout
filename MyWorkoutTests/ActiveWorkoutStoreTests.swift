@@ -380,6 +380,56 @@ final class ActiveWorkoutStoreTests:
         )
     }
 
+    /// Regression test for the adversarial-review finding that a
+    /// force-quit/crash within the ~0.3s save debounce could silently
+    /// lose the most recent mutation, with no lifecycle hook anywhere
+    /// in the app to prevent it. Unlike
+    /// `testExerciseStateMutationPersistsUpdatedSnapshot` above (which
+    /// waits up to 1s for the debounce to fire on its own),
+    /// this asserts the write lands the instant `flushPendingSave()`
+    /// returns — no waiting for the debounce at all, since a real
+    /// background/terminate transition can't be relied on to wait
+    /// either.
+    func testFlushPendingSaveForcesDebouncedWriteThroughSynchronously() {
+        let persistence = MockActiveWorkoutPersistence()
+        let store = ActiveWorkoutStore(persistence: persistence)
+
+        let workout = ActiveWorkoutTestFactory.makeWorkout()
+        _ = store.start(workout)
+        store.flushPendingSave()
+
+        let saveCountBeforeMutation = persistence.saveCallCount
+        let exerciseID = workout.exercises.first?.id ?? UUID()
+
+        store.exerciseStates[exerciseID] =
+            ExerciseSessionState(
+                targetReps: 6,
+                workingWeightPounds: 185,
+                notes: "Flushed before the debounce fired"
+            )
+
+        store.flushPendingSave()
+
+        XCTAssertEqual(
+            persistence.saveCallCount,
+            saveCountBeforeMutation + 1
+        )
+
+        let savedState =
+            persistence
+                .lastSavedSnapshot?
+                .exerciseStates
+                .first {
+                    $0.exerciseID == exerciseID
+                }?
+                .state
+
+        XCTAssertEqual(
+            savedState?.notes,
+            "Flushed before the debounce fired"
+        )
+    }
+
     func testStartingRestTimerPersistsRestState()
         async {
 

@@ -119,6 +119,36 @@ final class WorkoutLogStoreTests: XCTestCase {
         )
     }
 
+    /// Regression test for the adversarial-review finding that `add()`'s
+    /// dispatch to a background save queue isn't otherwise guaranteed
+    /// to complete before the process is suspended or killed. Unlike
+    /// `testAddInsertsNewestLogAtBeginningAndSavesSnapshot` above
+    /// (which waits on an expectation for that background write to
+    /// land), this asserts the write has already landed the instant
+    /// `flushPendingSave()` returns — no expectation, no waiting.
+    func testFlushPendingSaveWaitsForQueuedSaveToComplete() {
+        let repository = MockWorkoutLogRepository()
+        let store = WorkoutLogStore(repository: repository)
+
+        store.add(
+            WorkoutLogTestFactory.make(
+                name: "New",
+                daysAgo: 0
+            )
+        )
+
+        store.flushPendingSave()
+
+        XCTAssertEqual(repository.saveCallCount, 1)
+
+        XCTAssertEqual(
+            repository
+                .lastSavedSnapshot?
+                .map(\.workoutName),
+            ["New"]
+        )
+    }
+
     // MARK: - Replacement
 
     func testReplaceAllPublishesAndSavesReplacement()
