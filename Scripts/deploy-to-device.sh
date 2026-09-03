@@ -87,19 +87,64 @@ DEVICECTL_ID=$(echo "$DEVICECTL_CANDIDATES" | grep -oE '[0-9A-Fa-f]{8}-[0-9A-Fa-
 [ -n "$DEVICECTL_ID" ] || fail "Found a device via devicectl but couldn't parse its identifier: $DEVICECTL_CANDIDATES"
 
 # --- 2. Build for the device --------------------------------------------
+#
+# This machine's CoreSimulator is permanently broken (see the
+# `myworkout-simulator-broken-use-device` memory) — no simulator runtime
+# can ever be installed here. That breaks more than just the Simulator:
+# a normal `-scheme`/`-destination` build fails outright with "iOS 17.2
+# is not installed", because Xcode's destination-eligibility gate (and
+# `actool`, for any catalog containing an .appiconset/.colorset) require
+# a matching simulator runtime lookup that can never succeed, even for a
+# device-only build. Two workarounds, both required together:
+#
+#   1. Build with the classic `-target`/`-sdk` invocation instead of
+#      `-scheme`/`-destination` — this skips the destination-eligibility
+#      gate entirely. It also means `IPHONEOS_DEPLOYMENT_TARGET` must be
+#      passed explicitly: the pbxproj's target-level setting is stale
+#      (15.2, vs. 17.2 at the project level), and this invocation style
+#      uses the target-level value, which causes spurious "only
+#      available in iOS 16.0/17.0" errors on modern SwiftUI APIs.
+#   2. Temporarily move AppIcon.appiconset and AccentColor.colorset out
+#      of the asset catalog before building (actool's simulator lookup
+#      triggers on their mere presence, regardless of flags), then
+#      restore them immediately after — a trap guarantees the restore
+#      runs even if the build fails, so the source tree is never left
+#      modified.
+#
+# The resulting .app has no app icon or accent color baked in — fine for
+# on-device verification, not for anything where the visual icon/tint
+# matters.
 
-log "Building $SCHEME for device $UDID (this can take a minute)..."
-xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
-    -destination "id=$UDID" -configuration "$CONFIGURATION" build \
+ASSET_CATALOG="MyWorkout/Resources/Assets.xcassets"
+ASSET_BACKUP_DIR="$(mktemp -d)"
+
+restore_assets() {
+    [ -d "$ASSET_BACKUP_DIR/AppIcon.appiconset" ] && cp -R "$ASSET_BACKUP_DIR/AppIcon.appiconset" "$ASSET_CATALOG/"
+    [ -d "$ASSET_BACKUP_DIR/AccentColor.colorset" ] && cp -R "$ASSET_BACKUP_DIR/AccentColor.colorset" "$ASSET_CATALOG/"
+    rm -rf "$ASSET_BACKUP_DIR"
+}
+trap restore_assets EXIT
+
+mv "$ASSET_CATALOG/AppIcon.appiconset" "$ASSET_BACKUP_DIR/AppIcon.appiconset"
+mv "$ASSET_CATALOG/AccentColor.colorset" "$ASSET_BACKUP_DIR/AccentColor.colorset"
+
+log "Building $SCHEME for device (this can take a minute)..."
+xcodebuild -project "$PROJECT" -target "$SCHEME" -sdk iphoneos17.2 -configuration "$CONFIGURATION" \
+    IPHONEOS_DEPLOYMENT_TARGET=17.2 \
+    ASSETCATALOG_COMPILER_APPICON_NAME= \
+    ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME= \
+    build \
     | tail -20
 
 # --- 3. Locate the built .app -------------------------------------------
+#
+# The classic `-target`/`-sdk` invocation above (no `-derivedDataPath`)
+# always lands products in the project-relative `build/` folder — a
+# separate `-showBuildSettings` query to derive this path isn't reliable
+# here, it's been observed resolving to the default DerivedData location
+# instead even though the actual build didn't use it.
 
-BUILD_DIR=$(xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
-    -destination "id=$UDID" -configuration "$CONFIGURATION" \
-    -showBuildSettings 2>/dev/null \
-    | awk -F'= ' '/ TARGET_BUILD_DIR =/{print $2; exit}')
-APP_PATH="$BUILD_DIR/$SCHEME.app"
+APP_PATH="$PROJECT_ROOT/build/$CONFIGURATION-iphoneos/$SCHEME.app"
 
 [ -d "$APP_PATH" ] || fail "Expected app bundle not found at $APP_PATH"
 
