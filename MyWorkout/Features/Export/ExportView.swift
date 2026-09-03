@@ -5,7 +5,6 @@ struct ExportView: View {
         Form {
             ExportActionsSection()
             ImportActionsSection()
-            HistoricalDataImportSection()
         }
         .navigationTitle("Backup & Export")
     }

@@ -70,14 +70,12 @@
 		9E6870B6547847DFB3A53800 /* BodyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */; };
 		9E7FDD8481FC415AA546400B /* BodyMeasurementLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7257D795FC52489480E6FB48 /* BodyMeasurementLogStoreTests.swift */; };
 		9EAA7D45506442C086CD50C1 /* BarbellPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E19AFB3D5C42B38D2F0188 /* BarbellPlateView.swift */; };
-		9EEF9CCC43FA428486F53F00 /* HistoricalDataImportSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6ECCEA5A44495EBA5F9AD3 /* HistoricalDataImportSection.swift */; };
 		A653D85D80B8A42B73620ADF /* UserSettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4225D75C8294813704FC3CF9 /* UserSettingsStoreTests.swift */; };
 		ADCBA7A1E1774604997CCD13 /* DailyNutritionLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47AA421ED864FA489F82455 /* DailyNutritionLogStoreTests.swift */; };
 		AEFABBA1ABAC4817917373D0 /* LogNutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D5FB03FDF74007AE5B73AC /* LogNutritionView.swift */; };
 		AF3412AF8FB545E0A5BD599E /* WeeklySummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B30BB69A254086BECC6079 /* WeeklySummaryCard.swift */; };
 		B13D1C9A61C54403A752EC2F /* MacroGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110046977E0499991F4EAB3 /* MacroGoalStore.swift */; };
 		B1F15467CDE54B4BC721FA70 /* ExerciseCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB6C13B39F032E5372A408E /* ExerciseCodableTests.swift */; };
-		B21531CC0DA44FE0ACA370D7 /* HistoricalDataFixup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC6D2A4C2BE416299A711AB /* HistoricalDataFixup.swift */; };
 		B29B419C08084D3BA8C2E7BA /* BiologicalSex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CEE279C3C84B79B914863F /* BiologicalSex.swift */; };
 		B45AD8CCBFCD45DEA0670F69 /* MacroGoalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */; };
 		B475C8CD44F5E363D746AD69 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A423872DDB29572B68C36C /* AboutView.swift */; };
@@ -331,7 +329,6 @@
 		37ADEE57752806370BEFB555 /* MetricView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetricView.swift; sourceTree = "<group>"; };
 		38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTypeCatalog.swift; sourceTree = "<group>"; };
 		3A0A24B4D800D38682A83F1F /* AppCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppCard.swift; sourceTree = "<group>"; };
-		3A6ECCEA5A44495EBA5F9AD3 /* HistoricalDataImportSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalDataImportSection.swift; sourceTree = "<group>"; };
 		3EB6C13B39F032E5372A408E /* ExerciseCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCodableTests.swift; sourceTree = "<group>"; };
 		40FBFA608D994999B5ED559B /* MockDailyNutritionLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDailyNutritionLogRepository.swift; sourceTree = "<group>"; };
 		41A62BD9AF17B61273162F49 /* QuickActionSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionSection.swift; sourceTree = "<group>"; };
@@ -375,7 +372,6 @@
 		A15F3B4B230E90EC277DB2BE /* WorkoutCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutCard.swift; sourceTree = "<group>"; };
 		A52A1E488BDB5559F9523FDC /* ConsistencySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencySection.swift; sourceTree = "<group>"; };
 		A95A93027D4164B6BCF69CB1 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
-		AFC6D2A4C2BE416299A711AB /* HistoricalDataFixup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalDataFixup.swift; sourceTree = "<group>"; };
 		B17C0E9F00A248B791EC88A2 /* WeeklyBodyReportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyBodyReportEngine.swift; sourceTree = "<group>"; };
 		B1AFFCF06F5241EA8D21B86D /* MacroGoalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroGoalRepository.swift; sourceTree = "<group>"; };
 		B220E34A726F41B70D17FCE1 /* FavoriteExercisesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteExercisesStore.swift; sourceTree = "<group>"; };
@@ -918,7 +914,6 @@
 			children = (
 				F5BF30B62FFEDA7D00AB5AD9 /* ExportActionsSection.swift */,
 				F5BF30B72FFEDA7D00AB5AD9 /* ImportActionsSection.swift */,
-				3A6ECCEA5A44495EBA5F9AD3 /* HistoricalDataImportSection.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1310,7 +1305,6 @@
 				63AA3B0EB9564A06BAA6FA5F /* HealthKitAuthorizationManager.swift */,
 				38FACE59D17A47C396924565 /* HealthKitTypeCatalog.swift */,
 				58E70F81BAAB41F199581568 /* NavyBodyFatCalculator.swift */,
-				AFC6D2A4C2BE416299A711AB /* HistoricalDataFixup.swift */,
 				4D02B94249F14D27B5E23A93 /* Models */,
 				A30A31B3A40940D498CC528B /* Repositories */,
 				78427BA9D67E416D83CEDEF1 /* Services */,
@@ -1855,8 +1849,6 @@
 				F54004CD2FF0C8720079CC05 /* DashboardView.swift in Sources */,
 				1A2B7702046E477C91BDF850 /* WeeklyMeasurementsReminderBanner.swift in Sources */,
 				AF3412AF8FB545E0A5BD599E /* WeeklySummaryCard.swift in Sources */,
-				9EEF9CCC43FA428486F53F00 /* HistoricalDataImportSection.swift in Sources */,
-				B21531CC0DA44FE0ACA370D7 /* HistoricalDataFixup.swift in Sources */,
 				F54B80B83006F6F400615DA0 /* ExerciseSource.swift in Sources */,
 				F54004FB2FF476D70079CC05 /* StrengthTrendView.swift in Sources */,
 				F5BF30C530002EBC00AB5AD9 /* InputValidation.swift in Sources */,
