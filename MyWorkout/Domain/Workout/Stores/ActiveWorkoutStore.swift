@@ -24,6 +24,14 @@ final class ActiveWorkoutStore: ObservableObject {
     @Published private(set) var restSecondsRemaining: Int = 0
     @Published private(set) var persistenceError: StoreError?
 
+    /// The exercise the most recent `logSet(for:)` call was for — kept
+    /// around after rest starts/ends (unlike `activeRestExerciseID`,
+    /// which goes `nil` the moment rest stops) so the session view can
+    /// scope its "superset partner is up next" scroll target to the
+    /// exercise the user was actually just working on, instead of
+    /// scanning the whole workout for any superset mid-rotation.
+    @Published private(set) var lastLoggedExerciseID: UUID?
+
     private let persistenceCoordinator:
         ActiveWorkoutPersistenceCoordinator
 
@@ -142,6 +150,8 @@ final class ActiveWorkoutStore: ObservableObject {
             for: exerciseID,
             in: &exerciseStates
         )
+
+        lastLoggedExerciseID = exerciseID
     }
 
     func deleteSet(
@@ -312,7 +322,8 @@ final class ActiveWorkoutStore: ObservableObject {
 
         let anchorExerciseID = WorkoutSessionEngine.restTimerAnchorExerciseID(
             for: exercise,
-            in: activeWorkout
+            in: activeWorkout,
+            states: exerciseStates
         )
 
         startRestTimer(
@@ -396,6 +407,7 @@ final class ActiveWorkoutStore: ObservableObject {
         exerciseStates = [:]
         startedAt = Date()
         elapsedSeconds = 0
+        lastLoggedExerciseID = nil
 
         startTimerIfNeeded()
         persistActiveWorkout()
@@ -502,6 +514,7 @@ final class ActiveWorkoutStore: ObservableObject {
         elapsedSeconds = 0
         restTimerState = nil
         restSecondsRemaining = 0
+        lastLoggedExerciseID = nil
 
         isRestoring = false
 

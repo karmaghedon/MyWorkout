@@ -421,7 +421,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let workout = Workout(name: "Push", exercises: [ex])
 
         XCTAssertEqual(
-            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: workout),
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: workout, states: [:]),
             ex.id
         )
     }
@@ -442,12 +442,81 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let workout = Workout(name: "Push", exercises: [first, second])
 
         XCTAssertEqual(
-            WorkoutSessionEngine.restTimerAnchorExerciseID(for: second, in: workout),
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: second, in: workout, states: [:]),
             first.id
         )
         XCTAssertEqual(
-            WorkoutSessionEngine.restTimerAnchorExerciseID(for: first, in: workout),
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: first, in: workout, states: [:]),
             first.id
+        )
+    }
+
+    /// Regression test: when the group's positional-first member has
+    /// already logged all of its `targetSets` (e.g. it has fewer sets
+    /// than its partner) but the partner is still going, the badge for
+    /// the partner's own between-set rest must anchor on the partner —
+    /// not on the finished first member, which the user is done with.
+    func test_restTimerAnchorExerciseID_firstMemberFinished_anchorsOnStillActivePartner() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Incline Row")
+        first.supersetGroupID = groupID
+        first.targetSets = 3
+
+        var second = exercise(name: "Bench Press")
+        second.supersetGroupID = groupID
+        second.targetSets = 4
+
+        let workout = Workout(name: "Push", exercises: [first, second])
+
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 25, reps: 12),
+                LoggedSet(setNumber: 2, weight: 25, reps: 12),
+                LoggedSet(setNumber: 3, weight: 25, reps: 12)
+            ]),
+            second.id: ExerciseSessionState(loggedSets: [
+                LoggedSet(setNumber: 1, weight: 135, reps: 10),
+                LoggedSet(setNumber: 2, weight: 135, reps: 10),
+                LoggedSet(setNumber: 3, weight: 135, reps: 10)
+            ])
+        ]
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: second, in: workout, states: states),
+            second.id
+        )
+    }
+
+    /// Regression test: once every group member has logged all of its
+    /// `targetSets`, there's no "still active" member left to restart the
+    /// next round on — anchor on the exercise that actually just
+    /// triggered this closing rest, rather than falling back to whichever
+    /// member happens to be first by position.
+    func test_restTimerAnchorExerciseID_allMembersFinished_anchorsOnTriggeringExercise() {
+        let groupID = UUID()
+
+        var first = exercise(name: "Bench Press")
+        first.supersetGroupID = groupID
+
+        var second = exercise(name: "Incline Row")
+        second.supersetGroupID = groupID
+
+        let workout = Workout(name: "Push", exercises: [first, second])
+
+        let finishedSets = [
+            LoggedSet(setNumber: 1, weight: 25, reps: 12),
+            LoggedSet(setNumber: 2, weight: 25, reps: 12),
+            LoggedSet(setNumber: 3, weight: 25, reps: 12)
+        ]
+        let states: [UUID: ExerciseSessionState] = [
+            first.id: ExerciseSessionState(loggedSets: finishedSets),
+            second.id: ExerciseSessionState(loggedSets: finishedSets)
+        ]
+
+        XCTAssertEqual(
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: second, in: workout, states: states),
+            second.id
         )
     }
 
@@ -455,7 +524,7 @@ final class WorkoutSessionEngineTests: XCTestCase {
         let ex = exercise(name: "Bench Press")
 
         XCTAssertEqual(
-            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: nil),
+            WorkoutSessionEngine.restTimerAnchorExerciseID(for: ex, in: nil, states: [:]),
             ex.id
         )
     }

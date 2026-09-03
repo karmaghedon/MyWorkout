@@ -11,9 +11,9 @@ struct BarbellPlateView: View {
     let unitSystem: UnitSystem
 
     private static let referenceWeight: Double = 45
-    private static let minPlateHeight: CGFloat = 16
-    private static let maxPlateHeight: CGFloat = 34
-    private static let plateWidth: CGFloat = 10
+    private static let minPlateHeight: CGFloat = 20
+    private static let maxPlateHeight: CGFloat = 42
+    private static let plateWidth: CGFloat = 13
 
     var body: some View {
         if loading.platesPerSide.isEmpty {
@@ -40,7 +40,7 @@ struct BarbellPlateView: View {
     private var sleeveNub: some View {
         RoundedRectangle(cornerRadius: 2, style: .continuous)
             .fill(AppTheme.secondaryText.opacity(0.35))
-            .frame(width: 6, height: Self.minPlateHeight)
+            .frame(width: 8, height: Self.minPlateHeight)
     }
 
     private func plateBlock(for weightPounds: Double) -> some View {
@@ -51,7 +51,7 @@ struct BarbellPlateView: View {
             .frame(width: Self.plateWidth, height: height(for: weightPounds))
             .overlay {
                 Text(formatPlate(displayed))
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .fixedSize()
                     .rotationEffect(.degrees(-90))

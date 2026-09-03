@@ -125,6 +125,7 @@ struct WorkoutSessionView: View {
             activeRestExerciseID: activeWorkoutStore.activeRestExerciseID,
             restSecondsRemaining: activeWorkoutStore.restSecondsRemaining,
             restTotalSeconds: activeWorkoutStore.restTotalSeconds,
+            lastLoggedExerciseID: activeWorkoutStore.lastLoggedExerciseID,
             onLogSet: { exercise in
                 activeWorkoutStore.logSet(for: exercise.id)
                 Haptics.setLogged()

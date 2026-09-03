@@ -14,6 +14,7 @@ struct WorkoutSessionContentView: View {
     let activeRestExerciseID: UUID?
     let restSecondsRemaining: Int
     let restTotalSeconds: Int
+    let lastLoggedExerciseID: UUID?
 
     let onLogSet: (Exercise) -> Void
     let onStopRest: () -> Void
@@ -79,36 +80,41 @@ struct WorkoutSessionContentView: View {
         return ScrollTarget(id: Self.topAnchorID, anchor: .top)
     }
 
-    /// The superset partner currently "up" — the exercise some blocked
-    /// group member is waiting on, per
-    /// `WorkoutSessionEngine.nextSupersetExercise`. `nil` whenever nothing
-    /// in the workout is currently blocked (no superset in progress, or a
-    /// round just tied and either member could go next).
+    /// The superset partner currently "up" — but only when the exercise
+    /// blocked waiting on that partner is the one the user was just
+    /// working on (`lastLoggedExerciseID`), per
+    /// `WorkoutSessionEngine.nextSupersetExercise`. Scoped this way
+    /// rather than scanning every exercise in the workout: a superset
+    /// elsewhere can sit "mid-rotation" (one member blocked on the other)
+    /// for most of the time between its own rounds, so an unscoped scan
+    /// would hijack the scroll position to that unrelated superset the
+    /// moment rest ends on a completely different exercise. `nil` when
+    /// the last-logged exercise isn't grouped, or isn't currently
+    /// blocked (no superset in progress, or a round just tied and either
+    /// member could go next).
     private var nextActiveSupersetExercise: Exercise? {
+        guard let lastLoggedExerciseID,
+              let exercise = workout.exercises.first(where: { $0.id == lastLoggedExerciseID }),
+              exercise.supersetGroupID != nil
+        else { return nil }
+
         let states = Dictionary(
             uniqueKeysWithValues: workout.exercises.map {
                 ($0.id, stateForExercise($0.id).wrappedValue)
             }
         )
 
-        for exercise in workout.exercises {
-            guard exercise.supersetGroupID != nil,
-                  !WorkoutSessionEngine.canLogNextSet(
-                      for: exercise,
-                      in: workout.exercises,
-                      states: states
-                  ),
-                  let next = WorkoutSessionEngine.nextSupersetExercise(
-                      after: exercise,
-                      in: workout.exercises,
-                      states: states
-                  )
-            else { continue }
+        guard !WorkoutSessionEngine.canLogNextSet(
+            for: exercise,
+            in: workout.exercises,
+            states: states
+        ) else { return nil }
 
-            return next
-        }
-
-        return nil
+        return WorkoutSessionEngine.nextSupersetExercise(
+            after: exercise,
+            in: workout.exercises,
+            states: states
+        )
     }
 
     var body: some View {
