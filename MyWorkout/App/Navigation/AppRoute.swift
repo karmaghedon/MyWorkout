@@ -13,6 +13,9 @@ enum AppRoute: Hashable {
     case settings
     case export
     case logWeight
+    case logBodyMeasurements
+    case measurementHistory
+    case measurementHistoryForWeek(start: Date, end: Date)
     case macroGoals
     case logNutrition
     case weeklyReport

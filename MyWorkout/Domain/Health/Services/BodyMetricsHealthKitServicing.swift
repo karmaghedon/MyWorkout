@@ -8,13 +8,20 @@ import Foundation
 /// write real rows into the user's actual Health app. Any logic test
 /// exercises a mock conforming to this protocol instead.
 protocol BodyMetricsHealthKitServicing {
-    /// Writes weight (required) and, when provided, body fat % and waist
-    /// circumference to HealthKit. `bodyFatPercent` is a 0–100 value
-    /// (converted internally to HealthKit's expected 0–1 fraction).
+    /// Writes a weigh-in to HealthKit. Weight only — this app no longer
+    /// collects body fat % or waist on the daily weigh-in screen: body
+    /// fat % is always calculated (`NavyBodyFatCalculator`), never
+    /// entered, and waist is a weekly measurement logged separately via
+    /// `logWaist(cm:date:)`.
     func logWeight(
         kg: Double,
-        bodyFatPercent: Double?,
-        waistCm: Double?,
+        date: Date
+    ) async throws
+
+    /// Writes a waist-circumference reading to HealthKit. Logged
+    /// weekly, not daily — see `LogBodyMeasurementsView`.
+    func logWaist(
+        cm: Double,
         date: Date
     ) async throws
 
@@ -32,4 +39,11 @@ protocol BodyMetricsHealthKitServicing {
     /// synced a direct reading for it — `NavyBodyFatCalculator` fills
     /// that gap from waist/neck/hip instead.
     func bodyFatPercentSamples(since date: Date) async throws -> [DatedValue]
+
+    /// Deletes the waist-circumference sample with this exact start
+    /// date — `date` must be a value previously returned by
+    /// `waistSamples(since:)`, not an arbitrary calendar day (there can
+    /// be more than one sample on the same day). Used to correct or
+    /// remove a past entry from the measurement history screen.
+    func deleteWaistSample(date: Date) async throws
 }

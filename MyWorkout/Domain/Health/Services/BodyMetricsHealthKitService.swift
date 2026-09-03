@@ -10,43 +10,30 @@ final class BodyMetricsHealthKitService: BodyMetricsHealthKitServicing {
 
     func logWeight(
         kg: Double,
-        bodyFatPercent: Double?,
-        waistCm: Double?,
         date: Date
     ) async throws {
-        var samples: [HKQuantitySample] = [
-            HKQuantitySample(
-                type: HealthKitTypeCatalog.bodyMassType,
-                quantity: HKQuantity(unit: .gramUnit(with: .kilo), doubleValue: kg),
-                start: date,
-                end: date
-            )
-        ]
+        let sample = HKQuantitySample(
+            type: HealthKitTypeCatalog.bodyMassType,
+            quantity: HKQuantity(unit: .gramUnit(with: .kilo), doubleValue: kg),
+            start: date,
+            end: date
+        )
 
-        if let bodyFatPercent {
-            samples.append(
-                HKQuantitySample(
-                    type: HealthKitTypeCatalog.bodyFatPercentageType,
-                    // HealthKit expects a 0-1 fraction, not 0-100.
-                    quantity: HKQuantity(unit: .percent(), doubleValue: bodyFatPercent / 100),
-                    start: date,
-                    end: date
-                )
-            )
-        }
+        try await healthStore.save([sample])
+    }
 
-        if let waistCm {
-            samples.append(
-                HKQuantitySample(
-                    type: HealthKitTypeCatalog.waistCircumferenceType,
-                    quantity: HKQuantity(unit: .meterUnit(with: .centi), doubleValue: waistCm),
-                    start: date,
-                    end: date
-                )
-            )
-        }
+    func logWaist(
+        cm: Double,
+        date: Date
+    ) async throws {
+        let sample = HKQuantitySample(
+            type: HealthKitTypeCatalog.waistCircumferenceType,
+            quantity: HKQuantity(unit: .meterUnit(with: .centi), doubleValue: cm),
+            start: date,
+            end: date
+        )
 
-        try await healthStore.save(samples)
+        try await healthStore.save([sample])
     }
 
     func weightSamples(since date: Date) async throws -> [DatedValue] {
@@ -76,6 +63,43 @@ final class BodyMetricsHealthKitService: BodyMetricsHealthKitServicing {
         // value in this app (LogWeightView's input, NavyBodyFatCalculator's
         // output) is 0-100.
         return fractions.map { DatedValue(date: $0.date, value: $0.value * 100) }
+    }
+
+    func deleteWaistSample(date: Date) async throws {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
+
+        let predicate = HKQuery.predicateForSamples(
+            withStart: startOfDay,
+            end: endOfDay,
+            options: .strictStartDate
+        )
+
+        let matching: [HKQuantitySample] = try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: HealthKitTypeCatalog.waistCircumferenceType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: nil
+            ) { _, samples, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                let matches = (samples as? [HKQuantitySample] ?? [])
+                    .filter { $0.startDate == date }
+
+                continuation.resume(returning: matches)
+            }
+
+            healthStore.execute(query)
+        }
+
+        guard !matching.isEmpty else { return }
+
+        try await healthStore.delete(matching)
     }
 
     private func samples(

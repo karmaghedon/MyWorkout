@@ -39,6 +39,21 @@ final class BodyMeasurementLogStore: ObservableObject {
         save()
     }
 
+    /// Replaces an existing entry in place, matched by `id` — used to
+    /// correct a past neck/hip measurement (e.g. a typo) rather than
+    /// leaving both the wrong and the corrected entry logged.
+    func update(_ log: BodyMeasurementLog) {
+        guard let index = logs.firstIndex(where: { $0.id == log.id }) else { return }
+
+        logs[index] = log
+        save()
+    }
+
+    func remove(id: UUID) {
+        logs.removeAll { $0.id == id }
+        save()
+    }
+
     // MARK: - Persistence Errors
 
     func clearPersistenceError() {

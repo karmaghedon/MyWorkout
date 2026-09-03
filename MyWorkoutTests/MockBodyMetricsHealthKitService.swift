@@ -13,8 +13,11 @@ final class MockBodyMetricsHealthKitService:
 
     struct LoggedWeight: Equatable {
         let kg: Double
-        let bodyFatPercent: Double?
-        let waistCm: Double?
+        let date: Date
+    }
+
+    struct LoggedWaist: Equatable {
+        let cm: Double
         let date: Date
     }
 
@@ -25,6 +28,8 @@ final class MockBodyMetricsHealthKitService:
     private struct State {
         var result: Result<Void, Error> = .success(())
         var loggedWeights: [LoggedWeight] = []
+        var loggedWaists: [LoggedWaist] = []
+        var deletedWaistDates: [Date] = []
         var weightSamplesResult: Result<[DatedValue], Error> = .success([])
         var waistSamplesResult: Result<[DatedValue], Error> = .success([])
         var bodyFatPercentSamplesResult: Result<[DatedValue], Error> = .success([])
@@ -34,6 +39,14 @@ final class MockBodyMetricsHealthKitService:
 
     var loggedWeights: [LoggedWeight] {
         state.read { $0.loggedWeights }
+    }
+
+    var loggedWaists: [LoggedWaist] {
+        state.read { $0.loggedWaists }
+    }
+
+    var deletedWaistDates: [Date] {
+        state.read { $0.deletedWaistDates }
     }
 
     func setResult(_ result: Result<Void, Error>) {
@@ -54,14 +67,22 @@ final class MockBodyMetricsHealthKitService:
 
     func logWeight(
         kg: Double,
-        bodyFatPercent: Double?,
-        waistCm: Double?,
         date: Date
     ) async throws {
         let result: Result<Void, Error> = state.mutate {
-            $0.loggedWeights.append(
-                LoggedWeight(kg: kg, bodyFatPercent: bodyFatPercent, waistCm: waistCm, date: date)
-            )
+            $0.loggedWeights.append(LoggedWeight(kg: kg, date: date))
+            return $0.result
+        }
+
+        try result.get()
+    }
+
+    func logWaist(
+        cm: Double,
+        date: Date
+    ) async throws {
+        let result: Result<Void, Error> = state.mutate {
+            $0.loggedWaists.append(LoggedWaist(cm: cm, date: date))
             return $0.result
         }
 
@@ -78,5 +99,14 @@ final class MockBodyMetricsHealthKitService:
 
     func bodyFatPercentSamples(since date: Date) async throws -> [DatedValue] {
         try state.read { try $0.bodyFatPercentSamplesResult.get() }
+    }
+
+    func deleteWaistSample(date: Date) async throws {
+        let result: Result<Void, Error> = state.mutate {
+            $0.deletedWaistDates.append(date)
+            return $0.result
+        }
+
+        try result.get()
     }
 }

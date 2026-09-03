@@ -20,12 +20,20 @@ struct WeeklyReportView: View {
         }
         .navigationTitle("Weekly Report")
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await weeklyBodyReportStore.reload(
-                bodyMeasurementLogs: bodyMeasurementLogStore.logs,
-                sex: settingsStore.settings.biologicalSex,
-                heightCm: settingsStore.settings.heightCm
-            )
+        .onAppear {
+            // Not `.task`: this screen's tab keeps its NavigationStack
+            // mounted across tab switches, so `.task` (tied to view
+            // identity, fires once per lifetime) would never reload
+            // after logging a new weigh-in/measurement elsewhere and
+            // returning here. `.onAppear` fires every time this becomes
+            // visible again.
+            Task {
+                await weeklyBodyReportStore.reload(
+                    bodyMeasurementLogs: bodyMeasurementLogStore.logs,
+                    sex: settingsStore.settings.biologicalSex,
+                    heightCm: settingsStore.settings.heightCm
+                )
+            }
         }
     }
 
@@ -58,8 +66,23 @@ struct WeeklyReportView: View {
     private func weeklyCard(_ card: WeeklyBodyReportCard) -> some View {
         AppCard {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                Text(weekRangeText(card))
-                    .font(AppTheme.Typography.cardTitle)
+                HStack {
+                    Text(weekRangeText(card))
+                        .font(AppTheme.Typography.cardTitle)
+
+                    Spacer()
+
+                    NavigationLink(
+                        value: AppRoute.measurementHistoryForWeek(
+                            start: card.windowStart,
+                            end: card.windowEnd
+                        )
+                    ) {
+                        Image(systemName: "pencil.circle")
+                            .font(AppTheme.Typography.cardTitle)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                }
 
                 metricRow(
                     label: "Weight",

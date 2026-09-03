@@ -192,6 +192,15 @@ struct AppShellView: View {
         case .logWeight:
             LogWeightView()
 
+        case .logBodyMeasurements:
+            LogBodyMeasurementsView()
+
+        case .measurementHistory:
+            MeasurementLogHistoryView()
+
+        case let .measurementHistoryForWeek(start, end):
+            MeasurementLogHistoryView(dateRange: start..<end)
+
         case .macroGoals:
             GoalsView()
 
