@@ -1,30 +1,23 @@
 import SwiftUI
 import UIKit
 
-/// Logs a weigh-in. Weight is required and always goes to HealthKit;
-/// body fat % and waist are optional HealthKit fields; neck (everyone)
-/// and hip (shown only when Biological Sex is set to Female in
-/// Settings, since it's only needed for the women's Navy body-fat
-/// formula) are optional and local-only (`BodyMeasurementLogStore`)
-/// since HealthKit has no quantity type for either.
+/// Logs a weigh-in for `date` (defaults to today) — weight only. Body
+/// fat % is never entered anywhere in this app; it's always calculated
+/// (`NavyBodyFatCalculator`) from waist/neck/hip, which are logged
+/// weekly on `LogBodyMeasurementsView` instead, not here.
+///
+/// Presented for a past date from `WeeklySummaryCard`'s tappable day
+/// dots, in which case it pre-fills with that day's existing weight (if
+/// any) so re-opening it edits rather than always starting blank.
 struct LogWeightView: View {
     @EnvironmentObject private var settingsStore: UserSettingsStore
     @EnvironmentObject private var healthKitAuthorizationManager: HealthKitAuthorizationManager
-    @EnvironmentObject private var bodyMeasurementLogStore: BodyMeasurementLogStore
     @Environment(\.dismiss) private var dismiss
 
     private let healthKitService: any BodyMetricsHealthKitServicing
+    private let date: Date
 
     @State private var weight: Double = 150
-    @State private var bodyFatPercent: Double = 20
-    @State private var waistCm: Double = 80
-    @State private var neckCm: Double = 38
-    @State private var hipCm: Double = 95
-
-    @State private var includeBodyFat = false
-    @State private var includeWaist = false
-    @State private var includeNeck = false
-    @State private var includeHip = false
 
     @State private var isSaving = false
     @State private var authorizationDenied = false
@@ -32,8 +25,10 @@ struct LogWeightView: View {
     @State private var showError = false
 
     init(
+        date: Date = .now,
         healthKitService: any BodyMetricsHealthKitServicing = BodyMetricsHealthKitService()
     ) {
+        self.date = date
         self.healthKitService = healthKitService
     }
 
@@ -45,52 +40,6 @@ struct LogWeightView: View {
                     .listRowBackground(Color.clear)
             } footer: {
                 Text("Saved to Health as your weight.")
-            }
-
-            Section {
-                Toggle("Body Fat %", isOn: $includeBodyFat.animation())
-
-                if includeBodyFat {
-                    NumericEntryField(title: "Body Fat", value: $bodyFatPercent, suffix: "%")
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                }
-            }
-
-            Section {
-                Toggle("Waist", isOn: $includeWaist.animation())
-
-                if includeWaist {
-                    NumericEntryField(title: "Waist", value: $waistCm, suffix: "cm")
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                }
-            }
-
-            Section {
-                Toggle("Neck", isOn: $includeNeck.animation())
-
-                if includeNeck {
-                    NumericEntryField(title: "Neck", value: $neckCm, suffix: "cm")
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                }
-            } footer: {
-                Text("Neck isn't tracked by Health, so it's saved in MyWorkout only.")
-            }
-
-            if settingsStore.settings.biologicalSex == .female {
-                Section {
-                    Toggle("Hip", isOn: $includeHip.animation())
-
-                    if includeHip {
-                        NumericEntryField(title: "Hip", value: $hipCm, suffix: "cm")
-                            .listRowInsets(EdgeInsets())
-                            .listRowBackground(Color.clear)
-                    }
-                } footer: {
-                    Text("Needed for the body fat % estimate on days without a direct reading. Saved in MyWorkout only, same as neck.")
-                }
             }
 
             if authorizationDenied {
@@ -114,11 +63,12 @@ struct LogWeightView: View {
                 .listRowBackground(Color.clear)
             }
         }
-        .navigationTitle("Log Weight")
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .dismissKeyboardOnTap()
         .task {
             await requestAuthorizationIfNeeded()
+            await loadExistingWeight()
         }
         .alert(
             "Couldn't Save",
@@ -129,6 +79,12 @@ struct LogWeightView: View {
         } message: { message in
             Text(message)
         }
+    }
+
+    private var navigationTitle: String {
+        Calendar.current.isDateInToday(date)
+            ? "Log Weight"
+            : "Log Weight \u{2014} \(date.formatted(date: .abbreviated, time: .omitted))"
     }
 
     // MARK: - Units
@@ -146,6 +102,11 @@ struct LogWeightView: View {
         return WeightConversion.poundsToKilograms(pounds)
     }
 
+    private func displayWeight(kg: Double) -> Double {
+        let pounds = WeightConversion.kilogramsToPounds(kg)
+        return WeightConversion.fromPounds(pounds, to: settingsStore.settings.bodyWeightUnitSystem)
+    }
+
     // MARK: - Authorization
 
     private func requestAuthorizationIfNeeded() async {
@@ -156,6 +117,25 @@ struct LogWeightView: View {
             authorizationDenied = false
         } catch {
             authorizationDenied = true
+        }
+    }
+
+    // MARK: - Load existing
+
+    private func loadExistingWeight() async {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+
+        do {
+            let samples = try await healthKitService.weightSamples(since: startOfDay)
+
+            if let latestThatDay = samples
+                .filter({ calendar.isDate($0.date, inSameDayAs: date) })
+                .max(by: { $0.date < $1.date }) {
+                weight = displayWeight(kg: latestThatDay.value)
+            }
+        } catch {
+            // Not worth surfacing an error just for a pre-fill attempt.
         }
     }
 
@@ -170,20 +150,8 @@ struct LogWeightView: View {
             do {
                 try await healthKitService.logWeight(
                     kg: weightKilograms,
-                    bodyFatPercent: includeBodyFat ? bodyFatPercent : nil,
-                    waistCm: includeWaist ? waistCm : nil,
-                    date: .now
+                    date: date
                 )
-
-                if includeNeck || includeHip {
-                    bodyMeasurementLogStore.add(
-                        BodyMeasurementLog(
-                            date: .now,
-                            neckCm: includeNeck ? neckCm : nil,
-                            hipCm: includeHip ? hipCm : nil
-                        )
-                    )
-                }
 
                 dismiss()
             } catch {

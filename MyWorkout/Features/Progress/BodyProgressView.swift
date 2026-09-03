@@ -66,8 +66,15 @@ struct BodyProgressView: View {
         }
         .navigationTitle("Weight & Body")
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await reload()
+        .onAppear {
+            // Not `.task`: this screen's tab keeps its NavigationStack
+            // mounted across tab switches, so `.task` (tied to view
+            // identity, fires once per lifetime) would never reload
+            // after logging new data elsewhere and returning here.
+            // `.onAppear` fires every time this becomes visible again.
+            Task {
+                await reload()
+            }
         }
     }
 

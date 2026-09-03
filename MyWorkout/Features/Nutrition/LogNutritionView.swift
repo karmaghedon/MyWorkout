@@ -1,17 +1,22 @@
 import SwiftUI
 import UIKit
 
-/// Sets today's total macros. This is a calorie/macro tracker, not a
-/// food diary: there is one editable record per calendar day
-/// (`DailyNutritionLogStore.upsert`), not a list of individual food
-/// items. Calories are always derived from macros via the standard
-/// 4/4/9 kcal-per-gram rule and shown read-only — never entered
-/// directly.
+/// Sets `date`'s (defaults to today) total macros. This is a
+/// calorie/macro tracker, not a food diary: there is one editable
+/// record per calendar day (`DailyNutritionLogStore.upsert`), not a
+/// list of individual food items. Calories are always derived from
+/// macros via the standard 4/4/9 kcal-per-gram rule and shown
+/// read-only — never entered directly.
+///
+/// Presented for a past date from `WeeklySummaryCard`'s tappable day
+/// dots, in which case it pre-fills with that day's existing entry (if
+/// any) so re-opening it edits rather than always starting blank.
 struct LogNutritionView: View {
     @EnvironmentObject private var dailyNutritionLogStore: DailyNutritionLogStore
     @EnvironmentObject private var healthKitAuthorizationManager: HealthKitAuthorizationManager
 
     private let healthKitService: any NutritionHealthKitServicing
+    private let date: Date
 
     @State private var proteinG = 0
     @State private var carbsG = 0
@@ -23,8 +28,10 @@ struct LogNutritionView: View {
     @State private var showError = false
 
     init(
+        date: Date = .now,
         healthKitService: any NutritionHealthKitServicing = NutritionHealthKitService()
     ) {
+        self.date = date
         self.healthKitService = healthKitService
     }
 
@@ -50,7 +57,7 @@ struct LogNutritionView: View {
                     .listRowBackground(Color.clear)
 
                 PrimaryButton(
-                    title: "Save Today's Totals",
+                    title: "Save Totals",
                     isEnabled: !isSaving,
                     isLoading: isSaving,
                     action: save
@@ -71,12 +78,12 @@ struct LogNutritionView: View {
                 }
             }
         }
-        .navigationTitle("Today's Nutrition")
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .dismissKeyboardOnTap()
         .task {
             await requestAuthorizationIfNeeded()
-            loadTodaysEntry()
+            loadExistingEntry()
         }
         .alert(
             "Couldn't Save",
@@ -89,12 +96,18 @@ struct LogNutritionView: View {
         }
     }
 
+    private var navigationTitle: String {
+        Calendar.current.isDateInToday(date)
+            ? "Today's Nutrition"
+            : "Nutrition \u{2014} \(date.formatted(date: .abbreviated, time: .omitted))"
+    }
+
     private var caloriesSummary: some View {
         VStack(spacing: AppTheme.Spacing.xs) {
             Text("\(computedCalories)")
                 .font(AppTheme.Typography.numeric(40))
 
-            Text("calories today")
+            Text("calories")
                 .font(AppTheme.Typography.caption)
                 .foregroundStyle(.secondary)
         }
@@ -106,8 +119,8 @@ struct LogNutritionView: View {
         proteinG * 4 + carbsG * 4 + fatG * 9
     }
 
-    private func loadTodaysEntry() {
-        guard let entry = dailyNutritionLogStore.entry(on: .now) else { return }
+    private func loadExistingEntry() {
+        guard let entry = dailyNutritionLogStore.entry(on: date) else { return }
 
         proteinG = entry.proteinG
         carbsG = entry.carbsG
@@ -141,11 +154,11 @@ struct LogNutritionView: View {
                     carbsG: Double(carbsG),
                     fatG: Double(fatG),
                     calories: Double(computedCalories),
-                    date: .now
+                    date: date
                 )
 
                 dailyNutritionLogStore.upsert(
-                    date: .now,
+                    date: date,
                     proteinG: proteinG,
                     carbsG: carbsG,
                     fatG: fatG

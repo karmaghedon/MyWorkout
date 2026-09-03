@@ -30,6 +30,10 @@ struct DashboardView: View {
                     messages: currentErrorMessages
                 )
 
+                WeeklyMeasurementsReminderBanner()
+
+                WeeklySummaryCard()
+
                 heroCard
                     .padding(.horizontal)
 
@@ -42,8 +46,6 @@ struct DashboardView: View {
                 bodyMetricsQuickActionsSection
 
                 prHighlightsSection
-
-                weeklySummarySection
 
                 recoverySection
 
@@ -265,41 +267,25 @@ struct DashboardView: View {
 
     // MARK: - Body Metrics
 
-    /// "Log Weight" and "Log Nutrition", matching how `nextWorkoutSection`
-    /// above establishes the same NavigationLink-wrapped `AppCard` pattern
-    /// this reuses.
+    /// "Log Weight" only — matching how `nextWorkoutSection` above
+    /// establishes the same NavigationLink-wrapped `AppCard` pattern
+    /// this reuses. No "Log Nutrition" card here: `TodayNutritionCard`
+    /// already links to the same `AppRoute.logNutrition` screen, so a
+    /// second entry point next to this one was pure duplication.
     private var bodyMetricsQuickActionsSection: some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            NavigationLink(value: AppRoute.logWeight) {
-                AppCard {
-                    WorkoutCard(
-                        systemImage: "scalemass.fill",
-                        title: "Log Weight"
-                    ) {
-                        Text("Weight, body fat %, waist, and neck")
-                            .font(AppTheme.Typography.caption)
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
+        NavigationLink(value: AppRoute.logWeight) {
+            AppCard {
+                WorkoutCard(
+                    systemImage: "scalemass.fill",
+                    title: "Log Weight"
+                ) {
+                    Text("Weight, body fat %, waist, and neck")
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
                 }
             }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
-
-            NavigationLink(value: AppRoute.logNutrition) {
-                AppCard {
-                    WorkoutCard(
-                        systemImage: "flame.fill",
-                        title: "Log Nutrition"
-                    ) {
-                        Text("Today's calories and macros")
-                            .font(AppTheme.Typography.caption)
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
-                }
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
         }
+        .buttonStyle(.plain)
         .padding(.horizontal)
     }
 
@@ -377,124 +363,6 @@ struct DashboardView: View {
                 .padding(.horizontal)
             }
         }
-    }
-
-    // MARK: - Weekly Summary
-
-    /// A rolling 7-day window ending today (inclusive), not a fixed
-    /// calendar week. A fixed calendar week (e.g. `Calendar.current
-    /// .dateInterval(of: .weekOfYear, for:)`) silently resets to empty
-    /// on the first day of a new week even with several very recent
-    /// workouts, since those workouts fall in the *previous* week's
-    /// window — surprising on a screen whose whole point is showing
-    /// recent activity.
-    private var weekDays: [Date] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: .now)
-
-        return (0..<7).compactMap { daysAgo in
-            calendar.date(byAdding: .day, value: -(6 - daysAgo), to: today)
-        }
-    }
-
-    private var recentWeekInterval: DateInterval {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: .now)
-        let start = weekDays.first ?? today
-        let end = calendar.date(byAdding: .day, value: 1, to: today) ?? .now
-
-        return DateInterval(start: start, end: end)
-    }
-
-    private var thisWeeksLogs: [WorkoutLog] {
-        logStore.logs.filter {
-            recentWeekInterval.contains($0.date)
-        }
-    }
-
-    private var activeWorkoutStartedThisWeek: Bool {
-        guard let startedAt = activeWorkoutStore.startedAt else {
-            return false
-        }
-
-        return recentWeekInterval.contains(startedAt)
-    }
-
-    private var workoutsThisWeek: Int {
-        thisWeeksLogs.count + (activeWorkoutStartedThisWeek ? 1 : 0)
-    }
-
-    private var setsThisWeek: Int {
-        let completedSets = thisWeeksLogs.reduce(0) { total, log in
-            total + log.completedExercises.reduce(0) { $0 + $1.sets.count }
-        }
-
-        let activeSets = activeWorkoutStartedThisWeek
-            ? activeWorkoutStore.exerciseStates.values.reduce(0) { $0 + $1.loggedSets.count }
-            : 0
-
-        return completedSets + activeSets
-    }
-
-    private func hasWorkout(on day: Date) -> Bool {
-        let calendar = Calendar.current
-
-        let hasLoggedWorkout = logStore.logs.contains {
-            calendar.isDate($0.date, inSameDayAs: day)
-        }
-
-        let hasActiveWorkoutStartedThatDay = activeWorkoutStore.startedAt.map {
-            calendar.isDate($0, inSameDayAs: day)
-        } ?? false
-
-        return hasLoggedWorkout || hasActiveWorkoutStartedThatDay
-    }
-
-    private var weekDayAccessibilityLabel: String {
-        let workoutDayNames = weekDays
-            .filter { hasWorkout(on: $0) }
-            .map { $0.formatted(.dateTime.weekday(.wide)) }
-
-        guard !workoutDayNames.isEmpty else {
-            return "No workouts this week yet"
-        }
-
-        return "Workout days this week: " + workoutDayNames.joined(separator: ", ")
-    }
-
-    private var weeklySummarySection: some View {
-        AppCard {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                SectionHeader(title: "This Week")
-
-                HStack(spacing: AppTheme.Spacing.md) {
-                    MetricView(label: "Workouts", value: "\(workoutsThisWeek)")
-                    MetricView(label: "Sets", value: "\(setsThisWeek)")
-                }
-
-                HStack(spacing: AppTheme.Spacing.sm) {
-                    ForEach(weekDays, id: \.self) { day in
-                        VStack(spacing: 4) {
-                            Text(day.formatted(.dateTime.weekday(.narrow)))
-                                .font(AppTheme.Typography.footnote)
-                                .foregroundStyle(AppTheme.tertiaryText)
-
-                            Circle()
-                                .fill(
-                                    hasWorkout(on: day)
-                                        ? AppTheme.accent
-                                        : AppTheme.subtleFill
-                                )
-                                .frame(width: 10, height: 10)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(weekDayAccessibilityLabel)
-            }
-        }
-        .padding(.horizontal)
     }
 
     // MARK: - Recovery
