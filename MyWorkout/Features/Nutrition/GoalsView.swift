@@ -12,12 +12,16 @@ import UIKit
 /// resetting to hardcoded defaults, which otherwise made it look like the
 /// last goal you set had been lost every time you reopened this screen.
 ///
-/// Calories is always a manual, independent field — never derived from the
-/// macros. Grams are the actual source of truth (`MacroGoal` only stores
-/// grams); percentage is a computed, editable view of those same grams
-/// relative to calories, using the standard 4 kcal/g (protein, carbs) and
-/// 9 kcal/g (fat) conversion factors. Switching the mode toggle doesn't
-/// change any stored value, only how you're currently entering it.
+/// Which of calories vs. the macros is "in charge" flips with the entry
+/// mode: in **percent** mode, calories is the fixed budget you set
+/// manually, and the three percentages redistribute to keep summing to
+/// 100% of it. In **grams** mode, there's no fixed budget to preserve —
+/// each macro is entered independently, and calories becomes a read-only
+/// readout computed from them (via the standard 4 kcal/g for protein/
+/// carbs and 9 kcal/g for fat), so grams-mode edits never redistribute
+/// the other macros the way percent-mode edits do. `effectiveCalories`
+/// is the single source of truth for both display and saving, so the
+/// two can never drift out of sync with what's actually shown.
 struct GoalsView: View {
     @EnvironmentObject private var macroGoalStore: MacroGoalStore
 
@@ -44,7 +48,7 @@ struct GoalsView: View {
                     displayedComponents: .date
                 )
 
-                IntEntryField(title: "Calories", value: $calories, suffix: "kcal")
+                caloriesField
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
 
@@ -93,6 +97,36 @@ struct GoalsView: View {
         }
     }
 
+    // MARK: - Calories
+
+    /// The number everything else is computed against — a fixed manual
+    /// budget in percent mode, a read-only sum of the macros in grams
+    /// mode. See the type-level doc comment for why.
+    private var effectiveCalories: Int {
+        switch entryMode {
+        case .grams:
+            return proteinG * Int(Macro.protein.kcalPerGram)
+                + carbsG * Int(Macro.carbs.kcalPerGram)
+                + fatG * Int(Macro.fat.kcalPerGram)
+        case .percent:
+            return calories
+        }
+    }
+
+    @ViewBuilder
+    private var caloriesField: some View {
+        switch entryMode {
+        case .percent:
+            IntEntryField(title: "Calories", value: $calories, suffix: "kcal")
+
+        case .grams:
+            VStack(spacing: AppTheme.Spacing.xs) {
+                CalorieReadout(value: effectiveCalories)
+                caption("Calculated from the grams below")
+            }
+        }
+    }
+
     // MARK: - Entry Mode Toggle
 
     /// A plain `Button`-based segmented look, not `Picker(.segmented)` —
@@ -104,6 +138,13 @@ struct GoalsView: View {
         HStack(spacing: 4) {
             ForEach(MacroEntryMode.allCases) { mode in
                 Button {
+                    // Carry the grams-computed total over as the
+                    // starting manual budget, rather than snapping back
+                    // to whatever `calories` was last set to before
+                    // switching to grams mode.
+                    if entryMode == .grams && mode == .percent {
+                        calories = effectiveCalories
+                    }
                     entryMode = mode
                 } label: {
                     Text(mode.label)
@@ -167,48 +208,37 @@ struct GoalsView: View {
         }
     }
 
-    /// Grams typed here are kept *exactly* as typed for this macro —
-    /// never rounded through a grams→percent→grams round trip, which
-    /// previously corrupted the field while you were still typing (a
-    /// small number like "4" rounds down to 0% of calories, and
-    /// converting that 0% back to grams snapped the field to 0 before
-    /// you could finish typing). Only the flex macro's grams are derived
-    /// from percent math.
+    /// Grams mode has no fixed calorie budget to preserve (calories is
+    /// derived from these grams, not the other way around — see
+    /// `effectiveCalories`), so each macro is simply independent here:
+    /// no redistribution, no recency tracking, just the value you typed.
     private func gramsBinding(_ macro: Macro) -> Binding<Int> {
         Binding(
             get: { grams(macro) },
-            set: { newGrams in
-                guard calories > 0 else {
-                    setGrams(newGrams, macro)
-                    return
-                }
-
-                recordDirectEdit(macro)
-                setGrams(newGrams, macro)
-                rebalanceFlex(excluding: macro, editedPercent: percentFromGrams(newGrams, macro))
-            }
+            set: { setGrams($0, macro) }
         )
     }
 
-    /// `nil` when `calories` is 0 — nothing meaningful to show as a
-    /// percentage of no budget.
+    /// `nil` when `effectiveCalories` is 0 — nothing meaningful to show
+    /// as a percentage of no budget.
     private func percentOfCalories(_ macro: Macro) -> Int? {
-        guard calories > 0 else { return nil }
+        guard effectiveCalories > 0 else { return nil }
 
         return percentFromGrams(grams(macro), macro)
     }
 
     private func percentFromGrams(_ grams: Int, _ macro: Macro) -> Int {
-        guard calories > 0 else { return 0 }
+        guard effectiveCalories > 0 else { return 0 }
 
         let macroKcal = Double(grams) * macro.kcalPerGram
-        return Int((macroKcal / Double(calories) * 100).rounded())
+        return Int((macroKcal / Double(effectiveCalories) * 100).rounded())
     }
 
     /// Percent mode legitimately derives grams from the typed percentage
     /// (percent is the value you're entering here, grams is the
     /// secondary/derived one) — unlike grams mode, there's no verbatim
-    /// value to preserve.
+    /// value to preserve. Only meaningful in percent mode, where
+    /// `calories` is the fixed budget these redistribute against.
     private func percentBinding(_ macro: Macro) -> Binding<Int> {
         Binding(
             get: { percentOfCalories(macro) ?? 0 },
@@ -257,9 +287,9 @@ struct GoalsView: View {
     }
 
     private func gramsFromPercent(_ percent: Int, _ macro: Macro) -> Int {
-        guard calories > 0 else { return 0 }
+        guard effectiveCalories > 0 else { return 0 }
 
-        let macroKcal = Double(calories) * Double(percent) / 100
+        let macroKcal = Double(effectiveCalories) * Double(percent) / 100
         return Int((macroKcal / macro.kcalPerGram).rounded())
     }
 
@@ -292,7 +322,7 @@ struct GoalsView: View {
         macroGoalStore.add(
             MacroGoal(
                 effectiveDate: effectiveDate,
-                calories: calories,
+                calories: effectiveCalories,
                 proteinG: proteinG,
                 carbsG: carbsG,
                 fatG: fatG
@@ -332,6 +362,36 @@ private enum Macro: CaseIterable {
         case .protein, .carbs: return 4
         case .fat: return 9
         }
+    }
+}
+
+/// Non-interactive stand-in for `IntEntryField`, styled to match — used
+/// for calories in grams mode, where the number is computed from the
+/// macros rather than something to type into.
+private struct CalorieReadout: View {
+    let value: Int
+
+    var body: some View {
+        VStack(spacing: AppTheme.Spacing.sm) {
+            Text("CALORIES")
+                .font(AppTheme.Typography.eyebrow)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 4) {
+                Text("\(value)")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+
+                Text("kcal")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
+                .fill(AppTheme.cardBackground)
+        )
     }
 }
 
