@@ -24,6 +24,29 @@ enum EquipmentInventoryTestSupport {
         return defaults
     }
 
+    /// A unique file path per test/call, so tests never see each
+    /// other's data despite running against the real filesystem — same
+    /// isolation goal `makeUserDefaults` served before
+    /// `EquipmentInventoryStore` moved off `UserDefaults` (whose
+    /// `synchronize()` turned out not to reliably flush before process
+    /// termination — see the type-level doc comment on
+    /// `UserSettingsStore`, which hit the identical issue).
+    /// `makeUserDefaults` above is kept only for
+    /// `test_legacyUserDefaultsData_isMigratedOnFirstLoad`, which
+    /// specifically needs a real `UserDefaults` to migrate from.
+    static func makeFileURL(
+        testName: String
+    ) -> URL {
+        FileManager.default.temporaryDirectory
+            .appendingPathComponent(
+                "EquipmentInventoryStoreTests."
+                + testName
+                + "."
+                + UUID().uuidString
+                + ".json"
+            )
+    }
+
     static func makeInventory(
         unitSystem: UnitSystem = .pounds,
         barbellWeight: Double = 45,
@@ -57,14 +80,9 @@ enum EquipmentInventoryTestSupport {
     }
 
     static func decodeInventory(
-        from userDefaults: UserDefaults,
-        key: String
+        from fileURL: URL
     ) throws -> EquipmentInventory {
-        let data = try XCTUnwrap(
-            userDefaults.data(
-                forKey: key
-            )
-        )
+        let data = try Data(contentsOf: fileURL)
 
         return try JSONDecoder().decode(
             EquipmentInventory.self,

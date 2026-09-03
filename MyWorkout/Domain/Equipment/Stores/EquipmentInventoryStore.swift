@@ -6,35 +6,46 @@ final class EquipmentInventoryStore: ObservableObject {
 
     @Published private(set) var persistenceError: StoreError?
 
-    private let userDefaults: UserDefaults
-    private let persistenceKey: String
+    private let fileURL: URL
+
+    /// The pre-file-based-persistence key — see the equivalent comment
+    /// on `UserSettingsStore` for why this moved off `UserDefaults`
+    /// (`synchronize()` doesn't actually force a disk flush on modern
+    /// iOS, confirmed by real data loss on device). Kept only as a
+    /// one-time migration source for whatever's already stored there.
+    private let legacyUserDefaults: UserDefaults
+    private let legacyPersistenceKey: String
 
     init(
-        userDefaults: UserDefaults = .standard,
-        persistenceKey: String = "equipment_inventory"
+        fileURL: URL = EquipmentInventoryStore.defaultFileURL(),
+        legacyUserDefaults: UserDefaults = .standard,
+        legacyPersistenceKey: String = "equipment_inventory"
     ) {
-        self.userDefaults = userDefaults
-        self.persistenceKey = persistenceKey
+        self.fileURL = fileURL
+        self.legacyUserDefaults = legacyUserDefaults
+        self.legacyPersistenceKey = legacyPersistenceKey
 
-        if let data = userDefaults.data(
-            forKey: persistenceKey
+        if let data = Self.readData(
+            fileURL: fileURL,
+            legacyUserDefaults: legacyUserDefaults,
+            legacyPersistenceKey: legacyPersistenceKey
         ) {
             do {
                 inventory = try JSONDecoder().decode(
                     EquipmentInventory.self,
-                    from: data
+                    from: data.payload
                 )
 
                 clearPersistenceError(
                     for: .loading
                 )
+
+                if data.isFromLegacyLocation {
+                    save()
+                }
             } catch {
                 print(
                     "Failed to load equipment inventory: \(error)"
-                )
-
-                userDefaults.removeObject(
-                    forKey: persistenceKey
                 )
 
                 inventory =
@@ -55,6 +66,27 @@ final class EquipmentInventoryStore: ObservableObject {
 
             save()
         }
+    }
+
+    /// Reads from the current file location first; falls back to the
+    /// legacy `UserDefaults` key only if the file doesn't exist yet
+    /// (the first launch since the persistence backend changed), so a
+    /// real inventory from before this change still gets picked up
+    /// exactly once instead of silently resetting to defaults.
+    private static func readData(
+        fileURL: URL,
+        legacyUserDefaults: UserDefaults,
+        legacyPersistenceKey: String
+    ) -> (payload: Data, isFromLegacyLocation: Bool)? {
+        if let fileData = try? Data(contentsOf: fileURL) {
+            return (fileData, false)
+        }
+
+        guard let legacyData = legacyUserDefaults.data(forKey: legacyPersistenceKey) else {
+            return nil
+        }
+
+        return (legacyData, true)
     }
 
     // MARK: - Persistence Errors
@@ -88,13 +120,18 @@ final class EquipmentInventoryStore: ObservableObject {
 
     func save() {
         do {
+            try ensureDirectoryExists()
+
             let data = try JSONEncoder().encode(
                 inventory
             )
 
-            userDefaults.set(
-                data,
-                forKey: persistenceKey
+            // Atomic, synchronous — genuinely blocks until the write
+            // has landed on disk, unlike the old UserDefaults-backed
+            // save.
+            try data.write(
+                to: fileURL,
+                options: .atomic
             )
 
             clearPersistenceError(
@@ -111,6 +148,36 @@ final class EquipmentInventoryStore: ObservableObject {
                     "Couldn't save equipment inventory."
             )
         }
+    }
+
+    // MARK: - File Location
+
+    /// `nonisolated` so it can be used as a default parameter value in
+    /// `init` — a `@MainActor`-isolated static function can't be
+    /// referenced there, even though this one is a pure, stateless URL
+    /// computation with no actual dependency on main-actor state.
+    private nonisolated static func defaultFileURL() -> URL {
+        let applicationSupportDirectory = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        )[0]
+
+        return applicationSupportDirectory
+            .appendingPathComponent("MyWorkout", isDirectory: true)
+            .appendingPathComponent("equipment_inventory.json", isDirectory: false)
+    }
+
+    private func ensureDirectoryExists() throws {
+        let directoryURL = fileURL.deletingLastPathComponent()
+
+        guard !FileManager.default.fileExists(atPath: directoryURL.path) else {
+            return
+        }
+
+        try FileManager.default.createDirectory(
+            at: directoryURL,
+            withIntermediateDirectories: true
+        )
     }
 
     // MARK: - Inventory Management

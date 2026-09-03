@@ -6,18 +6,22 @@ final class UserSettingsStoreTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    private let key = "user_settings"
-
-    private func makeUserDefaults(testName: String) -> UserDefaults {
-        let suiteName =
-            "UserSettingsStoreTests."
-            + testName
-            + "."
-            + UUID().uuidString
-
-        let defaults = UserDefaults(suiteName: suiteName)!
-        defaults.removePersistentDomain(forName: suiteName)
-        return defaults
+    /// A unique file path per test/call, so tests never see each
+    /// other's data despite running against the real filesystem —
+    /// same isolation goal the old `UserDefaults(suiteName:)` fixture
+    /// served before `UserSettingsStore` moved off `UserDefaults`
+    /// (whose `synchronize()` turned out not to reliably flush before
+    /// process termination — see the type-level doc comment on
+    /// `UserSettingsStore`).
+    private func makeFileURL(testName: String) -> URL {
+        FileManager.default.temporaryDirectory
+            .appendingPathComponent(
+                "UserSettingsStoreTests."
+                + testName
+                + "."
+                + UUID().uuidString
+                + ".json"
+            )
     }
 
     /// A validly-shaped envelope containing real customizations, plus one
@@ -36,30 +40,30 @@ final class UserSettingsStoreTests: XCTestCase {
 
     // MARK: - Corrupted field inside a valid envelope
 
-    func test_corruptedFieldInEnvelope_preservesOriginalDataAndReportsError() {
-        let defaults = makeUserDefaults(testName: #function)
-        defaults.set(corruptedEnvelopeData(), forKey: key)
+    func test_corruptedFieldInEnvelope_preservesOriginalDataAndReportsError() throws {
+        let fileURL = makeFileURL(testName: #function)
+        try corruptedEnvelopeData().write(to: fileURL)
 
-        let store = UserSettingsStore(userDefaults: defaults)
+        let store = UserSettingsStore(fileURL: fileURL)
 
         // Falls back to in-memory defaults for this session...
         XCTAssertEqual(store.settings.unitSystem, .pounds)
         // ...but must NOT have overwritten the real data on disk, and must
         // surface a loading error rather than failing silently.
         XCTAssertEqual(store.persistenceError?.operation, .loading)
-        XCTAssertEqual(defaults.data(forKey: key), corruptedEnvelopeData())
+        XCTAssertEqual(try Data(contentsOf: fileURL), corruptedEnvelopeData())
     }
 
-    func test_corruptedFieldInEnvelope_refusesToSaveOverTheOriginalData() {
-        let defaults = makeUserDefaults(testName: #function)
-        defaults.set(corruptedEnvelopeData(), forKey: key)
+    func test_corruptedFieldInEnvelope_refusesToSaveOverTheOriginalData() throws {
+        let fileURL = makeFileURL(testName: #function)
+        try corruptedEnvelopeData().write(to: fileURL)
 
-        let store = UserSettingsStore(userDefaults: defaults)
+        let store = UserSettingsStore(fileURL: fileURL)
         store.save()
 
         // save() must be a no-op while the on-disk data is unreadable —
         // never silently replace it with defaults.
-        XCTAssertEqual(defaults.data(forKey: key), corruptedEnvelopeData())
+        XCTAssertEqual(try Data(contentsOf: fileURL), corruptedEnvelopeData())
         XCTAssertEqual(store.persistenceError?.operation, .saving)
     }
 
@@ -71,33 +75,66 @@ final class UserSettingsStoreTests: XCTestCase {
     /// "not envelope-shaped" and handed to the tolerant legacy decoder,
     /// which would silently succeed with all-default settings and
     /// immediately persist that wipe over the user's real data.
-    func test_envelopeWithDifferentlyCasedKey_isStillTreatedAsEnvelopeShaped() {
-        let defaults = makeUserDefaults(testName: #function)
+    func test_envelopeWithDifferentlyCasedKey_isStillTreatedAsEnvelopeShaped() throws {
+        let fileURL = makeFileURL(testName: #function)
         let data = corruptedEnvelopeData(payloadKey: "Payload")
-        defaults.set(data, forKey: key)
+        try data.write(to: fileURL)
 
-        let store = UserSettingsStore(userDefaults: defaults)
+        let store = UserSettingsStore(fileURL: fileURL)
 
         XCTAssertEqual(store.persistenceError?.operation, .loading)
-        XCTAssertEqual(defaults.data(forKey: key), data)
+        XCTAssertEqual(try Data(contentsOf: fileURL), data)
     }
 
     // MARK: - Healthy round trip (sanity check)
 
     func test_validEnvelope_loadsSuccessfullyWithNoError() {
-        let defaults = makeUserDefaults(testName: #function)
+        let fileURL = makeFileURL(testName: #function)
 
         var settings = UserSettings.defaults
         settings.unitSystem = .kilograms
         settings.appearanceMode = .dark
 
-        let firstStore = UserSettingsStore(userDefaults: defaults)
+        let firstStore = UserSettingsStore(fileURL: fileURL)
         firstStore.replace(with: settings)
 
-        let reloaded = UserSettingsStore(userDefaults: defaults)
+        let reloaded = UserSettingsStore(fileURL: fileURL)
 
         XCTAssertNil(reloaded.persistenceError)
         XCTAssertEqual(reloaded.settings.unitSystem, .kilograms)
         XCTAssertEqual(reloaded.settings.appearanceMode, .dark)
+    }
+
+    // MARK: - Migration from the legacy UserDefaults-backed store
+
+    /// Regression test: a real settings value saved by the old
+    /// `UserDefaults`-backed store, from before this persistence
+    /// change, must still be picked up on the first launch after the
+    /// change rather than silently resetting to defaults.
+    func test_legacyUserDefaultsData_isMigratedOnFirstLoad() throws {
+        let suiteName = "UserSettingsStoreTests.\(#function).\(UUID().uuidString)"
+        let legacyDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        legacyDefaults.removePersistentDomain(forName: suiteName)
+
+        var settings = UserSettings.defaults
+        settings.unitSystem = .kilograms
+        settings.compoundRestSeconds = 240
+
+        let envelope = PersistedEnvelope(schemaVersion: 1, payload: settings)
+        legacyDefaults.set(try JSONEncoder().encode(envelope), forKey: "user_settings")
+
+        let fileURL = makeFileURL(testName: #function)
+        // No file exists yet at `fileURL` — this is the "first launch
+        // since the persistence backend changed" case.
+        let store = UserSettingsStore(fileURL: fileURL, legacyUserDefaults: legacyDefaults)
+
+        XCTAssertNil(store.persistenceError)
+        XCTAssertEqual(store.settings.unitSystem, .kilograms)
+        XCTAssertEqual(store.settings.compoundRestSeconds, 240)
+
+        // The migration must have also written the file, so a
+        // subsequent launch doesn't depend on the legacy UserDefaults
+        // key still being present.
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
     }
 }

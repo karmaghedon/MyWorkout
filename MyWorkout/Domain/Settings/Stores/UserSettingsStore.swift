@@ -8,18 +8,34 @@ final class UserSettingsStore: ObservableObject {
 
     private static let currentSchemaVersion = 1
 
-    private let key = "user_settings"
-    private let userDefaults: UserDefaults
+    /// The pre-file-based-persistence key: `UserDefaults.set()` only
+    /// updates the in-memory cache synchronously, the actual disk
+    /// write-back happens on the OS's own schedule — and, contrary to
+    /// its name, `UserDefaults.synchronize()` does not force that
+    /// (Apple's own documentation calls it "unnecessary" precisely
+    /// because it no longer does anything on modern iOS). That made a
+    /// kill shortly after changing a setting silently lose it, since
+    /// nothing could guarantee the write had landed. Confirmed on
+    /// device before this fix. Settings now persist to a real file
+    /// instead (see `fileURL`), written synchronously and atomically —
+    /// this key is kept only as a one-time migration source for
+    /// whatever's already stored there from before this change.
+    private static let legacyUserDefaultsKey = "user_settings"
+
+    private let fileURL: URL
+    private let legacyUserDefaults: UserDefaults
 
     /// Prevents unreadable settings from being overwritten.
     private var isPersistenceWritable = true
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(
+        fileURL: URL = UserSettingsStore.defaultFileURL(),
+        legacyUserDefaults: UserDefaults = .standard
+    ) {
+        self.fileURL = fileURL
+        self.legacyUserDefaults = legacyUserDefaults
 
-        guard let data = userDefaults.data(
-            forKey: key
-        ) else {
+        guard let data = Self.readData(fileURL: fileURL, legacyUserDefaults: legacyUserDefaults) else {
             settings = .defaults
             save()
             return
@@ -27,7 +43,7 @@ final class UserSettingsStore: ObservableObject {
 
         do {
             let decodedResult = try Self.decodeSettings(
-                from: data
+                from: data.payload
             )
 
             settings = Self.validateSettings(
@@ -37,7 +53,7 @@ final class UserSettingsStore: ObservableObject {
             isPersistenceWritable = true
             clearPersistenceError(for: .loading)
 
-            if decodedResult.requiresMigration {
+            if decodedResult.requiresMigration || data.isFromLegacyLocation {
                 save()
             }
         } catch {
@@ -46,7 +62,7 @@ final class UserSettingsStore: ObservableObject {
             )
 
             /*
-             Keep the original UserDefaults value untouched.
+             Keep the original persisted value untouched.
              Do not replace it automatically with defaults.
              */
             settings = .defaults
@@ -60,6 +76,27 @@ final class UserSettingsStore: ObservableObject {
                     + "and the existing data was preserved."
             )
         }
+    }
+
+    /// Reads from the current file location first; falls back to the
+    /// legacy `UserDefaults` key only if the file doesn't exist yet
+    /// (i.e. this is the first launch since the persistence backend
+    /// changed), so a real settings value from before this change
+    /// still gets picked up exactly once instead of silently resetting
+    /// to defaults.
+    private static func readData(
+        fileURL: URL,
+        legacyUserDefaults: UserDefaults
+    ) -> (payload: Data, isFromLegacyLocation: Bool)? {
+        if let fileData = try? Data(contentsOf: fileURL) {
+            return (fileData, false)
+        }
+
+        guard let legacyData = legacyUserDefaults.data(forKey: legacyUserDefaultsKey) else {
+            return nil
+        }
+
+        return (legacyData, true)
     }
 
     // MARK: - Persistence Errors
@@ -145,6 +182,8 @@ final class UserSettingsStore: ObservableObject {
         }
 
         do {
+            try ensureDirectoryExists()
+
             let validatedSettings = Self.validateSettings(
                 settings
             )
@@ -158,9 +197,13 @@ final class UserSettingsStore: ObservableObject {
                 envelope
             )
 
-            userDefaults.set(
-                data,
-                forKey: key
+            // Atomic, synchronous — unlike the old UserDefaults-backed
+            // save, this genuinely blocks until the write has landed on
+            // disk, so there's nothing left to flush before the app
+            // backgrounds or terminates.
+            try data.write(
+                to: fileURL,
+                options: .atomic
             )
 
             settings = validatedSettings
@@ -176,6 +219,36 @@ final class UserSettingsStore: ObservableObject {
                     "Couldn't save settings."
             )
         }
+    }
+
+    // MARK: - File Location
+
+    /// `nonisolated` so it can be used as a default parameter value in
+    /// `init` — a `@MainActor`-isolated static function can't be
+    /// referenced there, even though this one is a pure, stateless URL
+    /// computation with no actual dependency on main-actor state.
+    private nonisolated static func defaultFileURL() -> URL {
+        let applicationSupportDirectory = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        )[0]
+
+        return applicationSupportDirectory
+            .appendingPathComponent("MyWorkout", isDirectory: true)
+            .appendingPathComponent("user_settings.json", isDirectory: false)
+    }
+
+    private func ensureDirectoryExists() throws {
+        let directoryURL = fileURL.deletingLastPathComponent()
+
+        guard !FileManager.default.fileExists(atPath: directoryURL.path) else {
+            return
+        }
+
+        try FileManager.default.createDirectory(
+            at: directoryURL,
+            withIntermediateDirectories: true
+        )
     }
 
     func replace(

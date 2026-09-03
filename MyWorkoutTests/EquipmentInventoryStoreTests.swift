@@ -5,23 +5,19 @@ import XCTest
 final class EquipmentInventoryStoreTests:
     XCTestCase {
 
-    private let persistenceKey =
-        "equipment_inventory_test"
-
     // MARK: - Initialization
 
     func testInitializationWithoutPersistedInventoryUsesDefaultsAndSaves()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         XCTAssertEqual(
@@ -46,8 +42,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -65,9 +60,9 @@ final class EquipmentInventoryStoreTests:
     func testInitializationLoadsPersistedInventory()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
@@ -81,14 +76,10 @@ final class EquipmentInventoryStoreTests:
             inventory
         )
 
-        defaults.set(
-            data,
-            forKey: persistenceKey
-        )
+        try data.write(to: fileURL)
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         XCTAssertEqual(
@@ -114,20 +105,16 @@ final class EquipmentInventoryStoreTests:
     func testInvalidPersistedDataRestoresDefaultsAndExposesLoadingError()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
-        defaults.set(
-            Data("invalid".utf8),
-            forKey: persistenceKey
-        )
+        try Data("invalid".utf8).write(to: fileURL)
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         XCTAssertEqual(
@@ -145,8 +132,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -162,15 +148,14 @@ final class EquipmentInventoryStoreTests:
     func testSavePersistsCurrentInventory()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.inventory.barbellWeight = 55
@@ -179,8 +164,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -194,15 +178,14 @@ final class EquipmentInventoryStoreTests:
     func testAddPlateSortsDescendingAndPersists()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -236,8 +219,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -249,15 +231,14 @@ final class EquipmentInventoryStoreTests:
     func testAddDumbbellSortsAscendingAndPersists()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -291,8 +272,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -304,15 +284,14 @@ final class EquipmentInventoryStoreTests:
     func testInvalidPlateInputDoesNotChangeInventory()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         let original =
@@ -335,15 +314,14 @@ final class EquipmentInventoryStoreTests:
     }
 
     func testInvalidDumbbellInputDoesNotChangeInventory() {
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         let original =
@@ -370,17 +348,16 @@ final class EquipmentInventoryStoreTests:
     func testDeletePlateByIdentifierPersists()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let removedID = UUID()
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -415,8 +392,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertFalse(
@@ -429,17 +405,16 @@ final class EquipmentInventoryStoreTests:
     func testDeleteDumbbellByIdentifierPersists()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let removedID = UUID()
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -474,8 +449,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertFalse(
@@ -490,15 +464,14 @@ final class EquipmentInventoryStoreTests:
     func testReplaceSortsAndPersistsInventory()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         let replacement =
@@ -547,8 +520,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -562,15 +534,14 @@ final class EquipmentInventoryStoreTests:
     func testResetToDefaultInPoundsRestoresDefaults()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -605,8 +576,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -618,15 +588,14 @@ final class EquipmentInventoryStoreTests:
     func testResetToDefaultInKilogramsConvertsAndPersists()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.resetToDefault(
@@ -648,8 +617,7 @@ final class EquipmentInventoryStoreTests:
         let persisted =
             try EquipmentInventoryTestSupport
                 .decodeInventory(
-                    from: defaults,
-                    key: persistenceKey
+                    from: fileURL
                 )
 
         XCTAssertEqual(
@@ -663,9 +631,9 @@ final class EquipmentInventoryStoreTests:
     func testConvertInventoryToKilogramsPreservesIdentifiersAndQuantities()
         throws {
 
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
@@ -673,8 +641,7 @@ final class EquipmentInventoryStoreTests:
         let dumbbellID = UUID()
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -736,15 +703,14 @@ final class EquipmentInventoryStoreTests:
     }
 
     func testConvertInventoryToSameUnitDoesNotRewriteValues() {
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         let originalBarbell =
@@ -771,15 +737,14 @@ final class EquipmentInventoryStoreTests:
     // MARK: - Loading Increment
 
     func testSmallestPlateIncrementUsesSmallestPair() {
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -811,15 +776,14 @@ final class EquipmentInventoryStoreTests:
     }
 
     func testSmallestPlateIncrementConvertsKilogramInventoryToPounds() {
-        let defaults =
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         store.replace(
@@ -846,21 +810,17 @@ final class EquipmentInventoryStoreTests:
 
     // MARK: - Error Clearing
 
-    func testClearPersistenceErrorRemovesLoadingError() {
-        let defaults =
+    func testClearPersistenceErrorRemovesLoadingError() throws {
+        let fileURL =
             EquipmentInventoryTestSupport
-                .makeUserDefaults(
+                .makeFileURL(
                     testName: #function
                 )
 
-        defaults.set(
-            Data("invalid".utf8),
-            forKey: persistenceKey
-        )
+        try Data("invalid".utf8).write(to: fileURL)
 
         let store = EquipmentInventoryStore(
-            userDefaults: defaults,
-            persistenceKey: persistenceKey
+            fileURL: fileURL
         )
 
         XCTAssertNotNil(
@@ -872,5 +832,46 @@ final class EquipmentInventoryStoreTests:
         XCTAssertNil(
             store.persistenceError
         )
+    }
+
+    // MARK: - Migration from the legacy UserDefaults-backed store
+
+    /// Regression test: a real inventory saved by the old
+    /// `UserDefaults`-backed store, from before this persistence
+    /// change, must still be picked up on the first launch after the
+    /// change rather than silently resetting to defaults.
+    func test_legacyUserDefaultsData_isMigratedOnFirstLoad() throws {
+        let legacyDefaults =
+            EquipmentInventoryTestSupport
+                .makeUserDefaults(testName: #function)
+        let legacyKey = "equipment_inventory_test"
+
+        let legacyInventory =
+            EquipmentInventoryTestSupport
+                .makeInventory(barbellWeight: 35)
+
+        legacyDefaults.set(
+            try JSONEncoder().encode(legacyInventory),
+            forKey: legacyKey
+        )
+
+        let fileURL =
+            EquipmentInventoryTestSupport
+                .makeFileURL(testName: #function)
+        // No file exists yet at `fileURL` — this is the "first launch
+        // since the persistence backend changed" case.
+        let store = EquipmentInventoryStore(
+            fileURL: fileURL,
+            legacyUserDefaults: legacyDefaults,
+            legacyPersistenceKey: legacyKey
+        )
+
+        XCTAssertNil(store.persistenceError)
+        XCTAssertEqual(store.inventory.barbellWeight, 35)
+
+        // The migration must have also written the file, so a
+        // subsequent launch doesn't depend on the legacy UserDefaults
+        // key still being present.
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
     }
 }
