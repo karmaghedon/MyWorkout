@@ -49,6 +49,11 @@ full `ExerciseDetailView` in a sheet — the same detail screen the
 Exercise Library uses, for looking up how to perform it without leaving
 the workout.
 
+`BarbellPlateView`'s suggested-plates graphic runs ~25% larger
+(min/max plate height 16→20/34→42, width 10→13, label 8pt→9pt) than its
+original size, per feedback that the plates were hard to read at a
+glance mid-set.
+
 ## Warm-ups
 
 `WarmupEngine.generateWarmups` produces the default ramp from the
@@ -94,6 +99,51 @@ working-set list — right after the row for the set that just triggered
 it, before whatever comes next (the next working-set row, or the "Add
 Set" button if that was the last one) — rather than trailing the whole
 card.
+
+## Rest-timer scroll centering
+
+`WorkoutSessionContentView.scrollTarget` decides where the session
+screen auto-scrolls to (the resting exercise's badge, a superset
+partner waiting on you, or wherever you last logged a set). Two bugs
+here were fixed together, since they shared one cause:
+
+- Rest ending on any exercise used to jump the view to an unrelated
+  superset elsewhere mid-rotation — that "blocked, waiting on partner"
+  state persists for most of the time between a superset's own rounds,
+  and the check for it scanned the *whole* workout rather than being
+  scoped to whatever you were actually just working on. Fixed by
+  scoping it to `ActiveWorkoutStore.lastLoggedExerciseID`, set whenever
+  `logSet(for:)` runs.
+- `WorkoutSessionEngine.restTimerAnchorExerciseID` always anchored the
+  rest badge to the group's *positionally* first member, even after
+  that member had finished all its own sets — so once one superset
+  member has more sets configured than the other, the badge stayed
+  stuck on a card you were done with for the remainder of that
+  exercise. Fixed to anchor on the first still-*active* member instead
+  (falls back to whichever exercise triggered the rest if every member
+  has finished).
+
+## Rest timer sound
+
+`RestTimerSound` (`UserSettings`) — a user-configurable sound to play
+alongside the completion haptic when the rest timer finishes, set in
+Settings → "Rest Timer Sound" (each option has a preview button).
+`ActiveWorkoutStore` receives the current selection the same way it
+already receives `RestTimerRule`'s settings — threaded in via
+`startRestTimer(for:settings:)`, no standing settings dependency needed
+on the store itself.
+
+Three options play a built-in iOS system alert tone by numeric ID
+(`Haptics.swift`, `AudioServicesPlaySystemSound`) — the *real named*
+modern alert tones (the ones in iOS's own Settings app, e.g. "Radar")
+turned out to be unreachable, since their files live under a system
+path this app's sandbox can't read on current iOS. The fourth option,
+Silver Bell, is synthesized entirely from scratch instead
+(`BellSynthesizer`) — additive synthesis with inharmonic overtone
+ratios and independent per-partial exponential decay, the way a real
+small bell actually rings, rendered via `AVAudioEngine`/
+`AVAudioPCMBuffer` and struck three times back-to-back so it's long
+enough to actually notice.
 
 ## UI composition
 

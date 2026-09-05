@@ -57,15 +57,56 @@ HealthKit-resident data (weight, body fat %, waist) is deliberately
 
 ## UI
 
-`LogWeightView` — a form with toggle-gated body fat %/waist/neck fields
-alongside the always-shown weight field. Requests HealthKit
+`LogWeightView` is weight-only — body fat % is never entered anywhere
+in this app (always calculated, see `NavyBodyFatCalculator` below), and
+waist/neck/hip moved to their own weekly screen (below) since they're
+logged on a different cadence than daily weigh-ins. Requests HealthKit
 authorization on first appearance if not yet granted, and shows an
 inline warning (routing the user to Settings) if access was denied.
 Reached from Home (`DashboardView`) via a "Log Weight" quick action and
-the `AppRoute.logWeight` route. Dismisses the keyboard on a tap
-anywhere else on screen via the existing `dismissKeyboardOnTap()`
-utility (`Core/Utilities/Keyboard.swift`), same as the workout session
-and equipment screens.
+the `AppRoute.logWeight` route, and also from `WeeklySummaryCard`'s
+tappable day dots for a past date (pre-fills that day's existing
+weight, if any, so re-opening it edits rather than always starting
+blank). Dismisses the keyboard on a tap anywhere else on screen via the
+existing `dismissKeyboardOnTap()` utility (`Core/Utilities/Keyboard.swift`),
+same as the workout session and equipment screens.
+
+### Weekly waist/neck/hip
+
+`LogBodyMeasurementsView` — waist (goes to HealthKit), neck (local-only,
+`BodyMeasurementLogStore`), and hip (local-only, shown only when
+Biological Sex is Female in Settings). Reached from Home via
+`WeeklyMeasurementsReminderBanner` and from `AppRoute.logBodyMeasurements`.
+No toggle-gating here — unlike the old combined `LogWeightView`, this
+screen exists specifically for these fields, so they're always shown.
+
+`WeeklyMeasurementsReminderBanner` (`Features/Dashboard/Components/`) —
+nudges toward this screen once a week. Visible from the most recent
+Saturday (inclusive) until *both* waist and neck have been logged since
+then; resets the following Saturday. The neck half of the check is a
+synchronous local read (`BodyMeasurementLogStore.logs`, always fresh on
+every render); the waist half needs an async HealthKit query, cached in
+`@State` and refreshed on `.onAppear` and on `scenePhase` becoming
+`.active` (so leaving the app open across a day boundary without ever
+navigating away still re-checks). Missing neck alone is enough to show
+the banner immediately, without waiting on the HealthKit round-trip —
+an earlier version gated the *entire* banner behind that async load
+finishing, which meant a slow or stalled HealthKit call could suppress
+a reminder the local data alone already knew was needed.
+
+### Correcting a past entry
+
+`MeasurementLogHistoryView` (reached from `LogBodyMeasurementsView`'s
+"History" toolbar button, and per-week via a pencil icon on each
+`WeeklyReportView` card) lists past waist/neck/hip entries merged by
+calendar day, with tap-to-correct (`EditMeasurementEntryView`) and
+swipe-to-delete. Added because there was previously no way to fix a
+typo in a past entry short of a one-off migration script.
+`BodyMeasurementLogStore` gained `update(_:)`/`remove(id:)` for this;
+`BodyMetricsHealthKitServicing` gained
+`deleteWaistSample(date:)` (matched by exact sample start date, not
+just calendar day, since more than one sample can land on the same
+day).
 
 Each numeric field is a `NumericEntryField` — a small view private to
 `LogWeightView.swift` — rather than the workout session's
@@ -126,6 +167,3 @@ an estimate; this is strictly a gap-filler, used by
 
 - Inches/cm toggle for waist, neck, hip, and height, matching the
   existing lb/kg toggle for weight.
-- Editing or deleting a previously-logged neck/hip measurement.
-- Surfacing a "last weighed in" summary on Home ahead of the full
-  Weekly Report / Progress chart phases.

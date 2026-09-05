@@ -140,3 +140,6 @@ version: `Docs/Development/WeightMacroTrainingRoadmap.md`.
 - cloud sync
 - wearable integration
 - expanded analytics
+- in-app walkthrough/onboarding tool (explain first-time-use context —
+  e.g. why the weekly waist/neck banner appears — without needing that
+  explanation baked into every screen's copy permanently)

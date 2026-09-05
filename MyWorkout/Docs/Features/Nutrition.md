@@ -40,14 +40,48 @@ to version 4) via a `MacroGoalReplacing` conformance, appended to
 
 ## UI
 
-`GoalsView` — a single screen combining a "New Goal" entry form
-(effective date picker + `BigStepperControl` for calories/protein/
-carbs/fat, reusing the same shared stepper the workout session screens
-use — no new numeric-entry component needed since goals are natural
-whole numbers, unlike weigh-in fields) and a "History" list of
-previously set goals, newest first, with swipe-to-delete. Reached from
-Profile (`ProfileHubView`) via a new "Health & Nutrition" section's
-"Macro Goals" row and the `AppRoute.macroGoals` route.
+`GoalsView` — a single screen combining a "New Goal" entry form and a
+"History" list of previously set goals, newest first, with
+swipe-to-delete. Reached from Profile (`ProfileHubView`) via a new
+"Health & Nutrition" section's "Macro Goals" row and the
+`AppRoute.macroGoals` route.
+
+The form pre-fills from whatever goal is active today
+(`prefillFromActiveGoal()`, called `.onAppear`) rather than always
+resetting to hardcoded defaults — an early version reset every time the
+screen reopened, which looked like the last goal you set had been
+silently lost.
+
+Entry is numpad-only throughout (`IntEntryField`, a private per-screen
+copy of the same tap-to-type idiom `LogWeightView`/
+`LogBodyMeasurementsView` use) — no +/- steppers anywhere on this
+screen, unlike the shared `BigStepperControl` the workout session
+screens use.
+
+A **Grams/Percent** toggle (`entryModeToggle`, plain `Button`s styled to
+look segmented — `Picker(.segmented)` has a gesture conflict with
+`List`'s own row-tap recognizer that made it need a long press) governs
+which of calories vs. the three macros is authoritative:
+
+- **Grams mode** — each macro is entered independently with no
+  redistribution; calories becomes a read-only computed readout
+  (`CalorieReadout`, standard 4/4/9 kcal-per-gram rule).
+- **Percent mode** — calories is a fixed, directly-editable budget;
+  editing one macro's percentage redistributes the remaining two so
+  they keep summing to 100%. The redistribution holds whichever of the
+  *other* two macros was more recently directly edited fixed at its
+  current value, and puts the entire remainder onto the one that's gone
+  longest without being directly edited (`editOrder`) — so an edit never
+  disturbs a macro you just deliberately set moments ago.
+
+Switching from grams to percent carries the grams-computed total over
+as the new manual budget, rather than snapping back to whatever
+`calories` held before the last switch to grams. `effectiveCalories`
+(mode-dependent: the computed sum in grams mode, the manual budget in
+percent mode) is the single source of truth for both what's displayed
+and what `saveGoal()` persists as `MacroGoal.calories` — the raw
+`calories` field is never saved directly, since in grams mode it can be
+stale.
 
 ## Testing
 
@@ -106,13 +140,14 @@ appended to `BackupImportHandler`'s replacement order.
 ## UI (Phase 3)
 
 `LogNutritionView` — a read-only computed-calories summary at the top,
-then `BigStepperControl` (same shared stepper `GoalsView` uses) for
-protein/carbs/fat, and a save button that upserts today's record. No
-list of entries, no food name field, no meal picker — loading the
-screen pre-fills today's already-saved macros if there are any, so
-it's an edit form for "today," not an ever-growing log. Reached from
-Home (`DashboardView`) via a "Log Nutrition" quick action next to "Log
-Weight," and the `AppRoute.logNutrition` route.
+then a numpad-only `NumericEntryField` (this screen's own private copy
+of the same tap-to-type idiom `GoalsView`/`LogWeightView` use, no +/-
+steppers) for protein/carbs/fat, and a save button that upserts today's
+record. No list of entries, no food name field, no meal picker —
+loading the screen pre-fills today's already-saved macros if there are
+any, so it's an edit form for "today," not an ever-growing log. Reached
+from Home (`DashboardView`) via a "Log Nutrition" quick action next to
+"Log Weight," and the `AppRoute.logNutrition` route.
 
 ## Testing (Phase 3)
 
