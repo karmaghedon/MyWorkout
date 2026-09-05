@@ -58,6 +58,20 @@ enum BellSynthesizer {
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
               let buffer = renderedBuffer(format: format) else { return }
 
+        // `AVAudioEngine.start()` activates the shared audio session
+        // under whatever category is currently set — left unconfigured,
+        // that defaults to `.soloAmbient`, which silences whatever else
+        // is already playing (Spotify, Apple Music, a podcast app) for
+        // as long as this engine is running. `.ambient` with
+        // `.mixWithOthers` is the category actually meant for a short
+        // incidental sound effect layered over other apps' audio: it
+        // leaves other playback running, still respects the silent
+        // switch (consistent with this app's other rest-timer sound
+        // options, which are plain system sounds).
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.ambient, options: [.mixWithOthers])
+        try? session.setActive(true, options: [])
+
         let engine = AVAudioEngine()
         let player = AVAudioPlayerNode()
 
