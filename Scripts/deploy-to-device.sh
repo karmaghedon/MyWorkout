@@ -129,7 +129,17 @@ mv "$ASSET_CATALOG/AppIcon.appiconset" "$ASSET_BACKUP_DIR/AppIcon.appiconset"
 mv "$ASSET_CATALOG/AccentColor.colorset" "$ASSET_BACKUP_DIR/AccentColor.colorset"
 
 log "Building $SCHEME for device (this can take a minute)..."
+# -allowProvisioningUpdates: this project's free-tier automatic-signing
+# provisioning profile is short-lived and expires on its own every so
+# often ("Provisioning profile ... expired on <date>"), independent of
+# anything in the source tree. This flag lets xcodebuild silently renew
+# it against the Developer Portal instead of hard-failing the build —
+# it still works with the classic -target/-sdk invocation, not just
+# -scheme/-destination. A freshly renewed profile can still require a
+# one-time re-trust on the device (Settings > General > VPN & Device
+# Management), same as any other new profile.
 xcodebuild -project "$PROJECT" -target "$SCHEME" -sdk iphoneos17.2 -configuration "$CONFIGURATION" \
+    -allowProvisioningUpdates \
     IPHONEOS_DEPLOYMENT_TARGET=17.2 \
     ASSETCATALOG_COMPILER_APPICON_NAME= \
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME= \
