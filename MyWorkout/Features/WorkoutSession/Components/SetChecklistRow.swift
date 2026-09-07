@@ -1,0 +1,99 @@
+import SwiftUI
+
+/// One row in the Checklist layout — used for both warm-up sets and
+/// working sets, since visually they're identical: a checkbox, a
+/// title/subtitle, and an optional compact plate graphic
+/// (`BarbellPlateView`) in place of a lengthy "45 + 25 + 5 lb/side" string.
+struct SetChecklistRow: View {
+    let title: String
+    let subtitle: String?
+    let plateLoading: PlateLoading?
+    let unitSystem: UnitSystem
+    let isComplete: Bool
+    let isNext: Bool
+    let onToggle: (() -> Void)?
+
+    /// When present, the title/subtitle area becomes tappable (with a
+    /// pencil hint) to reveal an inline weight/reps editor instead of the
+    /// row only ever being tappable to complete it. Only the next
+    /// (unlogged) working-set row passes this — warm-ups and already-
+    /// logged sets don't offer an edit affordance.
+    let onEdit: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: AppTheme.Spacing.md) {
+            Button {
+                onToggle?()
+            } label: {
+                ZStack {
+                    Circle()
+                        .strokeBorder(
+                            isComplete
+                                ? Color.clear
+                                : (isNext ? AppTheme.accent : Color.primary.opacity(0.2)),
+                            lineWidth: 2
+                        )
+                        .background(Circle().fill(isComplete ? AppTheme.success : Color.clear))
+
+                    if isComplete {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                }
+                .frame(width: 26, height: 26)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(onToggle == nil)
+            .accessibilityLabel(isComplete ? "Completed: \(title)" : "Mark complete: \(title)")
+
+            if let onEdit {
+                Button(action: onEdit) {
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        titleAndSubtitle
+
+                        Image(systemName: "pencil.circle")
+                            .font(.system(size: 14))
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Edit \(title)")
+                .accessibilityHint("Adjust weight and reps before logging")
+            } else {
+                titleAndSubtitle
+            }
+
+            Spacer(minLength: 0)
+
+            if let plateLoading {
+                BarbellPlateView(loading: plateLoading, unitSystem: unitSystem)
+            }
+        }
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.vertical, AppTheme.Spacing.xs)
+        .background(
+            (isNext && !isComplete)
+                ? AnyView(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
+                        .fill(AppTheme.accentMuted)
+                  )
+                : AnyView(Color.clear)
+        )
+    }
+
+    private var titleAndSubtitle: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(AppTheme.Typography.label)
+
+            if let subtitle {
+                Text(subtitle)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+    }
+}

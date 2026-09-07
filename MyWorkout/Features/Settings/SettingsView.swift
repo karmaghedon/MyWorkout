@@ -1,0 +1,169 @@
+import SwiftUI
+
+struct SettingsView: View {
+    @EnvironmentObject var settingsStore: UserSettingsStore
+    @EnvironmentObject var equipmentStore: EquipmentInventoryStore
+
+    var body: some View {
+        Form {
+            Section("Appearance") {
+                Picker("Appearance", selection: $settingsStore.settings.appearanceMode) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+                .onChange(of: settingsStore.settings.appearanceMode) { _, _ in
+                    settingsStore.save()
+                }
+            }
+
+            Section {
+                ForEach(RestTimerSound.allCases) { sound in
+                    HStack {
+                        Text(sound.displayName)
+
+                        Spacer()
+
+                        if sound != .none {
+                            Button {
+                                Haptics.preview(sound)
+                            } label: {
+                                Image(systemName: "play.circle")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+
+                        if settingsStore.settings.restTimerSound == sound {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(AppTheme.accent)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        settingsStore.settings.restTimerSound = sound
+                        settingsStore.save()
+                    }
+                }
+            } header: {
+                Text("Rest Timer Sound")
+            } footer: {
+                Text("Plays when the rest timer finishes, alongside the haptic buzz. Tap \(Image(systemName: "play.circle")) to preview.")
+            }
+
+            Section("Workout Session") {
+                Picker("Layout", selection: $settingsStore.settings.workoutSessionLayout) {
+                    ForEach(WorkoutSessionLayout.allCases) { layout in
+                        Text(layout.displayName).tag(layout)
+                    }
+                }
+                .onChange(of: settingsStore.settings.workoutSessionLayout) { _, _ in
+                    settingsStore.save()
+                }
+            }
+
+            Section {
+                Picker("Training Weight Unit", selection: $settingsStore.settings.unitSystem) {
+                    ForEach(UnitSystem.allCases) { unit in
+                        Text(unit.rawValue).tag(unit)
+                    }
+                }
+                .onChange(of: settingsStore.settings.unitSystem) { _, newUnit in
+                    equipmentStore.convertInventory(
+                        to: newUnit
+                    )
+
+                    settingsStore.save()
+                }
+
+                Picker("Body Weight Unit", selection: $settingsStore.settings.bodyWeightUnitSystem) {
+                    ForEach(UnitSystem.allCases) { unit in
+                        Text(unit.rawValue).tag(unit)
+                    }
+                }
+                .onChange(of: settingsStore.settings.bodyWeightUnitSystem) { _, _ in
+                    settingsStore.save()
+                }
+            } header: {
+                Text("Units")
+            } footer: {
+                Text("Training weight applies to workouts and equipment. Body weight applies to weigh-ins and the weekly report, and can be set independently.")
+            }
+
+            Section {
+                Picker("Biological Sex", selection: $settingsStore.settings.biologicalSex) {
+                    Text("Not Set").tag(BiologicalSex?.none)
+
+                    ForEach(BiologicalSex.allCases) { sex in
+                        Text(sex.displayName).tag(BiologicalSex?.some(sex))
+                    }
+                }
+                .onChange(of: settingsStore.settings.biologicalSex) { _, _ in
+                    settingsStore.save()
+                }
+
+                Stepper(
+                    "Height: \(Int(settingsStore.settings.heightCm ?? 170)) cm",
+                    value: Binding(
+                        get: { settingsStore.settings.heightCm ?? 170 },
+                        set: { settingsStore.settings.heightCm = $0 }
+                    ),
+                    in: 100...250,
+                    step: 1
+                )
+                .onChange(of: settingsStore.settings.heightCm) { _, _ in
+                    settingsStore.save()
+                }
+            } header: {
+                Text("Body Profile")
+            } footer: {
+                Text("Used only to estimate body fat % from waist/neck/hip measurements (U.S. Navy method) on days without a direct reading. Never shown or used anywhere else.")
+            }
+
+            Section("Rest Timers") {
+                Stepper("Compound: \(settingsStore.settings.compoundRestSeconds) sec",
+                        value: $settingsStore.settings.compoundRestSeconds,
+                        in: 30...600,
+                        step: 15)
+                    .onChange(of: settingsStore.settings.compoundRestSeconds) {_, _ in settingsStore.save() }
+
+                Stepper("Isolation: \(settingsStore.settings.isolationRestSeconds) sec",
+                        value: $settingsStore.settings.isolationRestSeconds,
+                        in: 30...600,
+                        step: 15)
+                    .onChange(of: settingsStore.settings.isolationRestSeconds) {_, _ in settingsStore.save() }
+
+                Stepper("Bodyweight: \(settingsStore.settings.bodyweightRestSeconds) sec",
+                        value: $settingsStore.settings.bodyweightRestSeconds,
+                        in: 30...600,
+                        step: 15)
+                    .onChange(of: settingsStore.settings.bodyweightRestSeconds) {_, _ in settingsStore.save() }
+            }
+
+            Section("Strength Formula") {
+                Picker("1RM Formula", selection: $settingsStore.settings.oneRepMaxFormula) {
+                    ForEach(OneRepMaxFormula.allCases) { formula in
+                        Text(formula.rawValue).tag(formula)
+                    }
+                }
+                .onChange(of: settingsStore.settings.oneRepMaxFormula) {_, _ in
+                    settingsStore.save()
+                }
+            }
+
+            Section("Progression Defaults") {
+                Stepper("Compound Increment: \(settingsStore.settings.compoundIncrement) \(settingsStore.settings.unitSystem.rawValue)",
+                        value: $settingsStore.settings.compoundIncrement,
+                        in: 1...25,
+                        step: 1)
+                    .onChange(of: settingsStore.settings.compoundIncrement) {_, _ in settingsStore.save() }
+
+                Stepper("Isolation Increment: \(settingsStore.settings.isolationIncrement) \(settingsStore.settings.unitSystem.rawValue)",
+                        value: $settingsStore.settings.isolationIncrement,
+                        in: 1...25,
+                        step: 1)
+                    .onChange(of: settingsStore.settings.isolationIncrement) {_, _ in settingsStore.save() }
+            }
+        }
+        .navigationTitle("Settings")
+    }
+}
