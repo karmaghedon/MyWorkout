@@ -76,25 +76,35 @@ enum WorkoutSessionEngine {
     /// rest actually starts (see `shouldStartRest` — that's only once the
     /// group's last member logs its set for the round). Rest between
     /// superset rounds is "time until you start the round again," and the
-    /// round restarts at the group's *first* exercise, not its last — so
-    /// anchoring the badge there keeps the countdown where the user's
-    /// attention returns to, instead of trailing the exercise they just
-    /// finished and won't touch again until it ends. Ungrouped exercises
-    /// are unaffected: the badge stays on the exercise itself.
+    /// round restarts at the group's *first still-active* exercise, not
+    /// its positional first — so anchoring the badge there keeps the
+    /// countdown where the user's attention returns to, instead of
+    /// trailing the exercise they just finished and won't touch again
+    /// until it ends. A member that already logged all of its own
+    /// `targetSets` is skipped even if it's first by position: once it's
+    /// done, the round it "restarts" no longer includes it, so anchoring
+    /// there would leave the badge stuck on a card the user is finished
+    /// with (e.g. one member with more sets than the other, still going
+    /// solo after its partner's finished). If every member is finished
+    /// (this rest is the group's closing one), anchor to `exercise`
+    /// itself rather than the group's first member, for the same reason.
+    /// Ungrouped exercises are unaffected: the badge stays on the
+    /// exercise itself.
     static func restTimerAnchorExerciseID(
         for exercise: Exercise,
-        in workout: Workout?
+        in workout: Workout?,
+        states: [UUID: ExerciseSessionState]
     ) -> UUID {
-        guard let groupID = exercise.supersetGroupID,
-              let workout,
-              let firstGroupMemberID = workout.exercises
-                  .filter({ $0.supersetGroupID == groupID })
-                  .first?.id
-        else {
+        guard let groupID = exercise.supersetGroupID, let workout else {
             return exercise.id
         }
 
-        return firstGroupMemberID
+        let firstActiveMemberID = workout.exercises
+            .filter { $0.supersetGroupID == groupID }
+            .first { (states[$0.id]?.loggedSets.count ?? 0) < $0.targetSets }?
+            .id
+
+        return firstActiveMemberID ?? exercise.id
     }
 
     /// The group members (in workout order) that still have sets left to

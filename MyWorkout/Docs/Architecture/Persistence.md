@@ -14,8 +14,8 @@ Persistence is designed around three goals:
 | Workout templates | Application Support JSON | `WorkoutTemplateRepository` |
 | Custom exercises | Application Support JSON | `CustomExerciseRepository` |
 | Active workout | Application Support snapshot | `ActiveWorkoutPersisting` |
-| Equipment inventory | UserDefaults | injectable `UserDefaults` |
-| User settings | UserDefaults | injectable `UserDefaults` |
+| Equipment inventory | Application Support JSON (migrated from UserDefaults) | injectable file URL |
+| User settings | Application Support JSON (migrated from UserDefaults) | injectable file URL |
 | Backup | user-selected JSON document | `AppBackup` and `BackupDocument` |
 | Workout export | CSV document | CSV exporter/document |
 
@@ -58,6 +58,8 @@ Known files include:
 - workout templates
 - custom exercises
 - active workout snapshot
+- equipment inventory
+- user settings
 
 ## Legacy migration
 
@@ -224,17 +226,59 @@ The snapshot includes:
 
 Active persistence is debounced so frequent session edits do not produce unnecessary writes.
 
-## UserDefaults injection
+## Flushing on app background, and why UserDefaults couldn't be trusted for it
 
-`EquipmentInventoryStore` and `UserSettingsStore` accept injectable UserDefaults and persistence keys.
+An adversarial code review flagged that nothing forced pending writes to
+disk before the process could be suspended or killed — a debounced save
+(scheduled via `asyncAfter`) or an in-flight background-queue save could
+simply never complete if the app left the foreground at the wrong
+moment, silently losing the most recent edit.
 
-Production defaults preserve existing behavior:
+The fix has two parts:
 
-```swift
-userDefaults: .standard
-```
+1. **A lifecycle hook.** `MyWorkoutApp` watches
+   `@Environment(\.scenePhase)` and calls `flushAllPendingSaves()` the
+   moment `scenePhase` becomes `.background`. Each store exposes its own
+   `flushPendingSave()`: it cancels any still-pending debounced
+   `DispatchWorkItem`, runs the save immediately instead, then blocks on
+   `saveQueue.sync {}` so the call doesn't return until that save has
+   actually finished landing on disk. This covers `WorkoutLogStore`,
+   `WorkoutTemplateStore`, `MacroGoalStore`, `DailyNutritionLogStore`,
+   `BodyMeasurementLogStore`, and the active-workout snapshot
+   (`ActiveWorkoutPersistenceCoordinator.flush`).
 
-Tests use isolated suites.
+2. **Migrating Equipment inventory and User settings off UserDefaults
+   entirely.** Both stores originally relied on
+   `UserDefaults.synchronize()` to force a flush before backgrounding.
+   That doesn't work: `synchronize()` has been a documented no-op on
+   modern iOS for years — UserDefaults writes are already flushed
+   asynchronously on the OS's own schedule, and calling it buys no
+   actual guarantee. Confirmed the hard way on-device: settings kept
+   resetting to defaults after a kill-and-relaunch even after adding the
+   `synchronize()` call, twice, with the second failure ruled out as a
+   stale-build artifact (both the workout state and the settings fix
+   used code paths that looked identical, and only settings kept
+   failing). The real fix was dropping UserDefaults for these two stores
+   in favor of the same atomic-file-write pattern every other domain in
+   this app already uses (`data.write(to:options:.atomic)`), which is
+   synchronous and needs no flush step at all — `save()` returning means
+   the data is already on disk, so neither store needs its own
+   `flushPendingSave()`.
+
+Both migrated stores keep a one-time legacy-migration path: the file
+location is tried first, and only if no file exists yet does the store
+fall back to reading the old UserDefaults key — the same read-once,
+write-through-to-the-new-location shape `WorkoutLogStore` and
+`WorkoutTemplateStore` already used for their own UserDefaults-era data.
+
+`FavoriteExercisesStore` deliberately stays on plain UserDefaults,
+undhooked from `flushAllPendingSaves()` — losing a favorite isn't worth
+the same treatment, per that store's own doc comment.
+
+`EquipmentInventoryStore` and `UserSettingsStore` accept an injectable
+file URL (defaulting to the real Application Support location) so tests
+can point at an isolated temporary file instead of ever touching
+production data — mirroring every other file-backed store in this app.
 
 ## Persistence change checklist
 

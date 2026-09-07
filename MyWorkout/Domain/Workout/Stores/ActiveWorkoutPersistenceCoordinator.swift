@@ -63,6 +63,25 @@ final class ActiveWorkoutPersistenceCoordinator {
         )
     }
 
+    /// Forces a pending debounced write through immediately, and blocks
+    /// until it (or any other write already in flight on this
+    /// coordinator's queue) has actually finished. `schedule`'s 0.3s
+    /// delay and `perform`'s background dispatch are both otherwise
+    /// unguaranteed to complete before the process suspends — call this
+    /// when the app is about to background or terminate.
+    func flush(
+        _ request: Request,
+        onSuccess: @escaping (StoreOperation) -> Void,
+        onFailure: @escaping FailureHandler
+    ) {
+        if scheduledWorkItem != nil {
+            cancelScheduledRequest()
+            perform(request, onSuccess: onSuccess, onFailure: onFailure)
+        }
+
+        saveQueue.sync {}
+    }
+
     func perform(
         _ request: Request,
         onSuccess: @escaping (StoreOperation) -> Void,

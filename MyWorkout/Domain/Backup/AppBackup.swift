@@ -1,7 +1,7 @@
 import Foundation
 
 struct AppBackup: Codable {
-    static let currentVersion = 2
+    static let currentVersion = 5
 
     let version: Int
     let exportedAt: Date
@@ -10,6 +10,13 @@ struct AppBackup: Codable {
     let equipment: EquipmentInventory
     let settings: UserSettings
     let customExercises: [StoredCustomExercise]
+    /// HealthKit-resident body metrics (weight, body fat %, waist) are
+    /// deliberately not part of this backup — they already live in
+    /// HealthKit/iCloud. Neck has no HealthKit type, so it's the one
+    /// body-metrics field backed up here.
+    let bodyMeasurementLogs: [BodyMeasurementLog]
+    let macroGoals: [MacroGoal]
+    let dailyNutritionLogs: [DailyNutritionLog]
 
     init(
         version: Int = Self.currentVersion,
@@ -18,7 +25,10 @@ struct AppBackup: Codable {
         templates: [WorkoutTemplate],
         equipment: EquipmentInventory,
         settings: UserSettings,
-        customExercises: [StoredCustomExercise] = []
+        customExercises: [StoredCustomExercise] = [],
+        bodyMeasurementLogs: [BodyMeasurementLog] = [],
+        macroGoals: [MacroGoal] = [],
+        dailyNutritionLogs: [DailyNutritionLog] = []
     ) {
         self.version = version
         self.exportedAt = exportedAt
@@ -27,6 +37,9 @@ struct AppBackup: Codable {
         self.equipment = equipment
         self.settings = settings
         self.customExercises = customExercises
+        self.bodyMeasurementLogs = bodyMeasurementLogs
+        self.macroGoals = macroGoals
+        self.dailyNutritionLogs = dailyNutritionLogs
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -37,6 +50,9 @@ struct AppBackup: Codable {
         case equipment
         case settings
         case customExercises
+        case bodyMeasurementLogs
+        case macroGoals
+        case dailyNutritionLogs
     }
 
     init(from decoder: Decoder) throws {
@@ -71,6 +87,18 @@ struct AppBackup: Codable {
         customExercises = try container.decodeIfPresent(
             [StoredCustomExercise].self,
             forKey: .customExercises
+        ) ?? []
+        bodyMeasurementLogs = try container.decodeIfPresent(
+            [BodyMeasurementLog].self,
+            forKey: .bodyMeasurementLogs
+        ) ?? []
+        macroGoals = try container.decodeIfPresent(
+            [MacroGoal].self,
+            forKey: .macroGoals
+        ) ?? []
+        dailyNutritionLogs = try container.decodeIfPresent(
+            [DailyNutritionLog].self,
+            forKey: .dailyNutritionLogs
         ) ?? []
     }
 }

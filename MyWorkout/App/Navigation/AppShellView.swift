@@ -189,6 +189,30 @@ struct AppShellView: View {
         case .export:
             ExportView()
 
+        case .logWeight:
+            LogWeightView()
+
+        case .logBodyMeasurements:
+            LogBodyMeasurementsView()
+
+        case .measurementHistory:
+            MeasurementLogHistoryView()
+
+        case let .measurementHistoryForWeek(start, end):
+            MeasurementLogHistoryView(dateRange: start..<end)
+
+        case .macroGoals:
+            GoalsView()
+
+        case .logNutrition:
+            LogNutritionView()
+
+        case .weeklyReport:
+            WeeklyReportView()
+
+        case .bodyProgress:
+            BodyProgressView()
+
         case .activeWorkout:
             WorkoutSessionView()
 

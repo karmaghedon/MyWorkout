@@ -19,6 +19,9 @@ struct BackupImportHandler {
     let equipmentStore: any EquipmentReplacing
     let settingsStore: any SettingsReplacing
     let customExerciseStore: any CustomExerciseReplacing
+    let bodyMeasurementLogStore: any BodyMeasurementLogReplacing
+    let macroGoalStore: any MacroGoalReplacing
+    let dailyNutritionLogStore: any DailyNutritionLogReplacing
 
     func importBackup(
         from url: URL
@@ -93,6 +96,18 @@ struct BackupImportHandler {
                     ?? "Custom exercises could not be imported."
                 )
             }
+
+            bodyMeasurementLogStore.replaceAll(
+                with: backup.bodyMeasurementLogs
+            )
+
+            macroGoalStore.replaceAll(
+                with: backup.macroGoals
+            )
+
+            dailyNutritionLogStore.replaceAll(
+                with: backup.dailyNutritionLogs
+            )
 
             return .success
         } catch {

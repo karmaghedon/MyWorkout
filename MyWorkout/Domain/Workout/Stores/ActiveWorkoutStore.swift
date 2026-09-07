@@ -24,12 +24,28 @@ final class ActiveWorkoutStore: ObservableObject {
     @Published private(set) var restSecondsRemaining: Int = 0
     @Published private(set) var persistenceError: StoreError?
 
+    /// The exercise the most recent `logSet(for:)` call was for — kept
+    /// around after rest starts/ends (unlike `activeRestExerciseID`,
+    /// which goes `nil` the moment rest stops) so the session view can
+    /// scope its "superset partner is up next" scroll target to the
+    /// exercise the user was actually just working on, instead of
+    /// scanning the whole workout for any superset mid-rotation.
+    @Published private(set) var lastLoggedExerciseID: UUID?
+
     private let persistenceCoordinator:
         ActiveWorkoutPersistenceCoordinator
 
     private var workoutTimer: Timer?
     private var isRestoring = false
     private var restTimer: Timer?
+
+    /// Set whenever `startRestTimer(for:settings:)` runs, so the
+    /// completion callback (which fires from an internal timer tick, with
+    /// no direct access to `UserSettingsStore`) knows which sound the user
+    /// currently has picked without this store needing a standing
+    /// dependency on settings — matches how `RestTimerRule.seconds` is
+    /// already threaded through that same call.
+    private var restTimerSound: RestTimerSound = .triTone
 
     init(
         persistence: any ActiveWorkoutPersisting =
@@ -142,6 +158,8 @@ final class ActiveWorkoutStore: ObservableObject {
             for: exerciseID,
             in: &exerciseStates
         )
+
+        lastLoggedExerciseID = exerciseID
     }
 
     func deleteSet(
@@ -305,6 +323,8 @@ final class ActiveWorkoutStore: ObservableObject {
         for exercise: Exercise,
         settings: UserSettings
     ) {
+        restTimerSound = settings.restTimerSound
+
         let seconds = RestTimerRule.seconds(
             for: exercise.exerciseType,
             settings: settings
@@ -312,7 +332,8 @@ final class ActiveWorkoutStore: ObservableObject {
 
         let anchorExerciseID = WorkoutSessionEngine.restTimerAnchorExerciseID(
             for: exercise,
-            in: activeWorkout
+            in: activeWorkout,
+            states: exerciseStates
         )
 
         startRestTimer(
@@ -396,6 +417,7 @@ final class ActiveWorkoutStore: ObservableObject {
         exerciseStates = [:]
         startedAt = Date()
         elapsedSeconds = 0
+        lastLoggedExerciseID = nil
 
         startTimerIfNeeded()
         persistActiveWorkout()
@@ -422,7 +444,7 @@ final class ActiveWorkoutStore: ObservableObject {
             stopRestTimer(clearPersistedState: true)
 
             if playsCompletionHaptic {
-                Haptics.restComplete()
+                Haptics.restComplete(sound: restTimerSound)
             }
         }
     }
@@ -479,6 +501,22 @@ final class ActiveWorkoutStore: ObservableObject {
 
     // MARK: - Persistence Coordination
 
+    /// Forces any pending debounced save of the active workout through
+    /// immediately and waits for it to finish — call when the app is
+    /// about to background or terminate, since the mutation `didSet`
+    /// hooks only *schedule* a write 0.3s out and there's otherwise
+    /// nothing that guarantees it actually runs before the process is
+    /// suspended or killed.
+    func flushPendingSave() {
+        guard !isRestoring else { return }
+
+        persistenceCoordinator.flush(
+            persistenceRequest(),
+            onSuccess: persistenceDidSucceed,
+            onFailure: persistenceDidFail
+        )
+    }
+
     private func schedulePersist() {
         guard !isRestoring else {
             return
@@ -502,6 +540,7 @@ final class ActiveWorkoutStore: ObservableObject {
         elapsedSeconds = 0
         restTimerState = nil
         restSecondsRemaining = 0
+        lastLoggedExerciseID = nil
 
         isRestoring = false
 

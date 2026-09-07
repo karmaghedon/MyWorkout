@@ -17,6 +17,39 @@ struct SettingsView: View {
                 }
             }
 
+            Section {
+                ForEach(RestTimerSound.allCases) { sound in
+                    HStack {
+                        Text(sound.displayName)
+
+                        Spacer()
+
+                        if sound != .none {
+                            Button {
+                                Haptics.preview(sound)
+                            } label: {
+                                Image(systemName: "play.circle")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+
+                        if settingsStore.settings.restTimerSound == sound {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(AppTheme.accent)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        settingsStore.settings.restTimerSound = sound
+                        settingsStore.save()
+                    }
+                }
+            } header: {
+                Text("Rest Timer Sound")
+            } footer: {
+                Text("Plays when the rest timer finishes, alongside the haptic buzz. Tap \(Image(systemName: "play.circle")) to preview.")
+            }
+
             Section("Workout Session") {
                 Picker("Layout", selection: $settingsStore.settings.workoutSessionLayout) {
                     ForEach(WorkoutSessionLayout.allCases) { layout in
@@ -28,8 +61,8 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Units") {
-                Picker("Weight Unit", selection: $settingsStore.settings.unitSystem) {
+            Section {
+                Picker("Training Weight Unit", selection: $settingsStore.settings.unitSystem) {
                     ForEach(UnitSystem.allCases) { unit in
                         Text(unit.rawValue).tag(unit)
                     }
@@ -41,6 +74,49 @@ struct SettingsView: View {
 
                     settingsStore.save()
                 }
+
+                Picker("Body Weight Unit", selection: $settingsStore.settings.bodyWeightUnitSystem) {
+                    ForEach(UnitSystem.allCases) { unit in
+                        Text(unit.rawValue).tag(unit)
+                    }
+                }
+                .onChange(of: settingsStore.settings.bodyWeightUnitSystem) { _, _ in
+                    settingsStore.save()
+                }
+            } header: {
+                Text("Units")
+            } footer: {
+                Text("Training weight applies to workouts and equipment. Body weight applies to weigh-ins and the weekly report, and can be set independently.")
+            }
+
+            Section {
+                Picker("Biological Sex", selection: $settingsStore.settings.biologicalSex) {
+                    Text("Not Set").tag(BiologicalSex?.none)
+
+                    ForEach(BiologicalSex.allCases) { sex in
+                        Text(sex.displayName).tag(BiologicalSex?.some(sex))
+                    }
+                }
+                .onChange(of: settingsStore.settings.biologicalSex) { _, _ in
+                    settingsStore.save()
+                }
+
+                Stepper(
+                    "Height: \(Int(settingsStore.settings.heightCm ?? 170)) cm",
+                    value: Binding(
+                        get: { settingsStore.settings.heightCm ?? 170 },
+                        set: { settingsStore.settings.heightCm = $0 }
+                    ),
+                    in: 100...250,
+                    step: 1
+                )
+                .onChange(of: settingsStore.settings.heightCm) { _, _ in
+                    settingsStore.save()
+                }
+            } header: {
+                Text("Body Profile")
+            } footer: {
+                Text("Used only to estimate body fat % from waist/neck/hip measurements (U.S. Navy method) on days without a direct reading. Never shown or used anywhere else.")
             }
 
             Section("Rest Timers") {

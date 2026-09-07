@@ -12,6 +12,14 @@ enum AppRoute: Hashable {
     case customExercises
     case settings
     case export
+    case logWeight
+    case logBodyMeasurements
+    case measurementHistory
+    case measurementHistoryForWeek(start: Date, end: Date)
+    case macroGoals
+    case logNutrition
+    case weeklyReport
+    case bodyProgress
 
     // MARK: - Detail Destinations
 

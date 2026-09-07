@@ -10,6 +10,9 @@ final class RestTimerRuleTests: XCTestCase {
     ) -> UserSettings {
         UserSettings(
             unitSystem: .pounds,
+            bodyWeightUnitSystem: .pounds,
+            biologicalSex: nil,
+            heightCm: nil,
             compoundRestSeconds: compound,
             isolationRestSeconds: isolation,
             bodyweightRestSeconds: bodyweight,
@@ -17,7 +20,8 @@ final class RestTimerRuleTests: XCTestCase {
             compoundIncrement: 5,
             isolationIncrement: 5,
             appearanceMode: .system,
-            workoutSessionLayout: .classic
+            workoutSessionLayout: .classic,
+            restTimerSound: .triTone
         )
     }
 

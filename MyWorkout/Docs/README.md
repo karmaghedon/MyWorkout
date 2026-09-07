@@ -20,7 +20,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `Architecture.md` — system responsibilities and dependency direction
 - `FolderStructure.md` — current folders and future organization rules
 - `DataFlow.md` — state and event movement through the app
-- `Persistence.md` — repositories, files, UserDefaults, migrations, and corruption protection
+- `Persistence.md` — repositories, files, legacy UserDefaults migrations, background-flush behavior, and corruption protection
 - `BackupSystem.md` — backup format, validation, import, and compatibility
 - `TestingStrategy.md` — test boundaries and regression expectations
 
@@ -34,6 +34,10 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `EquipmentInventory.md`
 - `CustomExercises.md`
 - `Recovery.md`
+- `WeightTracking.md`
+- `Nutrition.md`
+- `WeeklyReport.md`
+- `BodyProgress.md`
 
 ## Development documents
 
@@ -41,6 +45,7 @@ This directory is the internal reference for MyWorkout architecture, features, d
 - `DevelopmentWorkflow.md`
 - `CodingStandards.md`
 - `ReleaseChecklist.md`
+- `WeightMacroTrainingRoadmap.md`
 
 ## Documentation rule
 

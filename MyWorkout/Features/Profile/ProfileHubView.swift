@@ -22,6 +22,15 @@ struct ProfileHubView: View {
                     )
                 }
 
+                QuickActionSection(title: "Health & Nutrition") {
+                    quickActionLink(
+                        systemImage: "target",
+                        title: "Macro Goals",
+                        subtitle: "Calorie & macro targets",
+                        route: .macroGoals
+                    )
+                }
+
                 QuickActionSection(title: "Manage") {
                     quickActionLink(
                         systemImage: "scalemass",
