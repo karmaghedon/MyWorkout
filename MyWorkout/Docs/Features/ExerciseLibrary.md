@@ -42,6 +42,18 @@ decision log).
 ## Capabilities
 
 - browse grouped by muscle group, with a "show more" cutoff per group
+- narrow to one body part via a dropdown (`Picker` with
+  `.pickerStyle(.menu)`) above the list — "All Body Parts" plus one
+  entry per `MuscleGroup` actually present in the library. A row of
+  scrolling tabs was tried first and replaced with this dropdown: a
+  dozen-plus muscle groups either scrolled out of view or crowded the
+  screen as tabs, where a dropdown shows the current selection in one
+  compact control and lets you jump straight to any body part.
+- search by name (`.searchable(text:)` on the list, native nav-bar
+  search field) — same `.localizedCaseInsensitiveContains` pattern the
+  *template* exercise pickers (`CreateWorkoutTemplateView`,
+  `TemplateExercisePickerView`) already used, now also on
+  `ExerciseLibraryView` itself
 - filter by equipment, difficulty, and favorites-only
 - favorite/unfavorite an exercise (`FavoriteExercisesStore`), persisted
   by normalized exercise name rather than `Exercise.id` — a built-in
@@ -50,12 +62,12 @@ decision log).
   has had no reason to migrate off name-keying since
 - exercise detail view: overview, muscles, instructions, tips, warnings
 
-Not yet implemented: searching the Library by name. A search field
-exists for the *template* exercise pickers
-(`CreateWorkoutTemplateView`, `TemplateExercisePickerView`) but hasn't
-been added to `ExerciseLibraryView` itself — same
-`.localizedCaseInsensitiveContains` pattern would apply directly if
-added.
+The body-part dropdown, search text, and the Equipment/Difficulty/
+Favorites filters all narrow the same underlying `exercises` list
+together — `groupedExercises` (the muscle-group `Section`s the list
+renders) is computed from whatever that combined filter leaves, so
+picking one body part naturally collapses the list to that single
+section without any special-casing in the list body itself.
 
 ## Sources
 
@@ -124,8 +136,6 @@ format.
 
 Potential additions:
 
-- search (see Capabilities above — not yet on the Library root, though
-  the pattern already exists elsewhere in the app)
 - images
 - videos
 - muscle diagrams

@@ -21,10 +21,21 @@ struct ExerciseLibraryView: View {
     @State private var selectedEquipment: ExerciseEquipment?
     @State private var selectedDifficulty: String?
     @State private var showFavoritesOnly = false
+    @State private var selectedMuscleGroupTab: MuscleGroup?
+    @State private var searchText = ""
 
     private let initialDisplayCount = 10
 
     // MARK: - Filtering
+
+    /// Every muscle group actually present, in the same order
+    /// `groupedExercises` sections appear in — sourced from
+    /// `allExercises` rather than the already-filtered `exercises` so
+    /// switching an Equipment/Difficulty filter doesn't make an option
+    /// disappear out from under the user mid-browse.
+    private var muscleGroupOptions: [MuscleGroup] {
+        Array(Set(allExercises.map(\.muscleGroup))).sorted()
+    }
 
     private var equipmentOptions: [ExerciseEquipment] {
         Array(Set(allExercises.map(\.equipment))).sorted()
@@ -56,7 +67,9 @@ struct ExerciseLibraryView: View {
     }
 
     private var exercises: [Exercise] {
-        allExercises.filter { exercise in
+        let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return allExercises.filter { exercise in
             if let selectedEquipment, exercise.equipment != selectedEquipment {
                 return false
             }
@@ -66,6 +79,14 @@ struct ExerciseLibraryView: View {
             }
 
             if showFavoritesOnly, !favoriteExercisesStore.isFavorite(exercise) {
+                return false
+            }
+
+            if let selectedMuscleGroupTab, exercise.muscleGroup != selectedMuscleGroupTab {
+                return false
+            }
+
+            if !trimmedSearch.isEmpty, !exercise.name.localizedCaseInsensitiveContains(trimmedSearch) {
                 return false
             }
 
@@ -96,10 +117,15 @@ struct ExerciseLibraryView: View {
     }
 
     var body: some View {
-        List {
-            if exercises.isEmpty {
-                emptyFilterState
-            }
+        VStack(spacing: 0) {
+            muscleGroupPicker
+                .padding(.horizontal)
+                .padding(.vertical, AppTheme.Spacing.sm)
+
+            List {
+                if exercises.isEmpty {
+                    emptyFilterState
+                }
 
             ForEach(
                 groupedExercises,
@@ -150,8 +176,10 @@ struct ExerciseLibraryView: View {
                     }
                 }
             }
+            }
         }
         .navigationTitle("Exercise Library")
+        .searchable(text: $searchText, prompt: "Search exercises")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 filterMenu
@@ -160,6 +188,29 @@ struct ExerciseLibraryView: View {
                     Label("Custom Exercises", systemImage: "figure.strengthtraining.functional")
                 }
             }
+        }
+    }
+
+    // MARK: - Muscle Group Picker
+
+    /// A dropdown rather than a scrolling tab row — with a dozen-plus
+    /// muscle groups, a row of tabs either scrolled out of view or
+    /// crowded the screen; a single compact dropdown shows the current
+    /// selection and lets you pick any body part in one tap, same
+    /// native `.pickerStyle(.menu)` idiom the Equipment/Difficulty
+    /// filters already use inside the Filter menu.
+    private var muscleGroupPicker: some View {
+        HStack {
+            Picker("Body Part", selection: $selectedMuscleGroupTab) {
+                Text("All Body Parts").tag(MuscleGroup?.none)
+
+                ForEach(muscleGroupOptions) { group in
+                    Text(group.displayName).tag(Optional(group))
+                }
+            }
+            .pickerStyle(.menu)
+
+            Spacer()
         }
     }
 
