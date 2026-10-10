@@ -78,24 +78,55 @@ final class ProgressionEngineTests: XCTestCase {
     func testDoubleProgressionRepeatedFailureAtSameWeightSuggestsDeload() {
         let exercise = makeExercise(
             strategy: .doubleProgression,
+            minReps: 8,
             maxReps: 12,
             deloadAmount: 10,
             stallLimit: 3
         )
 
         let previous = [
-            completedExercise([9, 8, 7], weight: 100),
-            completedExercise([10, 9, 8], weight: 100)
+            completedExercise([7, 6, 5], weight: 100),
+            completedExercise([6, 5, 4], weight: 100)
         ]
 
         let result = ProgressionEngine.suggestion(
             exercise: exercise,
-            currentSets: sets([9, 8, 7], weight: 100),
+            currentSets: sets([7, 6, 5], weight: 100),
             previousPerformances: previous
         )
 
         XCTAssertEqual(result?.suggestedWeight, 90)
         XCTAssertEqual(result?.message, "Deload next time")
+    }
+
+    /// Missing the top of the rep range without falling below the
+    /// minimum is normal variance, not failure — repeated sessions like
+    /// this must never trigger a deload (this was the actual bug: the
+    /// deload check used to compare against `maxReps` instead of
+    /// `minReps`, so almost any non-personal-best session counted as a
+    /// "failure" and could deload someone who was simply holding steady).
+    func testDoubleProgressionRepeatedNearMaxSessionsDoNotDeload() {
+        let exercise = makeExercise(
+            strategy: .doubleProgression,
+            minReps: 8,
+            maxReps: 12,
+            deloadAmount: 10,
+            stallLimit: 3
+        )
+
+        let previous = [
+            completedExercise([12, 12, 10], weight: 100),
+            completedExercise([12, 11, 10], weight: 100)
+        ]
+
+        let result = ProgressionEngine.suggestion(
+            exercise: exercise,
+            currentSets: sets([12, 12, 10], weight: 100),
+            previousPerformances: previous
+        )
+
+        XCTAssertEqual(result?.suggestedWeight, 100)
+        XCTAssertEqual(result?.message, "Keep same weight")
     }
 
     func testDoubleProgressionInsufficientFailureHistoryDoesNotDeload() {
@@ -264,18 +295,19 @@ final class ProgressionEngineTests: XCTestCase {
     func testSlowProgressionUsesStandardDeloadBehavior() {
         let exercise = makeExercise(
             strategy: .slowProgression,
+            minReps: 8,
             maxReps: 12,
             deloadAmount: 10,
             stallLimit: 2
         )
 
         let previous = [
-            completedExercise([10, 9, 8], weight: 100)
+            completedExercise([7, 6, 5], weight: 100)
         ]
 
         let result = ProgressionEngine.suggestion(
             exercise: exercise,
-            currentSets: sets([10, 9, 8], weight: 100),
+            currentSets: sets([7, 6, 5], weight: 100),
             previousPerformances: previous
         )
 

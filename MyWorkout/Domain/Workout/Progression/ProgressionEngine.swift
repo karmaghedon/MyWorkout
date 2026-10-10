@@ -200,8 +200,14 @@ struct ProgressionEngine {
             )
         }
 
+        // A "failure" toward a deload means genuinely falling short —
+        // reps below `minReps` — not merely missing `maxReps` on a set.
+        // Not hitting the top of the rep range every single session is
+        // normal variance, not regression; using `maxReps` here would
+        // count nearly any non-personal-best session as a failure and
+        // deload someone who's simply holding steady within their range.
         let failedCurrent = workingSets.contains {
-            $0.reps < rule.maxReps
+            $0.reps < rule.minReps
         }
 
         let previousFailuresSameWeight = previousPerformances
@@ -210,7 +216,7 @@ struct ProgressionEngine {
                 let setsAtWeight = performance.sets.filter { $0.weight == currentWeight }
 
                 return !setsAtWeight.isEmpty && setsAtWeight.contains {
-                    $0.reps < rule.maxReps
+                    $0.reps < rule.minReps
                 }
             }
 
