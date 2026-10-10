@@ -92,11 +92,11 @@ the top) can keep a plain `ScrollView`/`List`.
 ## Content
 
 One step per major capability area rather than every sub-screen —
-13 steps total: Home (hero/start-workout, This Week, Log Weight,
+14 steps total: Home (hero/start-workout, This Week, Log Weight,
 Today's Nutrition), Library (browse/search, custom exercises), Workout
 (start from template, manage templates), Progress (History/Analytics/
-Strength overview, Body trends), Profile (Settings, Equipment, Backup
-& Data).
+Strength overview, Body trends), Profile (Settings, Macro Goals,
+Equipment, Backup & Data).
 
 ## Triggers
 

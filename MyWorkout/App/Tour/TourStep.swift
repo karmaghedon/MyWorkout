@@ -108,6 +108,14 @@ extension TourStep {
             message: "Switch units, pick a rest-timer sound, choose your workout session layout, and set your strength formula here."
         ),
         TourStep(
+            id: "profile-macro-goals",
+            tab: .profile,
+            path: [],
+            anchorID: "profile-macro-goals",
+            title: "Macro Goals",
+            message: "Set a daily calorie and macro target — Today's Nutrition on Home tracks your progress against it."
+        ),
+        TourStep(
             id: "profile-equipment",
             tab: .profile,
             path: [],

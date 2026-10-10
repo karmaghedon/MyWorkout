@@ -34,6 +34,7 @@ struct ProfileHubView: View {
                         route: .macroGoals
                     )
                 }
+                .tourAnchor("profile-macro-goals")
 
                 QuickActionSection(title: "Manage") {
                     quickActionLink(
