@@ -1,64 +1,48 @@
 import SwiftUI
 
-/// The single "past workouts" screen — replaces what used to be two
-/// separate screens (a flat History list and a date-grouped Calendar list)
-/// showing the same underlying logs. This keeps the more informative,
-/// date-grouped layout with set counts.
+/// The top-level "past workouts" screen. Used to list every day that
+/// ever had a workout in one continuously growing, manually-paginated
+/// list ("Load More") — for anyone with more than a few months of
+/// history that became one very long scroll with no real structure
+/// above the day level. Grouping by month and drilling into
+/// `MonthHistoryView` for the day-by-day breakdown turns that into
+/// genuinely separate, naturally-bounded pages instead.
 struct HistoryView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
 
-    @State private var groupedLogs: [(date: Date, logs: [WorkoutLog])] = []
-    @State private var displayedGroupCount = 20
-    
-    private let pageSize = 20
-    
-    private var hasMoreGroups: Bool {
-        displayedGroupCount < groupedLogs.count
+    @State private var monthGroups: [MonthGroup] = []
+
+    private struct MonthGroup: Identifiable {
+        let monthStart: Date
+        let logs: [WorkoutLog]
+
+        var id: Date { monthStart }
+
+        var totalSets: Int {
+            logs.reduce(0) { total, log in
+                total + log.completedExercises.reduce(0) { $0 + $1.sets.count }
+            }
+        }
     }
-    
-    private var visibleGroups: [(date: Date, logs: [WorkoutLog])] {
-        Array(groupedLogs.prefix(displayedGroupCount))
-    }
-    
+
     var body: some View {
         List {
-            ForEach(visibleGroups, id: \.date) { group in
-                Section(group.date.formatted(date: .long, time: .omitted)) {
-                    ForEach(group.logs) { log in
-                        NavigationLink {
-                            WorkoutLogDetailView(log: log)
-                        } label: {
-                            WorkoutCard(
-                                systemImage: "checkmark.seal.fill",
-                                title: log.workoutName
-                            ) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(log.date.formatted(date: .omitted, time: .shortened))
-                                        .font(AppTheme.Typography.caption)
-                                        .foregroundStyle(AppTheme.secondaryText)
+            ForEach(monthGroups) { group in
+                NavigationLink {
+                    MonthHistoryView(monthStart: group.monthStart, logs: group.logs)
+                } label: {
+                    HStack {
+                        Text(group.monthStart.formatted(.dateTime.month(.wide).year()))
 
-                                    Text("\(setCount(for: log)) sets")
-                                        .font(AppTheme.Typography.caption)
-                                }
-                            }
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("\(group.logs.count) workout\(group.logs.count == 1 ? "" : "s")")
+
+                            Text("\(group.totalSets) sets")
+                                .font(AppTheme.Typography.caption)
+                                .foregroundStyle(AppTheme.secondaryText)
                         }
-                    }
-                }
-            }
-            
-            if hasMoreGroups {
-                Section {
-                    Button {
-                        loadMore()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text("Load More")
-                                .font(AppTheme.Typography.label)
-                            Spacer()
-                        }
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
                     }
                 }
             }
@@ -78,29 +62,18 @@ struct HistoryView: View {
         }
         .onChange(of: logStore.logs.count) { _, _ in
             regroup()
-            displayedGroupCount = pageSize //Reset to first page when logs changed
         }
     }
-    
-    private func loadMore(){
-        displayedGroupCount += pageSize
-    }
-    
+
     private func regroup() {
         let calendar = Calendar.current
 
         let grouped = Dictionary(grouping: logStore.logs) { log in
-            calendar.startOfDay(for: log.date)
+            calendar.dateInterval(of: .month, for: log.date)?.start ?? log.date
         }
 
-        groupedLogs = grouped
-            .map { (date: $0.key, logs: $0.value) }
-            .sorted { $0.date > $1.date }
-    }
-
-    private func setCount(for log: WorkoutLog) -> Int {
-        log.completedExercises.reduce(0) { total, exercise in
-            total + exercise.sets.count
-        }
+        monthGroups = grouped
+            .map { MonthGroup(monthStart: $0.key, logs: $0.value) }
+            .sorted { $0.monthStart > $1.monthStart }
     }
 }

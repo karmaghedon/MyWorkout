@@ -26,11 +26,13 @@ This directory is the internal reference for MyWorkout architecture, features, d
 
 ## Feature documents
 
+- `Dashboard.md`
 - `ExerciseLibrary.md`
 - `WorkoutSessions.md`
 - `Templates.md`
 - `Progression.md`
 - `Analytics.md`
+- `History.md`
 - `EquipmentInventory.md`
 - `CustomExercises.md`
 - `Recovery.md`
