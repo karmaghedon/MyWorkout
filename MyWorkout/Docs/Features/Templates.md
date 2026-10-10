@@ -45,19 +45,62 @@ Templates define reusable exercise sequences for starting workouts.
   (`Exercise.progressionRule.minReps`/`maxReps`) so the weight-increase
   suggestion matches how that exercise is actually trained (e.g.
   straight sets of 8) instead of always assuming the global default
+- toggle `Exercise.progressionEnabled` per exercise ("Auto Progression")
+  to turn automatic weight increase/deload suggestions off entirely for
+  that exercise — the working weight then just carries forward
+  unchanged between sessions (still manually adjustable in the session
+  UI itself), with no suggestion banner shown
+- toggle a fixed, manually-edited warm-up ramp per exercise ("Auto
+  Warm-up" off) via `Exercise.customWarmups`, with a live preview of the
+  auto-calculated ramp shown whenever it's left on
 
 ## Exercise refresh
 
 Loaded or imported templates are refreshed through an exercise registry so built-in exercise definitions can evolve without duplicating lookup behavior throughout the UI.
 
-Refresh preserves the four per-template override fields
+Refresh preserves the per-template override fields
 (`targetSets`, `targetWeightPounds`, `supersetGroupID`,
-`progressionRule`) from the saved exercise rather than replacing it
-wholesale with the freshly-resolved built-in definition — that
-definition always carries the *global* defaults for those fields, so a
-naive swap silently discarded whatever had actually been configured for
-the template on every save. Any new per-template override field added
-in the future needs the same explicit carry-over.
+`progressionRule`, `progressionEnabled`, `customWarmups`) from the
+saved exercise rather than replacing it wholesale with the
+freshly-resolved built-in definition — that definition always carries
+the *global* defaults for those fields, so a naive swap silently
+discarded whatever had actually been configured for the template on
+every save. Any new per-template override field added in the future
+needs the same explicit carry-over.
+
+## Per-exercise progression and warm-up overrides
+
+Each exercise row in `TemplateExercisesSection` carries two independent
+toggles, alongside the existing sets/weight/rep-range controls:
+
+- **Auto Progression** (`Exercise.progressionEnabled`, default `true`)
+  — when turned off, `WorkoutSessionEngine.initialState` skips
+  `ProgressionEngine.suggestion` entirely for that exercise and just
+  carries the last logged weight and rep count forward unchanged, with
+  no suggestion message. This is for exercises where the user wants to
+  stay in full manual control of the load (e.g. technique-sensitive
+  lifts, or ones already at a deliberately-fixed working weight).
+
+- **Auto Warm-up** (`Exercise.customWarmups`, default `nil`) — while on,
+  the row shows a live read-only preview of
+  `WarmupEngine.generateWarmups(...)` computed off the exercise's
+  current working weight, updating immediately as that weight changes.
+  Turning it off seeds `customWarmups` from that same auto-calculation
+  as a starting point, then switches the row to an editable list
+  (weight/reps steppers per set, delete, and an "Add Warm-up Set"
+  button that seeds a new row from the last one) so the fixed ramp can
+  be hand-tuned and saved with the template. Turning it back on
+  discards the fixed list (`customWarmups = nil`) and reverts to
+  always-current auto-calculation — the fixed list is not preserved for
+  next time.
+
+At session time, `WarmupEngine.resolveWarmups` resolves the warm-up
+ramp with three-tier precedence: a session-time edit
+(`ExerciseSessionState.customWarmups`, made via the Checklist layout's
+edit flow) always wins for that one workout, then the template's
+`Exercise.customWarmups` fixed list, then auto-calculation. This lets a
+template define a sensible default ramp while still allowing one-off
+adjustments mid-workout without changing the template.
 
 ## Starting weight sync
 

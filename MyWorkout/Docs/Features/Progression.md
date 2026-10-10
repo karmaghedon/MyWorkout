@@ -46,6 +46,28 @@ The engine may recommend:
 - deloading after repeated failure
 - no suggestion when data is insufficient
 
+A "failure" toward a deload means a logged set falling genuinely short —
+reps below `minReps` — not merely missing `maxReps` on a set. Comparing
+against `maxReps` instead of `minReps` was a bug: it meant any session
+that didn't max out every single set (completely normal rep variance)
+counted toward a deload, so exercises could lose weight even while the
+lifter was holding steady or just short of the top of the rep range.
+Both `weightedSuggestion` failure checks (`failedCurrent` and
+`previousFailuresSameWeight`) now compare against `minReps`.
+
+## Per-exercise opt-out
+
+`Exercise.progressionEnabled` (default `true`) lets a template turn
+automatic progression off entirely for one exercise — same per-template
+override pattern as `progressionRule`. When `false`,
+`WorkoutSessionEngine.initialState` skips `ProgressionEngine.suggestion`
+altogether and carries the last logged weight and rep count forward
+unchanged, with no suggestion message. This is for exercises the user
+wants to keep in full manual control (e.g. technique-sensitive lifts),
+without losing automatic progression elsewhere in the same workout. See
+`Docs/Features/Templates.md` for the template-editor toggle
+("Auto Progression").
+
 ## Store integration
 
 `WorkoutLogStore.suggestedStartingSet` gathers prior performances and delegates the decision to `ProgressionEngine`.

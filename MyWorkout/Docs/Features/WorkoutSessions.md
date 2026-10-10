@@ -62,17 +62,36 @@ Superset/circuit members (`exercise.supersetGroupID != nil`) skip
 warm-ups entirely on both layouts — the assumption is the muscle group
 is already warm from the prior exercise in the group.
 
-The Checklist layout can override the auto-generated ramp per session,
+`WarmupEngine.resolveWarmups` is the single shared entry point both
+session card views call to decide what ramp to actually show, with
+three-tier precedence: a session-time override
+(`ExerciseSessionState.customWarmups`) wins over a template-configured
+fixed ramp (`Exercise.customWarmups`, see `Docs/Features/Templates.md`'s
+"Auto Warm-up" toggle), which wins over auto-calculation from the
+current working weight. This lets a template lock in a dialed-in ramp
+as the default while still allowing one-off session edits without
+changing the template.
+
+The Checklist layout can override the resolved ramp per session,
 without touching the template: each warm-up row is editable (weight and
 reps, via its pencil icon), warm-up sets can be added ("Add Warm-up
 Set") or removed ("Remove This Set," inside the open editor), and the
 override is stored in `ExerciseSessionState.customWarmups` — `nil`
-means "use the auto-generated ramp," non-`nil` fully replaces it.
-Editing/removing a specific row is matched **by its position** in the
-list, not by `WarmupSet.id`: the auto-generated ramp mints a fresh
-random id every time it's recomputed, so position is the only stable
-identity until the list has actually been materialized into
-`customWarmups`.
+means "defer to the template override or auto-generated ramp," non-`nil`
+fully replaces it for that session. Editing/removing a specific row is
+matched **by its position** in the list, not by `WarmupSet.id`: the
+auto-generated ramp mints a fresh random id every time it's recomputed,
+so position is the only stable identity until the list has actually
+been materialized into `customWarmups`.
+
+The Checklist layout's warm-up section is a `DisclosureGroup` that
+auto-collapses itself (but remains manually re-expandable) the moment
+every warm-up row in it is checked off — before that, a tall warm-up
+list can push the exercise's own name/set-count header off the top of
+the screen once the view scrolls to center the first working set or
+the rest timer; collapsing it as soon as it's no longer needed keeps
+the header on screen for the working sets that follow. See "Header
+visibility" below for the rest of that fix.
 
 Working sets have the mirror capability for a session-only extra set —
 `ActiveWorkoutStore.addExtraSet`/`removeExtraSet` adjust
@@ -122,6 +141,43 @@ here were fixed together, since they shared one cause:
   exercise. Fixed to anchor on the first still-*active* member instead
   (falls back to whichever exercise triggered the rest if every member
   has finished).
+
+## Header visibility
+
+Each session card can be much taller than the screen (warm-ups, several
+logged sets, notes), so scrolling to center the *whole card* routinely
+left `ExerciseSessionHeaderView` — the only place showing the exercise
+name and set progress together — scrolled off the top of the screen
+once a set was logged or rest started. Two changes fix this together:
+
+- `ExerciseSessionHeaderView.scrollAnchorID(for:)` gives the header
+  itself a stable scroll-anchor id, separate from the card's own id —
+  same precedent as `RestTimerBadge.scrollAnchorID`. The three
+  non-rest-timer branches of `WorkoutSessionContentView.scrollTarget`
+  (a superset partner waiting on you, or wherever you last logged a
+  set) scroll to this header id with `anchor: .top` instead of to the
+  card with `anchor: .center`.
+- The rest-timer branch still anchors on `RestTimerBadge.scrollAnchorID`
+  (unchanged — see "Rest-timer scroll centering" above), which is the
+  most common trigger since nearly every logged set starts a rest
+  period. Anchoring the *badge* rather than the header there is
+  intentional — the badge is what you actually need to see mid-rest —
+  but a long warm-up list above it could still push the header out of
+  view by the time rest ends. The Checklist layout's warm-up
+  auto-collapse (see "Warm-ups" above) addresses that by shortening the
+  card once warm-ups are no longer relevant, rather than by changing
+  this anchor.
+
+## Set progress display
+
+`ExerciseSessionHeaderView` shows a `Set loggedSetCount/targetSetCount`
+chip (e.g. "Set 3/4") next to the exercise name, via
+`WorkoutSessionEngine.targetSetCount(for:state:)` — the template's
+`Exercise.targetSets` plus any session-only extra sets
+(`ExerciseSessionState.extraWorkingSets`), floored at the number
+actually logged so far in case that ever exceeds the configured target.
+Both layouts compute this the same way and pass it into the shared
+header view.
 
 ## Rest timer sound
 
@@ -206,3 +262,11 @@ Canceling clears current session state and removes the persisted active snapshot
 - Checklist warm-up edit/add/remove, matched by position rather than id
 - "Remove Set" only appears once the extra working set is genuinely
   visible on screen
+- `WarmupEngine.resolveWarmups` precedence: session override beats
+  template override beats auto-calculation
+- Checklist warm-up section auto-collapses once every row is checked,
+  and can still be manually re-expanded afterward
+- header stays visible (anchored via `scrollAnchorID`, `.top`) when
+  scrolling to a superset partner or the last-logged exercise
+- `Set N/M` header chip reflects extra session-only sets and floors at
+  the actual logged count
