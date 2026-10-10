@@ -68,12 +68,26 @@ ways:
   metric like waist doesn't show a misleadingly "current" reading from
   weeks earlier).
 
-Weight is the only metric with a Swift Charts native legend-driving
-color assignment removed in favor of manual `.foregroundStyle(Color)`
-per mark — `.chartForegroundStyleScale` requires a `KeyValuePairs`
-literal, which can't be built dynamically from the toggle-selected set
-at runtime. The colored metric chips double as the legend instead: a
-selected chip's fill color is exactly the color its line renders in.
+Every selected metric's marks share identical `"Date"`/`"Value"` value
+labels (all six are independently normalized onto the same 0–100
+range), with nothing else distinguishing one metric's marks from
+another's. A per-mark literal `.foregroundStyle(Color)` — the original
+approach — turned out not to be reliable for this: with no categorical
+`foregroundStyle(by:)` grouping to tell the series apart, Swift Charts
+has no way to know they're different series and can render them all
+with a single inferred style regardless of each mark's own literal
+color, which is exactly the bug this screen shipped with (every
+selected metric's line rendering the same color). The fix names each
+series by its display name — `.foregroundStyle(by: .value("Metric",
+metric.displayName))` — and maps that name to the metric's actual color
+via an explicit `.chartForegroundStyleScale(domain: displayNames,
+range: colors)`, using the exact same `ProgressMetric.color` values
+already shown on the chips/tooltip. The chart's own legend is hidden
+(`.chartLegend(.hidden)`) since the colored metric chips above the
+chart already serve that role, and a second legend would just repeat
+it. The weight trend line stays a literal `.foregroundStyle(AppTheme.
+secondaryText)` — it's deliberately gray, not part of the named scale,
+and literal colors on other marks coexist fine alongside the scale.
 
 Weight uniquely renders as two series: raw daily dots, and a smoothed
 `TrendSmoother` trend line (both normalized together using the raw

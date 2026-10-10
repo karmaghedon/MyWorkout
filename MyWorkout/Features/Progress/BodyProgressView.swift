@@ -204,6 +204,21 @@ struct BodyProgressView: View {
                 chartContent(for: metric)
             }
         }
+        // Every series shares the same "Date"/"Value" value labels (they're
+        // all independently normalized onto the same 0-100 scale), with
+        // nothing else distinguishing one metric's marks from another's —
+        // with no categorical `foregroundStyle(by:)` grouping, Swift
+        // Charts has no way to tell the marks apart as separate series and
+        // can render them all with a single inferred style instead of
+        // each mark's own literal color. Naming each series by its
+        // display name here, and mapping that name to the exact same
+        // `ProgressMetric.color` already used for its chip/tooltip dot,
+        // makes every selected metric keep its own distinct line color.
+        .chartForegroundStyleScale(
+            domain: ProgressMetric.allCases.map(\.displayName),
+            range: ProgressMetric.allCases.map(\.color)
+        )
+        .chartLegend(.hidden)
         .chartYAxis(.hidden)
         .frame(height: 260)
         .chartOverlay { proxy in
@@ -230,10 +245,10 @@ struct BodyProgressView: View {
             ForEach(normalize(raw, referenceMin: minValue, referenceMax: maxValue), id: \.date) { point in
                 if metric == .weight {
                     PointMark(x: .value("Date", point.date), y: .value("Value", point.value))
-                        .foregroundStyle(metric.color)
+                        .foregroundStyle(by: .value("Metric", metric.displayName))
                 } else {
                     LineMark(x: .value("Date", point.date), y: .value("Value", point.value))
-                        .foregroundStyle(metric.color)
+                        .foregroundStyle(by: .value("Metric", metric.displayName))
                 }
             }
 
