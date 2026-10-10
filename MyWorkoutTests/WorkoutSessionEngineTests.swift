@@ -10,7 +10,8 @@ final class WorkoutSessionEngineTests: XCTestCase {
         equipment: ExerciseEquipment = .barbell,
         exerciseType: ExerciseType = .compound,
         strategy: ProgressionStrategy = .doubleProgression,
-        targetWeightPounds: Double? = nil
+        targetWeightPounds: Double? = nil,
+        progressionEnabled: Bool = true
     ) -> Exercise {
         Exercise(
             name: name,
@@ -26,7 +27,8 @@ final class WorkoutSessionEngineTests: XCTestCase {
             ),
             exerciseType: exerciseType,
             progressionStrategy: strategy,
-            targetWeightPounds: targetWeightPounds
+            targetWeightPounds: targetWeightPounds,
+            progressionEnabled: progressionEnabled
         )
     }
 
@@ -189,6 +191,44 @@ final class WorkoutSessionEngineTests: XCTestCase {
         XCTAssertEqual(log?.completedExercises.first?.exerciseName, "Bench Press")
     }
 
+    // MARK: - targetSetCount
+
+    func test_targetSetCount_noExtraSets_returnsTemplateTargetSets() {
+        var ex = exercise()
+        ex.targetSets = 4
+
+        let state = ExerciseSessionState()
+
+        XCTAssertEqual(WorkoutSessionEngine.targetSetCount(for: ex, state: state), 4)
+    }
+
+    func test_targetSetCount_withExtraSets_addsThemOnTop() {
+        var ex = exercise()
+        ex.targetSets = 3
+
+        var state = ExerciseSessionState()
+        state.extraWorkingSets = 2
+
+        XCTAssertEqual(WorkoutSessionEngine.targetSetCount(for: ex, state: state), 5)
+    }
+
+    func test_targetSetCount_loggedSetsExceedingTarget_flooredAtLoggedCount() {
+        var ex = exercise()
+        ex.targetSets = 2
+
+        var state = ExerciseSessionState()
+        state.loggedSets = [
+            LoggedSet(setNumber: 1, weight: 100, reps: 10),
+            LoggedSet(setNumber: 2, weight: 100, reps: 10),
+            LoggedSet(setNumber: 3, weight: 100, reps: 10)
+        ]
+
+        // Safety floor: a logged set can never end up hidden even if
+        // targetSets/extraWorkingSets ever drift below how many are
+        // actually logged.
+        XCTAssertEqual(WorkoutSessionEngine.targetSetCount(for: ex, state: state), 3)
+    }
+
     // MARK: - initialState
 
     func test_initialState_noHistory_usesDefaultStartingWeightAndMessage() {
@@ -278,6 +318,40 @@ final class WorkoutSessionEngineTests: XCTestCase {
         // Real progression history takes priority over the template's
         // one-time starting weight — 105 (progressed from 100), not 225.
         XCTAssertEqual(state.workingWeightPounds, 105)
+    }
+
+    func test_initialState_withHistory_progressionDisabled_carriesLastSetForward() {
+        let ex = exercise(
+            equipment: .barbell,
+            exerciseType: .compound,
+            strategy: .doubleProgression,
+            progressionEnabled: false
+        )
+
+        let latest = CompletedExercise(
+            exerciseName: "Bench Press",
+            sets: [
+                LoggedSet(setNumber: 1, weight: 100, reps: 12),
+                LoggedSet(setNumber: 2, weight: 100, reps: 12),
+                LoggedSet(setNumber: 3, weight: 100, reps: 12)
+            ],
+            notes: ""
+        )
+
+        let state = WorkoutSessionEngine.initialState(
+            for: ex,
+            latestPerformance: latest,
+            previousPerformances: [],
+            equipmentInventory: inventory(barbellWeight: 45)
+        )
+
+        // All sets hit max reps, which would normally suggest an
+        // increase to 105 — but progression is disabled for this
+        // exercise, so the last logged weight/reps carry forward
+        // unchanged with no suggestion message.
+        XCTAssertEqual(state.workingWeightPounds, 100)
+        XCTAssertEqual(state.targetReps, 12)
+        XCTAssertNil(state.suggestionMessage)
     }
 
     // MARK: - shouldStartRest (supersets)

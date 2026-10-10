@@ -38,12 +38,10 @@ struct ExerciseSessionCardView: View {
     private var warmups: [WarmupSet] {
         guard exercise.supersetGroupID == nil else { return [] }
 
-        if let customWarmups = state.customWarmups {
-            return customWarmups
-        }
-
-        return WarmupEngine.generateWarmups(
-            for: state.workingWeightPounds,
+        return WarmupEngine.resolveWarmups(
+            sessionOverride: state.customWarmups,
+            templateOverride: exercise.customWarmups,
+            workingWeight: state.workingWeightPounds,
             exerciseType: exercise.exerciseType,
             usesBarbell: exercise.usesBarbell,
             barbellWeight: storedBarbellWeightPounds
@@ -52,6 +50,10 @@ struct ExerciseSessionCardView: View {
 
     private var nextSetNumber: Int {
         state.loggedSets.count + 1
+    }
+
+    private var targetSetCount: Int {
+        WorkoutSessionEngine.targetSetCount(for: exercise, state: state)
     }
 
     private var storedBarbellWeightPounds: Double {
@@ -67,8 +69,10 @@ struct ExerciseSessionCardView: View {
                 exercise: exercise,
                 exerciseType: exercise.exerciseType.rawValue.capitalized,
                 progressionStrategy: exercise.progressionStrategy.displayName,
-                nextSetNumber: nextSetNumber
+                loggedSetCount: state.loggedSets.count,
+                targetSetCount: targetSetCount
             )
+            .id(ExerciseSessionHeaderView.scrollAnchorID(for: exercise.id))
 
             if let suggestion = state.suggestionMessage {
                 suggestionBanner(suggestion)

@@ -68,4 +68,72 @@ final class ExerciseCodableTests: XCTestCase {
 
         XCTAssertEqual(decoded.targetSets, 5)
     }
+
+    // MARK: - progressionEnabled / customWarmups
+
+    /// Same "simulate a pre-change payload" approach as `targetSets`
+    /// above — `progressionEnabled` and `customWarmups` were added after
+    /// every exercise already persisted on a device predates them.
+    func testDecodingPayloadWithoutNewFieldsUsesDocumentedDefaults() throws {
+        let exercise = Exercise(
+            name: "Test Exercise",
+            muscleGroup: .chest,
+            equipment: .barbell,
+            instructions: "Do the thing.",
+            progressionRule: ProgressionRule(
+                minReps: 8,
+                maxReps: 10,
+                increaseAmount: 5,
+                deloadAmount: 5,
+                stallLimit: 3
+            ),
+            exerciseType: .compound,
+            progressionStrategy: .doubleProgression
+        )
+
+        let encoded = try JSONEncoder().encode(exercise)
+
+        var payload = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: encoded) as? [String: Any]
+        )
+        payload.removeValue(forKey: "progressionEnabled")
+        payload.removeValue(forKey: "customWarmups")
+
+        let strippedData = try JSONSerialization.data(withJSONObject: payload)
+
+        let decoded = try JSONDecoder().decode(Exercise.self, from: strippedData)
+
+        XCTAssertEqual(decoded.progressionEnabled, true)
+        XCTAssertNil(decoded.customWarmups)
+    }
+
+    func testDecodingPayloadPreservesProgressionEnabledAndCustomWarmups() throws {
+        let exercise = Exercise(
+            name: "Test Exercise",
+            muscleGroup: .chest,
+            equipment: .barbell,
+            instructions: "Do the thing.",
+            progressionRule: ProgressionRule(
+                minReps: 8,
+                maxReps: 10,
+                increaseAmount: 5,
+                deloadAmount: 5,
+                stallLimit: 3
+            ),
+            exerciseType: .compound,
+            progressionStrategy: .doubleProgression,
+            progressionEnabled: false,
+            customWarmups: [
+                WarmupSet(weight: 95, reps: 5),
+                WarmupSet(weight: 135, reps: 3)
+            ]
+        )
+
+        let encoded = try JSONEncoder().encode(exercise)
+        let decoded = try JSONDecoder().decode(Exercise.self, from: encoded)
+
+        XCTAssertEqual(decoded.progressionEnabled, false)
+        XCTAssertEqual(decoded.customWarmups?.map(\.weight), [95, 135])
+        XCTAssertEqual(decoded.customWarmups?.map(\.reps), [5, 3])
+    }
 }

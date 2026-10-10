@@ -4,7 +4,8 @@ struct ExerciseSessionHeaderView: View {
     let exercise: Exercise
     let exerciseType: String
     let progressionStrategy: String
-    let nextSetNumber: Int
+    let loggedSetCount: Int
+    let targetSetCount: Int
 
     @State private var showsExerciseDetail = false
 
@@ -32,7 +33,7 @@ struct ExerciseSessionHeaderView: View {
                 Spacer(minLength: AppTheme.Spacing.md)
 
                 Chip(
-                    text: "Set \(nextSetNumber)",
+                    text: "Set \(loggedSetCount)/\(targetSetCount)",
                     font: AppTheme.Typography.label,
                     backgroundColor: AppTheme.accentMuted,
                     foregroundColor: Color.primary
@@ -52,5 +53,18 @@ struct ExerciseSessionHeaderView: View {
                 ExerciseDetailView(exercise: exercise, showsDoneButton: true)
             }
         }
+    }
+}
+
+extension ExerciseSessionHeaderView {
+    /// Stable scroll-anchor id for the header itself, distinct from the
+    /// exercise card's own id — same reasoning as
+    /// `RestTimerBadge.scrollAnchorID`. The card can be much taller than
+    /// the screen (warm-ups, several logged sets, notes), so scrolling to
+    /// center the *card* can leave this header — the only place showing
+    /// the exercise name and set progress together — scrolled off the
+    /// top of the screen. Scrolling to this id instead keeps it in view.
+    static func scrollAnchorID(for exerciseID: UUID) -> String {
+        "exerciseHeader_\(exerciseID.uuidString)"
     }
 }

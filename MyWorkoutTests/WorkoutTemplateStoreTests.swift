@@ -81,6 +81,33 @@ final class WorkoutTemplateStoreTests: XCTestCase {
         XCTAssertEqual(savedExercises[1].supersetGroupID, groupID)
     }
 
+    /// Same reasoning as
+    /// `test_add_preservesTargetSetsAndWeightOverrideForBuiltInExercise`,
+    /// for the two newest per-template overrides — caught during
+    /// implementation: `refreshed(_:)` didn't yet know about
+    /// `progressionEnabled`/`customWarmups`, so saving a template would
+    /// have silently reset both back to their defaults immediately.
+    func test_add_preservesProgressionEnabledAndCustomWarmupsForBuiltInExercise() {
+        var exercise = createSampleExercise(name: "Bench Press")
+        exercise.progressionEnabled = false
+        exercise.customWarmups = [
+            WarmupSet(weight: 95, reps: 5),
+            WarmupSet(weight: 135, reps: 3)
+        ]
+
+        let template = WorkoutTemplate(
+            name: "Push Day",
+            exercises: [exercise]
+        )
+
+        sut.add(template)
+
+        let savedExercise = sut.templates.first?.exercises.first
+        XCTAssertEqual(savedExercise?.progressionEnabled, false)
+        XCTAssertEqual(savedExercise?.customWarmups?.map(\.weight), [95, 135])
+        XCTAssertEqual(savedExercise?.customWarmups?.map(\.reps), [5, 3])
+    }
+
     func test_add_multipleTemplatesAreStored() {
         sut.add(createSampleTemplate(name: "Push"))
         sut.add(createSampleTemplate(name: "Pull"))

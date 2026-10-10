@@ -20,6 +20,21 @@ enum WorkoutSessionEngine {
         )
     }
 
+    /// Total planned sets for this exercise this session — the
+    /// template's `targetSets` plus any extra sets added mid-session via
+    /// "Add Set", floored at however many are actually logged so a
+    /// logged set can never end up uncounted if the two ever drift (e.g.
+    /// a set logged from a different layout mid-workout).
+    static func targetSetCount(
+        for exercise: Exercise,
+        state: ExerciseSessionState
+    ) -> Int {
+        max(
+            exercise.targetSets + state.extraWorkingSets,
+            state.loggedSets.count
+        )
+    }
+
     /// Whether logging a set for `exercise` should start the rest timer.
     ///
     /// Ungrouped exercises always rest after every set — unchanged
@@ -320,6 +335,20 @@ enum WorkoutSessionEngine {
     ) -> ExerciseSessionState {
         if let latestPerformance,
            let latestSet = latestPerformance.sets.last {
+
+            // With progression disabled for this exercise, the working
+            // weight simply carries forward exactly as last logged —
+            // no algorithmic suggestion or message, since the owner has
+            // opted out of the app deciding when to add or cut weight.
+            guard exercise.progressionEnabled else {
+                return ExerciseSessionState(
+                    targetReps: latestSet.reps,
+                    workingWeightPounds: latestSet.weight,
+                    loggedSets: [],
+                    suggestionMessage: nil,
+                    notes: ""
+                )
+            }
 
             let suggestion = ProgressionEngine.suggestion(
                 exercise: exercise,

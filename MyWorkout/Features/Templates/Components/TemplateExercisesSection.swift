@@ -126,6 +126,12 @@ struct TemplateExercisesSection: View {
             )
             .font(AppTheme.Typography.caption)
             .foregroundStyle(AppTheme.secondaryText)
+
+            Toggle("Auto Progression", isOn: exercise.progressionEnabled)
+                .font(AppTheme.Typography.caption)
+                .tint(AppTheme.accent)
+
+            warmupSection(for: exercise)
         }
         .padding(.leading, exercise.wrappedValue.supersetGroupID != nil ? AppTheme.Spacing.sm : 0)
         .overlay(alignment: .leading) {
@@ -153,6 +159,183 @@ struct TemplateExercisesSection: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    // MARK: - Warm-up
+
+    /// Toggle + preview/editor, directly reflecting
+    /// `Exercise.customWarmups`: nil shows a live read-only preview of
+    /// what `WarmupEngine.generateWarmups` produces off this exercise's
+    /// current weight ("see what are the warm-up for every exercise
+    /// based on the working weight"); non-nil shows an editable, fixed
+    /// list the owner has taken over.
+    @ViewBuilder
+    private func warmupSection(for exercise: Binding<Exercise>) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            Toggle("Auto Warm-up", isOn: autoWarmupBinding(for: exercise))
+                .font(AppTheme.Typography.caption)
+                .tint(AppTheme.accent)
+
+            if exercise.wrappedValue.customWarmups == nil {
+                warmupPreview(for: exercise.wrappedValue)
+            } else {
+                editableWarmups(for: exercise)
+            }
+        }
+        .padding(.top, AppTheme.Spacing.xs)
+    }
+
+    /// `isOn` reflects whether `customWarmups` is nil (auto) or set
+    /// (manual). Turning auto *off* seeds the fixed list from whatever
+    /// the auto-calculation produces at that moment — a starting point
+    /// to then hand-edit, not a blank list. Turning it back *on*
+    /// discards the fixed list entirely rather than remembering it, so
+    /// toggling auto back off again re-seeds fresh from the
+    /// (possibly since-changed) current weight.
+    private func autoWarmupBinding(for exercise: Binding<Exercise>) -> Binding<Bool> {
+        Binding(
+            get: { exercise.wrappedValue.customWarmups == nil },
+            set: { isAuto in
+                exercise.wrappedValue.customWarmups =
+                    isAuto ? nil : computedWarmups(for: exercise.wrappedValue)
+            }
+        )
+    }
+
+    @ViewBuilder
+    private func warmupPreview(for exercise: Exercise) -> some View {
+        let warmups = computedWarmups(for: exercise)
+
+        if warmups.isEmpty {
+            Text("No warm-up needed at this weight.")
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(AppTheme.secondaryText)
+        } else {
+            ForEach(warmups) { warmup in
+                Text("\(formatWeight(displayWeight(warmup.weight))) \(weightUnit) \u{d7} \(warmup.reps)")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func editableWarmups(for exercise: Binding<Exercise>) -> some View {
+        let warmups = exercise.wrappedValue.customWarmups ?? []
+
+        ForEach(Array(warmups.enumerated()), id: \.element.id) { index, _ in
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text("Warm-up \(index + 1)")
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+
+                    Spacer()
+
+                    Button {
+                        removeWarmupSet(at: index, for: exercise)
+                    } label: {
+                        Image(systemName: "minus.circle.fill")
+                            .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Stepper(
+                    "\(formatWeight(warmupWeightBinding(for: exercise, at: index).wrappedValue)) \(weightUnit)",
+                    value: warmupWeightBinding(for: exercise, at: index),
+                    in: 0...500,
+                    step: weightStep
+                )
+                .font(AppTheme.Typography.caption)
+
+                Stepper(
+                    "\(warmupRepsBinding(for: exercise, at: index).wrappedValue) reps",
+                    value: warmupRepsBinding(for: exercise, at: index),
+                    in: 1...50
+                )
+                .font(AppTheme.Typography.caption)
+            }
+        }
+
+        Button("Add Warm-up Set") {
+            addWarmupSet(for: exercise)
+        }
+        .font(AppTheme.Typography.caption)
+    }
+
+    private func warmupWeightBinding(for exercise: Binding<Exercise>, at index: Int) -> Binding<Double> {
+        Binding(
+            get: {
+                guard let warmups = exercise.wrappedValue.customWarmups,
+                      warmups.indices.contains(index) else { return 0 }
+                return displayWeight(warmups[index].weight)
+            },
+            set: { displayedWeight in
+                guard exercise.wrappedValue.customWarmups?.indices.contains(index) == true else { return }
+                exercise.wrappedValue.customWarmups?[index].weight = WeightConversion.storedPounds(
+                    fromDisplayedWeight: displayedWeight,
+                    unitSystem: settingsStore.settings.unitSystem
+                )
+            }
+        )
+    }
+
+    private func warmupRepsBinding(for exercise: Binding<Exercise>, at index: Int) -> Binding<Int> {
+        Binding(
+            get: {
+                guard let warmups = exercise.wrappedValue.customWarmups,
+                      warmups.indices.contains(index) else { return 0 }
+                return warmups[index].reps
+            },
+            set: { newValue in
+                guard exercise.wrappedValue.customWarmups?.indices.contains(index) == true else { return }
+                exercise.wrappedValue.customWarmups?[index].reps = newValue
+            }
+        )
+    }
+
+    /// Seeds a new row from the last row's weight/reps (or a light
+    /// default if there isn't one yet) — same seeding behavior as
+    /// `ActiveWorkoutStore.addWarmupSet`'s session-time equivalent.
+    private func addWarmupSet(for exercise: Binding<Exercise>) {
+        let current = exercise.wrappedValue.customWarmups ?? []
+        let last = current.last
+
+        let newWarmup = WarmupSet(
+            weight: last?.weight ?? 45,
+            reps: last?.reps ?? 10
+        )
+
+        exercise.wrappedValue.customWarmups = current + [newWarmup]
+    }
+
+    private func removeWarmupSet(at index: Int, for exercise: Binding<Exercise>) {
+        guard var warmups = exercise.wrappedValue.customWarmups,
+              warmups.indices.contains(index) else { return }
+
+        warmups.remove(at: index)
+        exercise.wrappedValue.customWarmups = warmups
+    }
+
+    private func computedWarmups(for exercise: Exercise) -> [WarmupSet] {
+        WarmupEngine.generateWarmups(
+            for: effectiveWeightPounds(for: exercise),
+            exerciseType: exercise.exerciseType,
+            usesBarbell: exercise.usesBarbell,
+            barbellWeight: storedBarbellWeightPounds
+        )
+    }
+
+    private func effectiveWeightPounds(for exercise: Exercise) -> Double {
+        exercise.targetWeightPounds ?? defaultWeightPounds(for: exercise)
+    }
+
+    private var storedBarbellWeightPounds: Double {
+        WeightConversion.toPounds(
+            equipmentStore.inventory.barbellWeight,
+            from: equipmentStore.inventory.unitSystem
+        )
     }
 
     // MARK: - Weight Boundary

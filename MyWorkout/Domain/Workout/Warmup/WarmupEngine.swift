@@ -1,6 +1,39 @@
 import Foundation
 
 struct WarmupEngine {
+    /// The single source of truth for "what warm-ups should this
+    /// exercise show right now" — both session card layouts call this
+    /// instead of separately re-implementing the same fallback chain.
+    /// Precedence: a session-time edit always wins for that one workout
+    /// (`sessionOverride`, `ExerciseSessionState.customWarmups`), then a
+    /// template's own fixed ramp (`templateOverride`,
+    /// `Exercise.customWarmups`), and only once neither is set does this
+    /// fall back to computing a fresh ramp from the current working
+    /// weight.
+    static func resolveWarmups(
+        sessionOverride: [WarmupSet]?,
+        templateOverride: [WarmupSet]?,
+        workingWeight: Double,
+        exerciseType: ExerciseType,
+        usesBarbell: Bool,
+        barbellWeight: Double
+    ) -> [WarmupSet] {
+        if let sessionOverride {
+            return sessionOverride
+        }
+
+        if let templateOverride {
+            return templateOverride
+        }
+
+        return generateWarmups(
+            for: workingWeight,
+            exerciseType: exerciseType,
+            usesBarbell: usesBarbell,
+            barbellWeight: barbellWeight
+        )
+    }
+
     static func generateWarmups(
         for workingWeight: Double,
         exerciseType: ExerciseType,

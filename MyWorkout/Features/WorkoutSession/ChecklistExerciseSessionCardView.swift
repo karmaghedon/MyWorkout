@@ -56,6 +56,15 @@ struct ChecklistExerciseSessionCardView: View {
     @State private var nextSetWeightText = ""
     @State private var nextSetRepsText = ""
 
+    /// Starts expanded (you need to see and check off each row as you do
+    /// it), then collapses itself automatically the moment every warm-up
+    /// is checked — a long warm-up list otherwise keeps pushing the
+    /// header (exercise name + current set number) and rest-timer badge
+    /// further down the card, which can scroll them out of view once
+    /// several working sets are logged on top of it. Still manually
+    /// re-expandable afterward (e.g. to uncheck a warm-up by mistake).
+    @State private var isWarmupExpanded = true
+
     private var unitSystem: UnitSystem {
         settingsStore.settings.unitSystem
     }
@@ -71,20 +80,18 @@ struct ChecklistExerciseSessionCardView: View {
     private var warmups: [WarmupSet] {
         guard exercise.supersetGroupID == nil else { return [] }
 
-        if let customWarmups = state.customWarmups {
-            return customWarmups
-        }
-
-        return WarmupEngine.generateWarmups(
-            for: state.workingWeightPounds,
+        return WarmupEngine.resolveWarmups(
+            sessionOverride: state.customWarmups,
+            templateOverride: exercise.customWarmups,
+            workingWeight: state.workingWeightPounds,
             exerciseType: exercise.exerciseType,
             usesBarbell: exercise.usesBarbell,
             barbellWeight: storedBarbellWeightPounds
         )
     }
 
-    private var nextSetNumber: Int {
-        state.loggedSets.count + 1
+    private var targetSetCount: Int {
+        WorkoutSessionEngine.targetSetCount(for: exercise, state: state)
     }
 
     private var storedBarbellWeightPounds: Double {
@@ -94,14 +101,24 @@ struct ChecklistExerciseSessionCardView: View {
         )
     }
 
+    private var allWarmupsComplete: Bool {
+        !warmups.isEmpty && warmups.enumerated().allSatisfy { index, warmup in
+            state.completedWarmupKeys.contains(
+                ExerciseSessionState.warmupKey(index: index, weight: warmup.weight, reps: warmup.reps)
+            )
+        }
+    }
+
     var body: some View {
         WorkoutSessionCard {
             ExerciseSessionHeaderView(
                 exercise: exercise,
                 exerciseType: exercise.exerciseType.rawValue.capitalized,
                 progressionStrategy: exercise.progressionStrategy.displayName,
-                nextSetNumber: nextSetNumber
+                loggedSetCount: state.loggedSets.count,
+                targetSetCount: targetSetCount
             )
+            .id(ExerciseSessionHeaderView.scrollAnchorID(for: exercise.id))
 
             PreviousPerformanceView(
                 previousSets: previousSets,
@@ -117,14 +134,33 @@ struct ChecklistExerciseSessionCardView: View {
 
             NotesSectionView(notes: $state.notes)
         }
+        .onChange(of: allWarmupsComplete) { _, isComplete in
+            guard isComplete else { return }
+            isWarmupExpanded = false
+        }
     }
 
     private var warmupChecklist: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("WARM-UP")
-                .font(AppTheme.Typography.eyebrow)
-                .foregroundStyle(AppTheme.secondaryText)
+        DisclosureGroup(isExpanded: $isWarmupExpanded) {
+            warmupRows
+        } label: {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Text("WARM-UP")
+                    .font(AppTheme.Typography.eyebrow)
+                    .foregroundStyle(AppTheme.secondaryText)
 
+                if allWarmupsComplete {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.success)
+                }
+            }
+        }
+        .tint(Color.primary)
+    }
+
+    private var warmupRows: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             ForEach(Array(warmups.enumerated()), id: \.offset) { index, warmup in
                 SetChecklistRow(
                     title: "\(formatWeight(displayWeight(warmup.weight))) \(weightUnit) × \(warmup.reps)",
@@ -221,17 +257,7 @@ struct ChecklistExerciseSessionCardView: View {
     }
 
     private var workingSetChecklist: some View {
-        // `max(..., loggedSets.count)` is only a safety floor — it should
-        // never actually bind in normal use, since `onAddSet` is the only
-        // way `loggedSets` can approach the target, but it guarantees a
-        // logged set can never end up hidden if the two ever drift (e.g.
-        // a set logged from Classic view mid-workout).
-        let targetSetCount = max(
-            exercise.targetSets + state.extraWorkingSets,
-            state.loggedSets.count
-        )
-
-        return VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             Text("WORKING SETS")
                 .font(AppTheme.Typography.eyebrow)
                 .foregroundStyle(AppTheme.secondaryText)

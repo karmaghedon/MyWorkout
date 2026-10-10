@@ -50,6 +50,28 @@ struct Exercise: Identifiable, Codable {
     /// different templates.
     var supersetGroupID: UUID?
 
+    /// Whether `ProgressionEngine` may suggest a weight increase or
+    /// deload for this exercise. `true` (the default) is today's
+    /// existing behavior, unchanged for every already-persisted
+    /// `Exercise`. When `false`, the working weight simply carries
+    /// forward unchanged between sessions (still manually adjustable in
+    /// the session UI itself), and no algorithmic suggestion or message
+    /// is shown — for exercises where the owner wants full manual
+    /// control rather than the app deciding when to add or cut weight.
+    var progressionEnabled: Bool = true
+
+    /// A fixed warm-up ramp for this exercise, overriding
+    /// `WarmupEngine.generateWarmups` — same nil-means-"use the
+    /// auto-generated ramp" pattern as
+    /// `ExerciseSessionState.customWarmups` at the session level, just
+    /// promoted to the template so it's reused every time this template
+    /// runs rather than needing to be rebuilt each session. `nil` (the
+    /// default) matches every already-persisted `Exercise`. A session's
+    /// own edits (`ExerciseSessionState.customWarmups`) still take
+    /// precedence over this for that one workout — see
+    /// `WarmupEngine.resolveWarmups`.
+    var customWarmups: [WarmupSet]?
+
     var usesBarbell: Bool {
         equipment.usesBarbell
     }
@@ -71,7 +93,9 @@ struct Exercise: Identifiable, Codable {
         progressionStrategy: ProgressionStrategy,
         targetSets: Int = 3,
         targetWeightPounds: Double? = nil,
-        supersetGroupID: UUID? = nil
+        supersetGroupID: UUID? = nil,
+        progressionEnabled: Bool = true,
+        customWarmups: [WarmupSet]? = nil
     ) {
         self.id = id
         self.name = name
@@ -90,6 +114,8 @@ struct Exercise: Identifiable, Codable {
         self.targetSets = targetSets
         self.targetWeightPounds = targetWeightPounds
         self.supersetGroupID = supersetGroupID
+        self.progressionEnabled = progressionEnabled
+        self.customWarmups = customWarmups
     }
 
     // MARK: - Codable
@@ -110,6 +136,8 @@ struct Exercise: Identifiable, Codable {
         case targetSets
         case targetWeightPounds
         case supersetGroupID
+        case progressionEnabled
+        case customWarmups
     }
 
     init(from decoder: Decoder) throws {
@@ -133,6 +161,8 @@ struct Exercise: Identifiable, Codable {
         targetSets = try container.decodeIfPresent(Int.self, forKey: .targetSets) ?? 3
         targetWeightPounds = try container.decodeIfPresent(Double.self, forKey: .targetWeightPounds)
         supersetGroupID = try container.decodeIfPresent(UUID.self, forKey: .supersetGroupID)
+        progressionEnabled = try container.decodeIfPresent(Bool.self, forKey: .progressionEnabled) ?? true
+        customWarmups = try container.decodeIfPresent([WarmupSet].self, forKey: .customWarmups)
     }
 
     func encode(
@@ -162,5 +192,7 @@ struct Exercise: Identifiable, Codable {
         try container.encode(targetSets, forKey: .targetSets)
         try container.encodeIfPresent(targetWeightPounds, forKey: .targetWeightPounds)
         try container.encodeIfPresent(supersetGroupID, forKey: .supersetGroupID)
+        try container.encode(progressionEnabled, forKey: .progressionEnabled)
+        try container.encodeIfPresent(customWarmups, forKey: .customWarmups)
     }
 }

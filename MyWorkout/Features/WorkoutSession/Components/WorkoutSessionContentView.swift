@@ -49,16 +49,21 @@ struct WorkoutSessionContentView: View {
     ///    last left off).
     /// 4. The top of the screen, for a fresh, untouched session.
     ///
-    /// Case 4 anchors to `.top` rather than `.center` — centering the
-    /// header would leave a gap above it instead of pinning it to the top
-    /// edge.
+    /// Cases 2–4 all anchor to `.top` rather than `.center` — centering a
+    /// header-like element would leave a gap above it instead of pinning
+    /// it to the top edge.
     ///
-    /// The resting case (1) scrolls to the *badge's* id
-    /// (`RestTimerBadge.scrollAnchorID`), not the exercise card's — the
-    /// card can be much taller than the screen (warm-ups, several logged
-    /// sets, notes), so centering the whole card doesn't put the badge,
-    /// which can sit well down the card, anywhere near the center of the
-    /// viewport.
+    /// Cases 1–3 scroll to a specific sub-element's id
+    /// (`RestTimerBadge.scrollAnchorID` / `ExerciseSessionHeaderView.scrollAnchorID`),
+    /// not the exercise card's own id — the card can be much taller than
+    /// the screen (warm-ups, several logged sets, notes), so scrolling to
+    /// the whole card doesn't reliably put any specific part of it (the
+    /// rest badge, or the header showing the exercise name and current
+    /// set number) anywhere near the viewport. This used to only apply to
+    /// the rest badge; the header had the exact same problem once a
+    /// card grew tall enough — the name/set-number row would scroll off
+    /// the top while the card's geometric center (mid-way through a long
+    /// list of warm-ups and logged sets) sat in view instead.
     private var scrollTarget: ScrollTarget {
         if let activeRestExerciseID, restSecondsRemaining > 0 {
             return ScrollTarget(
@@ -68,13 +73,19 @@ struct WorkoutSessionContentView: View {
         }
 
         if let nextActiveSupersetExercise {
-            return ScrollTarget(id: nextActiveSupersetExercise.id, anchor: .center)
+            return ScrollTarget(
+                id: ExerciseSessionHeaderView.scrollAnchorID(for: nextActiveSupersetExercise.id),
+                anchor: .top
+            )
         }
 
         if let lastCheckedExerciseID = workout.exercises.last(where: { exercise in
             !stateForExercise(exercise.id).wrappedValue.loggedSets.isEmpty
         })?.id {
-            return ScrollTarget(id: lastCheckedExerciseID, anchor: .center)
+            return ScrollTarget(
+                id: ExerciseSessionHeaderView.scrollAnchorID(for: lastCheckedExerciseID),
+                anchor: .top
+            )
         }
 
         return ScrollTarget(id: Self.topAnchorID, anchor: .top)

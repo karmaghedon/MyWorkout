@@ -356,6 +356,8 @@ final class WorkoutTemplateStore: ObservableObject {
                 refreshedExercise.targetWeightPounds = savedExercise.targetWeightPounds
                 refreshedExercise.supersetGroupID = savedExercise.supersetGroupID
                 refreshedExercise.progressionRule = savedExercise.progressionRule
+                refreshedExercise.progressionEnabled = savedExercise.progressionEnabled
+                refreshedExercise.customWarmups = savedExercise.customWarmups
 
                 return refreshedExercise
             }

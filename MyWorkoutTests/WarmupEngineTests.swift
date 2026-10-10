@@ -499,6 +499,58 @@ final class WarmupEngineTests: XCTestCase {
         )
     }
 
+    // MARK: - resolveWarmups Precedence
+
+    func testResolveWarmupsPrefersSessionOverrideOverEverythingElse() {
+        let sessionOverride = [WarmupSet(weight: 1, reps: 1)]
+        let templateOverride = [WarmupSet(weight: 2, reps: 2)]
+
+        let resolved = WarmupEngine.resolveWarmups(
+            sessionOverride: sessionOverride,
+            templateOverride: templateOverride,
+            workingWeight: 250,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertEqual(pairs(from: resolved), [Pair(1, 1)])
+    }
+
+    func testResolveWarmupsPrefersTemplateOverrideWhenNoSessionOverride() {
+        let templateOverride = [WarmupSet(weight: 2, reps: 2)]
+
+        let resolved = WarmupEngine.resolveWarmups(
+            sessionOverride: nil,
+            templateOverride: templateOverride,
+            workingWeight: 250,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertEqual(pairs(from: resolved), [Pair(2, 2)])
+    }
+
+    func testResolveWarmupsFallsBackToAutoCalculationWhenNoOverrides() {
+        let resolved = WarmupEngine.resolveWarmups(
+            sessionOverride: nil,
+            templateOverride: nil,
+            workingWeight: 70,
+            exerciseType: .compound,
+            usesBarbell: true,
+            barbellWeight: 45
+        )
+
+        XCTAssertEqual(
+            pairs(from: resolved),
+            [
+                Pair(45, 10),
+                Pair(45, 8)
+            ]
+        )
+    }
+
     // MARK: - Helpers
 
     private func pairs(
