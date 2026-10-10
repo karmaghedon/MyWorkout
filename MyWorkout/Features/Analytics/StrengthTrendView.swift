@@ -14,12 +14,21 @@ struct StrengthPoint: Identifiable {
 struct StrengthTrendView: View {
     @EnvironmentObject var logStore: WorkoutLogStore
     @EnvironmentObject var settingsStore: UserSettingsStore
+    @EnvironmentObject var templateStore: WorkoutTemplateStore
 
     @State private var selectedExerciseName: String = ""
 
+    /// Exercises you currently train, not every exercise that's ever
+    /// picked up a single logged set — this used to be sourced from
+    /// `logStore.logs` directly, which meant one-off test entries or
+    /// exercises from templates you've since deleted or replaced stuck
+    /// around in this picker forever, making it drift toward "every
+    /// exercise in the library" the longer the app's been used. Scoping
+    /// to the exercises actually assigned to a *current* template keeps
+    /// this list matching what you're training right now.
     private var exerciseNames: [String] {
-        Array(Set(logStore.logs.flatMap { log in
-            log.completedExercises.map { $0.exerciseName }
+        Array(Set(templateStore.templates.flatMap { template in
+            template.exercises.map(\.name)
         }))
         .sorted()
     }
