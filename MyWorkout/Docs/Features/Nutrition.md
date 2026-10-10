@@ -179,9 +179,10 @@ Profile rather than a bar with a zero target. The whole card is a
 `NavigationLink` to `AppRoute.logNutrition` — tapping it always opens
 the entry screen, whether or not a goal exists yet, since logging
 today's macros doesn't require a goal to already be set.
-`DashboardView` embeds it via `todaysNutritionSection`, directly after
-`todaysProgressSection`. Pure UI composition — no new persistence, no
-`AppBackup` version bump.
+`DashboardView` embeds it via `todaysNutritionSection` — see
+`Docs/Features/Dashboard.md` for the current card order, which has
+moved around a couple of times since this was first added. Pure UI
+composition — no new persistence, no `AppBackup` version bump.
 
 ## Future extensions
 

@@ -30,30 +30,18 @@ struct DashboardView: View {
                     messages: currentErrorMessages
                 )
 
+                needsAttentionBanner
+
                 WeeklyMeasurementsReminderBanner()
 
                 WeeklySummaryCard()
 
+                bodyMetricsQuickActionsSection
+
                 heroCard
                     .padding(.horizontal)
 
-                nextWorkoutSection
-
-                todaysProgressSection
-
                 todaysNutritionSection
-
-                bodyMetricsQuickActionsSection
-
-                prHighlightsSection
-
-                recoverySection
-
-                DashboardStatsView()
-
-                if !recentLogs.isEmpty {
-                    recentActivitySection
-                }
             }
             .padding(.bottom)
         }
@@ -122,23 +110,57 @@ struct DashboardView: View {
         }
     }
 
+    /// Shows the single most-due template directly in the hero, rather
+    /// than as a separate "Next Up" section below it — one primary call
+    /// to action instead of two competing ones. Falls back to the
+    /// generic prompt when there's no template yet to suggest.
+    @ViewBuilder
     private var startWorkoutHero: some View {
-        AppCard {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Ready to train?")
-                        .font(AppTheme.Typography.cardTitle)
+        if let template = suggestedNextTemplate {
+            AppCard {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Next Up")
+                            .font(AppTheme.Typography.eyebrow)
+                            .foregroundStyle(AppTheme.secondaryText)
 
-                    Text("Start a workout from one of your templates.")
+                        Text(template.name)
+                            .font(AppTheme.Typography.cardTitle)
+
+                        Text(nextWorkoutSubtitle(for: template))
+                            .font(AppTheme.Typography.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+
+                    PrimaryButton(
+                        title: "Start Workout",
+                        systemImage: "figure.strengthtraining.traditional"
+                    ) {
+                        startSuggestedWorkout(template)
+                    }
+
+                    Button("Choose a different workout", action: onStartWorkout)
                         .font(AppTheme.Typography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
                 }
+            }
+        } else {
+            AppCard {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Ready to train?")
+                            .font(AppTheme.Typography.cardTitle)
 
-                PrimaryButton(
-                    title: "Start Workout",
-                    systemImage: "figure.strengthtraining.traditional",
-                    action: onStartWorkout
-                )
+                        Text("Start a workout from one of your templates.")
+                            .font(AppTheme.Typography.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+
+                    PrimaryButton(
+                        title: "Start Workout",
+                        systemImage: "figure.strengthtraining.traditional",
+                        action: onStartWorkout
+                    )
+                }
             }
         }
     }
@@ -180,85 +202,6 @@ struct DashboardView: View {
         }
     }
 
-    @ViewBuilder
-    private var nextWorkoutSection: some View {
-        if !activeWorkoutStore.hasActiveWorkout,
-           let template = suggestedNextTemplate {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                SectionHeader(title: "Next Up")
-                    .padding(.horizontal)
-
-                AppCard {
-                    HStack(spacing: AppTheme.Spacing.md) {
-                        WorkoutCard(
-                            systemImage: "figure.strengthtraining.traditional",
-                            title: template.name
-                        ) {
-                            Text(nextWorkoutSubtitle(for: template))
-                                .font(AppTheme.Typography.caption)
-                                .foregroundStyle(AppTheme.secondaryText)
-                        }
-
-                        IconButton(
-                            systemImage: "play.fill",
-                            accessibilityLabel: "Start \(template.name)",
-                            color: AppTheme.accent
-                        ) {
-                            startSuggestedWorkout(template)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    // MARK: - Today's Progress
-
-    private var todaysLogs: [WorkoutLog] {
-        logStore.logs.filter {
-            Calendar.current.isDateInToday($0.date)
-        }
-    }
-
-    private var activeWorkoutStartedToday: Bool {
-        guard let startedAt = activeWorkoutStore.startedAt else {
-            return false
-        }
-
-        return Calendar.current.isDateInToday(startedAt)
-    }
-
-    private var workoutsToday: Int {
-        todaysLogs.count + (activeWorkoutStartedToday ? 1 : 0)
-    }
-
-    private var setsToday: Int {
-        let completedSets = todaysLogs.reduce(0) { total, log in
-            total + log.completedExercises.reduce(0) { $0 + $1.sets.count }
-        }
-
-        let activeSets = activeWorkoutStartedToday
-            ? activeWorkoutStore.exerciseStates.values.reduce(0) { $0 + $1.loggedSets.count }
-            : 0
-
-        return completedSets + activeSets
-    }
-
-    private var todaysProgressSection: some View {
-        AppCard {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                SectionHeader(title: "Today")
-
-                HStack(spacing: AppTheme.Spacing.md) {
-                    MetricView(label: "Workouts", value: "\(workoutsToday)")
-                    MetricView(label: "Sets", value: "\(setsToday)")
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-
     // MARK: - Today's Nutrition
 
     private var todaysNutritionSection: some View {
@@ -267,9 +210,9 @@ struct DashboardView: View {
 
     // MARK: - Body Metrics
 
-    /// "Log Weight" only — matching how `nextWorkoutSection` above
-    /// establishes the same NavigationLink-wrapped `AppCard` pattern
-    /// this reuses. No "Log Nutrition" card here: `TodayNutritionCard`
+    /// "Log Weight" only — matching the same NavigationLink-wrapped
+    /// `AppCard` pattern used elsewhere on this screen. No "Log
+    /// Nutrition" card here: `TodayNutritionCard`
     /// already links to the same `AppRoute.logNutrition` screen, so a
     /// second entry point next to this one was pure duplication.
     private var bodyMetricsQuickActionsSection: some View {
@@ -289,185 +232,39 @@ struct DashboardView: View {
         .padding(.horizontal)
     }
 
-    // MARK: - PR Highlights
+    // MARK: - Needs Attention
 
-    /// Personal records genuinely set *today* — reuses the exact same
-    /// comparison `WorkoutFinishSummaryView` uses, computed fresh from
-    /// `logStore.logs` for each of today's logs against everything
-    /// strictly before it (so two workouts today compare correctly
-    /// against each other, not just against history before today).
-    ///
-    /// Deliberately not read from `AnalyticsCache`: that cache recomputes
-    /// on a 300ms debounce, so it can be stale for a few hundred
-    /// milliseconds after finishing a workout. Reimplementing the
-    /// comparison here previously also compared today's sets against the
-    /// *current* standing best rather than the best *before* today's log,
-    /// which reports a repeated (tied, not beaten) old PR as new — using
-    /// the shared helper avoids duplicating that logic a second, slightly
-    /// different way.
-    private var newPersonalRecordsToday: [PersonalRecord] {
-        let sortedLogs = logStore.logs.sorted { $0.date < $1.date }
-
-        return sortedLogs.enumerated().flatMap { index, log -> [PersonalRecord] in
-            guard Calendar.current.isDateInToday(log.date) else {
-                return []
-            }
-
-            return WorkoutSessionEngine.newPersonalRecords(
-                in: log,
-                priorLogs: Array(sortedLogs[..<index])
-            )
-        }
+    /// A single entry point into Analytics for anything that needs a
+    /// look — recovery warnings and performance warnings both already
+    /// get their own full sections there (`RecoveryWarningsSection`,
+    /// `PerformanceWarningsSection`), so Home only needs a count and a
+    /// link, not a duplicate rendering of the warnings themselves.
+    private var totalAlerts: Int {
+        analyticsCache.recoveryWarnings.count + analyticsCache.performanceWarnings.count
     }
 
     @ViewBuilder
-    private var prHighlightsSection: some View {
-        if !newPersonalRecordsToday.isEmpty {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                SectionHeader(title: "New Personal Records")
-                    .padding(.horizontal)
-
-                AppCard(backgroundColor: AppTheme.accentMuted) {
-                    VStack(spacing: AppTheme.Spacing.md) {
-                        ForEach(
-                            Array(newPersonalRecordsToday.enumerated()),
-                            id: \.element.id
-                        ) { index, record in
-                            HStack(spacing: AppTheme.Spacing.md) {
-                                Image(systemName: "trophy.fill")
-                                    .foregroundStyle(AppTheme.accent)
-                                    .accessibilityHidden(true)
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(record.exerciseName)
-                                        .font(AppTheme.Typography.cardTitle)
-
-                                    Text(
-                                        "\(formatWeight(settingsStore.settings.displayWeight(record.weightPounds))) "
-                                        + "\(settingsStore.settings.weightUnitLabel) × \(record.reps)"
-                                    )
-                                    .font(AppTheme.Typography.caption)
-                                    .foregroundStyle(AppTheme.secondaryText)
-                                }
-
-                                Spacer(minLength: 0)
-                            }
-                            .accessibilityElement(children: .combine)
-
-                            if index < newPersonalRecordsToday.count - 1 {
-                                Divider()
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    // MARK: - Recovery
-
-    private var topRecoveryWarning: RecoveryWarning? {
-        analyticsCache.recoveryWarnings.max {
-            severityRank($0.severity) < severityRank($1.severity)
-        }
-    }
-
-    private func severityRank(_ severity: WarningSeverity) -> Int {
-        switch severity {
-        case .low:
-            0
-        case .medium:
-            1
-        case .high:
-            2
-        }
-    }
-
-    private func severityColor(_ severity: WarningSeverity) -> Color {
-        severity == .high ? AppTheme.error : AppTheme.warning
-    }
-
-    @ViewBuilder
-    private var recoverySection: some View {
-        if let warning = topRecoveryWarning {
+    private var needsAttentionBanner: some View {
+        if totalAlerts > 0 {
             NavigationLink(value: AppRoute.analytics) {
                 AppCard {
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                        HStack {
-                            Label("Recovery", systemImage: "heart.text.square.fill")
-                                .font(AppTheme.Typography.eyebrow)
-                                .foregroundStyle(AppTheme.secondaryText)
+                    HStack(spacing: AppTheme.Spacing.sm) {
+                        Label(
+                            "\(totalAlerts) item\(totalAlerts == 1 ? "" : "s") need attention",
+                            systemImage: "exclamationmark.triangle.fill"
+                        )
+                        .foregroundStyle(AppTheme.warning)
+                        .font(AppTheme.Typography.label)
 
-                            Spacer()
+                        Spacer(minLength: AppTheme.Spacing.sm)
 
-                            ProgressBadge(
-                                text: warning.severity.rawValue,
-                                color: severityColor(warning.severity)
-                            )
-                        }
-
-                        Text(warning.title)
-                            .font(AppTheme.Typography.cardTitle)
-                            .foregroundStyle(Color.primary)
-
-                        Text(warning.message)
-                            .font(AppTheme.Typography.caption)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
                             .foregroundStyle(AppTheme.secondaryText)
-
-                        if analyticsCache.recoveryWarnings.count > 1 {
-                            let remaining = analyticsCache.recoveryWarnings.count - 1
-
-                            Text("+\(remaining) more recovery warning\(remaining == 1 ? "" : "s")")
-                                .font(AppTheme.Typography.footnote)
-                                .foregroundStyle(AppTheme.secondaryText)
-                        }
                     }
                 }
             }
             .buttonStyle(.plain)
-            .padding(.horizontal)
-        }
-    }
-
-    // MARK: - Recent Activity
-
-    private var recentLogs: [WorkoutLog] {
-        Array(logStore.logs.prefix(3))
-    }
-
-    private var recentActivitySection: some View {
-        VStack(
-            alignment: .leading,
-            spacing: AppTheme.Spacing.sm
-        ) {
-            SectionHeader(title: "Recent Activity")
-                .padding(.horizontal)
-
-            AppCard {
-                VStack(spacing: AppTheme.Spacing.md) {
-                    ForEach(
-                        Array(recentLogs.enumerated()),
-                        id: \.element.id
-                    ) { index, log in
-                        NavigationLink(value: AppRoute.workoutLogDetail(log.id)) {
-                            WorkoutCard(
-                                systemImage: "checkmark.seal.fill",
-                                title: log.workoutName
-                            ) {
-                                Text(log.date.formatted(date: .abbreviated, time: .shortened))
-                                    .font(AppTheme.Typography.caption)
-                                    .foregroundStyle(AppTheme.secondaryText)
-                            }
-                        }
-                        .buttonStyle(.plain)
-
-                        if index < recentLogs.count - 1 {
-                            Divider()
-                        }
-                    }
-                }
-            }
             .padding(.horizontal)
         }
     }
