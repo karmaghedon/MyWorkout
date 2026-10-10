@@ -98,6 +98,12 @@
 		E83F41699EF8BF2CB25151CE /* VolumeTrendSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CEA233FCEB0453ED137EB78 /* VolumeTrendSection.swift */; };
 		F06015E36930446DB71495BF /* MockBodyMetricsHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD7B74A7E54946B7F4EF1D /* MockBodyMetricsHealthKitService.swift */; };
 		F54004B12FF0C6FE0079CC05 /* MyWorkoutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */; };
+		AD778CC806154D938014E21E /* TourStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 972E80D4F16142E386B7800F /* TourStep.swift */; };
+		4F59940330454769817BC8CB /* TourAnchorPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40A661AC3CE4397BDC8518D /* TourAnchorPreferenceKey.swift */; };
+		37722DFE6CE34FB89EED9482 /* TourStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B51FE5C7CD4C7681377722 /* TourStore.swift */; };
+		CFE7D3523DC94E75B22412C9 /* TourCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9DB3454D764BFAB0AF3B4E /* TourCoordinator.swift */; };
+		9495B0354B3B4290BDFC4BC4 /* TourOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A24010C80C4065B3680568 /* TourOverlayView.swift */; };
+		178CFE3E0CE24C66BBFBBB9A /* TourScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED023B9921CA4730B39B4AEB /* TourScrollView.swift */; };
 		F54004B72FF0C7030079CC05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54004B62FF0C7030079CC05 /* Assets.xcassets */; };
 		F54004BA2FF0C7030079CC05 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54004B92FF0C7030079CC05 /* Preview Assets.xcassets */; };
 		F54004C52FF0C83E0079CC05 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54004C42FF0C83E0079CC05 /* Exercise.swift */; };
@@ -406,6 +412,12 @@
 		F4FD229C971B4DC08B3B211F /* BodyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyProgressView.swift; sourceTree = "<group>"; };
 		F54004AD2FF0C6FE0079CC05 /* MyWorkout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWorkout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWorkoutApp.swift; sourceTree = "<group>"; };
+		972E80D4F16142E386B7800F /* TourStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourStep.swift; sourceTree = "<group>"; };
+		C40A661AC3CE4397BDC8518D /* TourAnchorPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourAnchorPreferenceKey.swift; sourceTree = "<group>"; };
+		64B51FE5C7CD4C7681377722 /* TourStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourStore.swift; sourceTree = "<group>"; };
+		9D9DB3454D764BFAB0AF3B4E /* TourCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourCoordinator.swift; sourceTree = "<group>"; };
+		A1A24010C80C4065B3680568 /* TourOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourOverlayView.swift; sourceTree = "<group>"; };
+		ED023B9921CA4730B39B4AEB /* TourScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourScrollView.swift; sourceTree = "<group>"; };
 		F54004B62FF0C7030079CC05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F54004B92FF0C7030079CC05 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F54004BB2FF0C7030079CC05 /* MyWorkout.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyWorkout.entitlements; sourceTree = "<group>"; };
@@ -968,6 +980,7 @@
 			isa = PBXGroup;
 			children = (
 				FB127745BE452A254728F3DE /* Navigation */,
+				263984F9386D4FA3B8FB43FD /* Tour */,
 				F54004B02FF0C6FE0079CC05 /* MyWorkoutApp.swift */,
 			);
 			path = App;
@@ -1642,6 +1655,19 @@
 			path = CustomExercises;
 			sourceTree = "<group>";
 		};
+		263984F9386D4FA3B8FB43FD /* Tour */ = {
+			isa = PBXGroup;
+			children = (
+				972E80D4F16142E386B7800F /* TourStep.swift */,
+				C40A661AC3CE4397BDC8518D /* TourAnchorPreferenceKey.swift */,
+				64B51FE5C7CD4C7681377722 /* TourStore.swift */,
+				9D9DB3454D764BFAB0AF3B4E /* TourCoordinator.swift */,
+				A1A24010C80C4065B3680568 /* TourOverlayView.swift */,
+				ED023B9921CA4730B39B4AEB /* TourScrollView.swift */,
+			);
+			path = Tour;
+			sourceTree = "<group>";
+		};
 		FB127745BE452A254728F3DE /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -1965,6 +1991,12 @@
 				E0634E8D079BCAFCBD329A3D /* FavoriteExercisesStore.swift in Sources */,
 				F54004C72FF0C8490079CC05 /* Workout.swift in Sources */,
 				F54004B12FF0C6FE0079CC05 /* MyWorkoutApp.swift in Sources */,
+				AD778CC806154D938014E21E /* TourStep.swift in Sources */,
+				4F59940330454769817BC8CB /* TourAnchorPreferenceKey.swift in Sources */,
+				37722DFE6CE34FB89EED9482 /* TourStore.swift in Sources */,
+				CFE7D3523DC94E75B22412C9 /* TourCoordinator.swift in Sources */,
+				9495B0354B3B4290BDFC4BC4 /* TourOverlayView.swift in Sources */,
+				178CFE3E0CE24C66BBFBBB9A /* TourScrollView.swift in Sources */,
 				F54B80C63008503700615DA0 /* EditableStringListSection.swift in Sources */,
 				F5BF30712FFB17E200AB5AD9 /* WorkoutSessionContentView.swift in Sources */,
 				F5630A273002669F000BB3AD /* StoreError.swift in Sources */,

@@ -7,7 +7,7 @@ import SwiftUI
 /// with SwiftUI's own `ProgressView` (the spinner/progress-bar type).
 struct ProgressHubView: View {
     var body: some View {
-        ScrollView {
+        TourScrollView(tab: .progress) {
             VStack(
                 alignment: .leading,
                 spacing: AppTheme.Spacing.xl
@@ -41,6 +41,7 @@ struct ProgressHubView: View {
                         route: .strengthTrends
                     )
                 }
+                .tourAnchor("progress-overview")
 
                 QuickActionSection(title: "Body") {
                     quickActionLink(
@@ -59,6 +60,7 @@ struct ProgressHubView: View {
                         route: .bodyProgress
                     )
                 }
+                .tourAnchor("progress-body")
             }
             .padding(.bottom)
         }

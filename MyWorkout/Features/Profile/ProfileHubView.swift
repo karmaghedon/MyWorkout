@@ -4,8 +4,11 @@ import SwiftUI
 /// lightweight hub organizing Settings, Equipment, and Backup & Data
 /// rather than defaulting straight into Settings.
 struct ProfileHubView: View {
+    @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
+    @EnvironmentObject private var tourCoordinator: TourCoordinator
+
     var body: some View {
-        ScrollView {
+        TourScrollView(tab: .profile) {
             VStack(
                 alignment: .leading,
                 spacing: AppTheme.Spacing.xl
@@ -21,6 +24,7 @@ struct ProfileHubView: View {
                         route: .settings
                     )
                 }
+                .tourAnchor("profile-settings")
 
                 QuickActionSection(title: "Health & Nutrition") {
                     quickActionLink(
@@ -38,6 +42,7 @@ struct ProfileHubView: View {
                         subtitle: "Inventory & plates",
                         route: .equipmentInventory
                     )
+                    .tourAnchor("profile-equipment")
 
                     Divider()
 
@@ -47,6 +52,23 @@ struct ProfileHubView: View {
                         subtitle: "CSV export, import & backup",
                         route: .export
                     )
+                    .tourAnchor("profile-backup")
+                }
+
+                QuickActionSection(title: "Help") {
+                    Button {
+                        tourCoordinator.start()
+                    } label: {
+                        QuickActionRow(
+                            systemImage: "sparkles",
+                            title: "Take the Tour",
+                            subtitle: activeWorkoutStore.hasActiveWorkout
+                                ? "Finish or cancel your active workout first"
+                                : "A guided walkthrough of what the app can do"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(activeWorkoutStore.hasActiveWorkout)
                 }
 
                 QuickActionSection(title: "About") {

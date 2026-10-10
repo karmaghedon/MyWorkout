@@ -6,6 +6,8 @@ struct AppShellView: View {
     @EnvironmentObject private var customExerciseStore: CustomExerciseStore
     @EnvironmentObject private var activeWorkoutStore: ActiveWorkoutStore
     @EnvironmentObject private var settingsStore: UserSettingsStore
+    @EnvironmentObject private var tourCoordinator: TourCoordinator
+    @EnvironmentObject private var tourStore: TourStore
 
     @State private var selectedTab: AppTab = .home
 
@@ -14,6 +16,8 @@ struct AppShellView: View {
     @State private var workoutPath: [AppRoute] = []
     @State private var progressPath: [AppRoute] = []
     @State private var profilePath: [AppRoute] = []
+
+    @State private var hasCheckedTourAutoStart = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -77,6 +81,70 @@ struct AppShellView: View {
             }
         }
         .preferredColorScheme(preferredColorScheme)
+        .overlayPreferenceValue(TourAnchorPreferenceKey.self) { anchors in
+            TourOverlayView(anchors: anchors)
+        }
+        .onChange(of: tourCoordinator.requestToken) { _, _ in
+            applyTourStep()
+        }
+        .onAppear {
+            maybeAutoStartTour()
+        }
+    }
+
+    // MARK: - Tour
+
+    /// Applies the tour's current step to this view's own tab/path
+    /// `@State` — see `TourCoordinator`'s doc comment for why the tour
+    /// can't set these directly.
+    private func applyTourStep() {
+        guard let step = tourCoordinator.currentStep else {
+            return
+        }
+
+        selectedTab = step.tab
+        tabPath(for: step.tab).wrappedValue = step.path
+    }
+
+    private func tabPath(for tab: AppTab) -> Binding<[AppRoute]> {
+        switch tab {
+        case .home:
+            $homePath
+
+        case .library:
+            $libraryPath
+
+        case .workout:
+            $workoutPath
+
+        case .progress:
+            $progressPath
+
+        case .profile:
+            $profilePath
+        }
+    }
+
+    /// Only ever auto-starts once per app launch (`hasCheckedTourAutoStart`),
+    /// and only for a user who's never completed it and isn't mid-workout
+    /// — several steps assume no active session, and yanking someone out
+    /// of one to show the tour would be disruptive rather than helpful.
+    private func maybeAutoStartTour() {
+        guard !hasCheckedTourAutoStart else {
+            return
+        }
+
+        hasCheckedTourAutoStart = true
+
+        guard !tourStore.hasCompletedTour,
+              !activeWorkoutStore.hasActiveWorkout else {
+            return
+        }
+
+        Task {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            tourCoordinator.start()
+        }
     }
 
     // MARK: - Appearance

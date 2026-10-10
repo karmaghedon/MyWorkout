@@ -46,6 +46,14 @@ struct StartWorkoutView: View {
                     .buttonStyle(.plain)
                 }
             }
+            .tourAnchor("workout-templates-list")
+
+            Section {
+                NavigationLink(value: AppRoute.templates) {
+                    Label("Manage Templates", systemImage: "list.bullet.rectangle")
+                }
+            }
+            .tourAnchor("workout-manage-templates")
         }
         .overlay {
             if templateStore.templates.isEmpty {
@@ -53,6 +61,15 @@ struct StartWorkoutView: View {
             }
         }
         .navigationTitle("Start Workout")
+        // The "Manage Templates" row in the List above reaches the same
+        // destination as this toolbar button — kept both rather than
+        // replacing one with the other: the toolbar button is the
+        // familiar always-visible shortcut, and the List row is what
+        // the tour can actually spotlight (a toolbar item's content
+        // renders through a separate hosting hierarchy that doesn't
+        // propagate the `.tourAnchor(_:)` preference the tour relies
+        // on — confirmed on-device, the toolbar button itself never
+        // highlighted).
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 NavigationLink(value: AppRoute.templates) {

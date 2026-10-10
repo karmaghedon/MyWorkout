@@ -18,7 +18,7 @@ struct DashboardView: View {
     let onStartWorkout: () -> Void
 
     var body: some View {
-        ScrollView {
+        TourScrollView(tab: .home) {
             VStack(
                 alignment: .leading,
                 spacing: AppTheme.Spacing.xl
@@ -35,13 +35,17 @@ struct DashboardView: View {
                 WeeklyMeasurementsReminderBanner()
 
                 WeeklySummaryCard()
+                    .tourAnchor("home-week-summary")
 
                 bodyMetricsQuickActionsSection
+                    .tourAnchor("home-log-weight")
 
                 heroCard
                     .padding(.horizontal)
+                    .tourAnchor("home-hero")
 
                 todaysNutritionSection
+                    .tourAnchor("home-nutrition")
             }
             .padding(.bottom)
         }

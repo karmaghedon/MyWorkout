@@ -121,6 +121,12 @@ struct ExerciseLibraryView: View {
             muscleGroupPicker
                 .padding(.horizontal)
                 .padding(.vertical, AppTheme.Spacing.sm)
+                .tourAnchor("library-browse")
+
+            customExercisesLink
+                .padding(.horizontal)
+                .padding(.bottom, AppTheme.Spacing.sm)
+                .tourAnchor("library-custom")
 
             List {
                 if exercises.isEmpty {
@@ -211,6 +217,34 @@ struct ExerciseLibraryView: View {
             .pickerStyle(.menu)
 
             Spacer()
+        }
+    }
+
+    // MARK: - Custom Exercises Link
+
+    /// A body-visible entry point to the same destination the toolbar's
+    /// "Custom Exercises" button already reaches — not a duplicate for
+    /// its own sake, but the only reliable way for the tour to
+    /// spotlight it: a toolbar item's content renders through a
+    /// separate hosting hierarchy that doesn't propagate the
+    /// `.tourAnchor(_:)` preference this screen's other steps rely on
+    /// (confirmed — the toolbar button itself never highlighted). A
+    /// second, ordinary in-content link sidesteps that limitation
+    /// entirely and is a reasonable discoverability win on its own.
+    private var customExercisesLink: some View {
+        NavigationLink(value: AppRoute.customExercises) {
+            HStack(spacing: AppTheme.Spacing.sm) {
+                Image(systemName: "figure.strengthtraining.functional")
+
+                Text("Manage Custom Exercises")
+                    .font(AppTheme.Typography.caption)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+            }
+            .foregroundStyle(AppTheme.secondaryText)
         }
     }
 
